@@ -767,7 +767,7 @@ one-word edit into a paragraph-sized hunk.
 
 `.prettierignore` — these paths are **byte-significant** and must never be reformatted:
 
-```
+```text
 pnpm-lock.yaml
 dist/
 .astro/
@@ -1744,7 +1744,7 @@ A **single-series** line chart:
   are the same or when the two labels would overlap; never label every point.
 - Comparator values (`< 0.10`, `> 20`) render as hollow markers at the reported
   bound with the matching caret and an accessible tooltip saying “reported as below
-  [or above] this bound; exact value unknown.” They are not joined by the line.
+  \[or above\] this bound; exact value unknown.” They are not joined by the line.
 - Explicit `missing` Measurements are gaps that break the line, whether or not the
   lab printed a ReferenceRange. A marker absent from another Report means “not
   supplied”, not a synthetic null point. Never interpolate across an explicit gap.

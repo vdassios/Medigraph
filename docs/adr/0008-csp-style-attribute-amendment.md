@@ -31,7 +31,7 @@ origin for injected CSS to reach.
 
 Amend the style directives of the Task 0.4 CSP, and only those:
 
-```
+```text
 style-src 'self' <generated-style-hashes>;
 style-src-elem 'self' <generated-style-hashes>;
 style-src-attr 'unsafe-inline';

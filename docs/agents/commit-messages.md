@@ -5,7 +5,7 @@ message** in the structure below and hand it over — not to run `git commit`.
 
 Every message has three parts: a **header**, a **body** and a **footer**.
 
-```
+```text
 type(scope): subject
 
   - what changed, and where
@@ -58,7 +58,7 @@ Follows [`@commitlint/config-conventional`](https://github.com/conventional-chan
 - One entry per distinct change, each on its own line, each beginning with **two
   spaces then `- `**:
 
-  ```
+  ```text
     - rewrite D1 as a data rule with a declared connect-src origin allowlist
     - add D13 and the display-only clause to the Trend chart spec
   ```
@@ -96,7 +96,7 @@ only its issue reference is absent.
 
 With an issue:
 
-```
+```text
 feat(extract): add Pass B column model
 
   - add columns.ts with x-clustering and header detection
@@ -108,7 +108,7 @@ Closes: #17
 
 Without an issue — the footer is absent entirely, and the message ends after the body:
 
-```
+```text
 docs(plan): revise D1 egress scope and add D13 display-only positioning
 
   - restate D1 as a data rule with a declared connect-src origin allowlist

@@ -16,7 +16,7 @@ If any of these files don't exist, **proceed silently**. Don't flag their absenc
 
 Single-context repo (most repos):
 
-```
+```text
 /
 ├── CONTEXT.md
 ├── docs/adr/
@@ -27,7 +27,7 @@ Single-context repo (most repos):
 
 Multi-context repo (presence of `CONTEXT-MAP.md` at the root):
 
-```
+```text
 /
 ├── CONTEXT-MAP.md
 ├── docs/adr/                          ← system-wide decisions
