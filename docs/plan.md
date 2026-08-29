@@ -1344,10 +1344,15 @@ jobs:
       - run: pnpm build
 ```
 
-**Third-party actions are pinned by commit SHA**, with the human-readable tag in a
-trailing comment. Tags are mutable; D1's threat model already names a compromised
-build input as an adversary, and a movable tag in CI is exactly that hole. The tags
-above are current as of 2026-08-29 — the implementing task resolves each to its SHA.
+**Actions are pinned by version tag.** Tags are mutable, so this is weaker than commit
+SHAs — but the exposure here is small and the friction is not. This workflow declares
+`permissions: contents: read`, uses no secrets and performs no deploy, so a compromised
+action cannot exfiltrate anything or write to the repository; the worst case is a wrong
+pass/fail signal. SHA pinning also costs unreadable diffs and manual bumps.
+
+**Revisit this the moment that changes.** Adding a deploy job, any secret, or a
+write-scoped `permissions` block makes a moved tag a real path to compromise, and the
+actions should be pinned by SHA at that point — with the tag in a trailing comment.
 
 ### Migration note
 
