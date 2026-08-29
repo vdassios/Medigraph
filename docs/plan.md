@@ -811,8 +811,8 @@ linting them uses the standard native tools, wired as separate CI steps:
 
 | Language | Linter | How it runs |
 |---|---|---|
-| bash / sh | `shellcheck` | Preinstalled on `ubuntu-latest`. Local hook skips with a notice when the binary is absent, so contributors are never blocked by a missing system package; CI never skips. |
-| Dockerfile | `hadolint` | `hadolint/hadolint-action@v3.5.0` in CI. Local hook skips when absent, same rule. |
+| bash / sh | `shellcheck` | Invoked directly. Preinstalled on `ubuntu-latest`; installed locally via Homebrew/apt. Covers `scripts/*.sh` **and** `.husky/*`, whose hooks are shell scripts with no extension that no `*.sh` glob matches. |
+| Dockerfile | `hadolint` | Invoked directly from lint-staged, and `hadolint/hadolint-action@v3.5.0` in CI guarded by `hashFiles('Dockerfile')`. Both stay inert until the app is containerised — the planned final step. |
 
 `eslint.config.js`:
 
@@ -834,11 +834,12 @@ import prettier from 'eslint-config-prettier/flat';
 export default defineConfig([
   { ignores: ['dist/**', '.astro/**', 'coverage/**', 'public/ocr/**', 'pnpm-lock.yaml'] },
 
-  js.configs.recommended,
-  tseslint.configs.strictTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
+  // Scoped to code files. Applied unscoped, these also match .json/.md/.yaml,
+  // whose languages provide no getAllComments() and crash core rules.
+  { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'], extends: [js.configs.recommended] },
   {
     files: ['**/*.{ts,tsx}'],
+    extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
     languageOptions: {
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
       globals: globals.browser,
@@ -861,6 +862,13 @@ export default defineConfig([
   },
   { files: ['**/*.md'], plugins: { markdown }, extends: ['markdown/recommended'] },
   yml.configs.recommended,
+  {
+    // GitHub Actions uses empty mapping values idiomatically (`on: pull_request:`
+    // means "all activity types, all branches"). Giving them a value to satisfy
+    // the linter would change the workflow to say something it does not mean.
+    files: ['.github/workflows/*.{yml,yaml}'],
+    rules: { 'yml/no-empty-mapping-value': 'off' },
+  },
   {
     files: ['**/*.html'],
     plugins: { html },
@@ -915,12 +923,26 @@ pnpm reports that as an unmet peer warning (and as an error under
 `package.json` — never by disabling peer checking tree-wide, which would hide a
 future real conflict:
 
-```json
-"pnpm": {
-  "peerDependencyRules": {
-    "allowedVersions": { "eslint-plugin-jsx-a11y>eslint": "10" }
-  }
-}
+**pnpm 11 no longer reads the `pnpm` field in `package.json`** — it warns and ignores
+it. Settings live in `pnpm-workspace.yaml`:
+
+```yaml
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-jsx-a11y>eslint: "10"
+```
+
+The same file also carries **`allowBuilds`**, which pnpm 11 requires before any
+dependency build script runs (it replaced pnpm 10's `onlyBuiltDependencies` list, and
+pnpm rewrites the key in place if it finds the old name). `esbuild` fetches the
+platform binary Vite/Astro/Vitest need and `sharp` builds Astro's image pipeline, so
+both are declared rather than approved interactively — a clean checkout and CI must
+behave identically:
+
+```yaml
+allowBuilds:
+  esbuild: true
+  sharp: true
 ```
 
 Delete the rule the moment `eslint-plugin-jsx-a11y` publishes an ESLint 10 peer
@@ -1021,16 +1043,24 @@ core CSS parser, so no separate configuration is needed and the block is covered
    rules off) and `eslint-plugin-prettier` (run the formatter as a rule) are different
    packages solving different problems; only the former is wanted here.
 5. **No stylistic ESLint rule is enabled by hand.** If a rule fights Prettier, the
-   rule is wrong. Prove the config stays clean with the bundled CLI helper, which
-   reports any rule left on that conflicts with Prettier:
+   rule is wrong. `eslint-config-prettier` already turns every such rule off, and
+   keeping it last in the exported array (rule 3) is what makes that hold. That is
+   the enforcement; there is no separate verification step.
+
+   The package also ships a CLI helper that reports conflicting rules left enabled
+   for a given path. It is a **diagnostic, not a gate**, and this repo does not wire
+   it into `verify:static` or CI: it would only ever fire if someone appended a
+   config after `prettier` or re-enabled a stylistic rule by hand, and both are
+   already visible — CI runs `pnpm lint` and `pnpm format:check` in sequence, so a
+   rule fighting the formatter fails one of them. Reach for the helper when
+   debugging such a failure:
 
    ```sh
-   pnpm exec eslint-config-prettier src/ui/MedigraphApp.tsx
+   pnpm exec eslint-config-prettier <file>
    ```
 
-   This runs as the `lint:config-conflicts` script and as a CI step, so a future
-   plugin addition that reintroduces a conflict fails the build rather than producing
-   a hook that fights itself.
+   Note it resolves the effective config **for that path**, so a flat config with
+   per-glob blocks needs one file per block to be inspected fully.
 
 ### Hooks — husky and lint-staged
 
@@ -1056,15 +1086,22 @@ order**, which is where the ESLint-then-Prettier rule is actually enforced:
 "lint-staged": {
   "*.{ts,tsx,js,jsx,mjs,cjs,astro}": ["eslint --fix --max-warnings=0", "prettier --write"],
   "*.{json,jsonc,md,yml,yaml,html}": ["eslint --fix --max-warnings=0", "prettier --write"],
-  "*.{sh,bash}": ["prettier --write", "scripts/lint-shell.sh"],
-  "{Dockerfile,Dockerfile.*,*.dockerfile}": ["prettier --write", "scripts/lint-docker.sh"]
+  "*.{sh,bash}": ["prettier --write", "shellcheck"],
+  ".husky/*": ["prettier --parser sh --write", "shellcheck"],
+  "{Dockerfile,Dockerfile.*,*.dockerfile}": ["prettier --write", "hadolint"]
 }
 ```
 
-`scripts/lint-shell.sh` and `scripts/lint-docker.sh` exit 0 with a printed notice when
-`shellcheck` / `hadolint` is not on `PATH`, and otherwise run it. Hooks are a
-convenience that must not be bypassable in a way that matters: **CI is the gate**, and
-CI installs both binaries, so `--no-verify` delays a failure rather than avoiding one.
+`shellcheck` and `hadolint` are invoked directly — there is no wrapper script and no
+skip-when-absent behaviour. Both are ordinary developer prerequisites, installed via
+Homebrew or apt; a wrapper that silently passes when the binary is missing is a gate
+that reports success without checking anything. Hooks remain a convenience that must
+not be bypassable in a way that matters: **CI is the gate**, and CI provides both
+binaries, so `--no-verify` delays a failure rather than avoiding one.
+
+`.husky/pre-commit` and `.husky/pre-push` carry a `#!/usr/bin/env sh` shebang. Husky 9
+does not need one, but without it shellcheck cannot determine the dialect and reports
+SC2148.
 
 ### Scripts (`package.json`)
 
@@ -1074,13 +1111,11 @@ CI installs both binaries, so `--no-verify` delays a failure rather than avoidin
   "prepare": "husky",
   "lint": "eslint .",
   "lint:fix": "eslint . --fix",
-  "lint:config-conflicts": "eslint-config-prettier src/ui/MedigraphApp.tsx",
-  "lint:shell": "scripts/lint-shell.sh --all",
-  "lint:docker": "scripts/lint-docker.sh --all",
+  "lint:shell": "shellcheck .husky/pre-commit .husky/pre-push",
   "format": "prettier --write .",
   "format:check": "prettier --check .",
   "typecheck": "astro check && tsc --noEmit",
-  "verify:static": "pnpm lint && pnpm lint:config-conflicts && pnpm format:check && pnpm typecheck"
+  "verify:static": "pnpm lint && pnpm format:check && pnpm typecheck"
 }
 ```
 
@@ -1121,8 +1156,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint                       # 1. ESLint first
-      - run: pnpm lint:config-conflicts      # 2. prove no rule fights Prettier
-      - run: pnpm format:check               # 3. Prettier second, check-only
+      - run: pnpm format:check               # 2. Prettier second, check-only
       - run: pnpm typecheck
       - run: pnpm lint:shell                 # shellcheck: preinstalled on ubuntu-latest
       - uses: hadolint/hadolint-action@v3.5.0
@@ -1855,7 +1889,7 @@ spec is ambiguous, stop and comment on the issue instead of choosing."*
 | # | Task | Deliverable |
 |---|---|---|
 | 0.0 | **Domain baseline.** Commit root `CONTEXT.md` and accepted ADRs for D1, D1a, D3, D4, D6/D7, D8, D9 and D13, plus ADR-0008 (CSP style-directive scope), ADR-0009 (supersedes ADR-0001; D1's data rule and origin allowlist) and ADR-0010 (D13 display-only positioning), before implementation issues are opened. | Vocabulary and changed binding decisions are reviewable independently of code. |
-| 0.1 | **Scaffold.** Astro 5 static output, one Preact `MedigraphApp` island entry, strict TypeScript, Vitest, Playwright and pnpm. Materialise **[Frontend toolchain](#frontend-toolchain--formatting-linting-and-static-gates)** exactly: Node/pnpm/TypeScript pins, `prettier@3.9.6` with its two plugins, ESLint 10 flat config with every listed language plugin, `eslint-config-prettier` last, husky + lint-staged hooks, and `.github/workflows/ci.yml` with the `lint` job gating `test` and `build`. Do not substitute versions, add `eslint-plugin-prettier`, or reorder ESLint and Prettier. Later score, privacy and bundle gates attach to the same workflow. | Empty static app builds and tests green; `pnpm verify:static` passes on a clean checkout and `pnpm exec eslint-config-prettier` reports no conflicting rule. |
+| 0.1 | **Scaffold.** Astro 5 static output, one Preact `MedigraphApp` island entry, strict TypeScript, Vitest, Playwright and pnpm. Materialise **[Frontend toolchain](#frontend-toolchain--formatting-linting-and-static-gates)** exactly: Node/pnpm/TypeScript pins, `prettier@3.9.6` with its two plugins, ESLint 10 flat config with every listed language plugin, `eslint-config-prettier` last, husky + lint-staged hooks, and `.github/workflows/ci.yml` with the `lint` job gating `test` and `build`. Do not substitute versions, add `eslint-plugin-prettier`, or reorder ESLint and Prettier. Later score, privacy and bundle gates attach to the same workflow. | Empty static app builds and tests green; `pnpm verify:static` passes on a clean checkout. |
 | 0.2 | **Implement provisional contracts.** Create `types.ts` exactly from “Field-level contracts”, plus structural `validateProfile(x: unknown): Profile` and semantic `assertProfileSafe(profile: Profile): void`. Validate finite numbers, coordinate bounds, discriminated ranges, ids, timestamps, uniqueness, cardinality, status/value consistency and free-text policy. | Contract tests reject every malformed boundary. These shapes freeze only after 3.8, not here. |
 | 0.3 | **Synthetic/redacted seed fixtures.** Build content-equivalent synthetic PDFs and hand-checked TextItem/expected JSON; do **not** copy the identifying root PDFs. Correct mapping: `MedilabRslt29384Page2.pdf` is the 25-marker **biochemistry** layout; `Page3.pdf` is the multi-region **haematology/CBC** layout. Commit only `fixtures/seed/biochemistry.{pdf,textitems.json,expected.json}` and `haematology.{pdf,textitems.json,expected.json}` with specimen identity and content-based names. Include fragmented and whole-line versions. | No real identity substring or document metadata survives. Expected output includes dates, comparators, missing status, retained ranges and SourceRefs. Human/capable-model task. |
 | 0.4 | **Static security foundation—not the final privacy E2E.** Self-host every browser byte under `public/`. There is **no** generated asset manifest and **no** generated CSP hash list: the policy is a committed static string. Commit `_headers` with CSP `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'`. `connect-src` carries D1's origin allowlist and is `'self'` alone in v1; adding an origin edits this one line. Set `build.inlineStylesheets: 'never'` so component `<style>` blocks always emit as external `'self'` stylesheets and no style hash is ever required. Emit no inline `<script>`, so `script-src` needs no hash, nonce, `'unsafe-inline'` or `'unsafe-hashes'`. `style-src-attr 'unsafe-inline'` is the deliberate, scoped exception recorded in [ADR-0008](adr/0008-csp-style-attribute-amendment.md); record which target browsers honour `style-src-attr` and which fall back to `style-src`. Add COOP `same-origin`, COEP `require-corp`, CORP `same-origin`, `Referrer-Policy: no-referrer`, HSTS, `X-Content-Type-Options: nosniff`, and a Permissions Policy allowing only same-origin camera while disabling microphone/geolocation/payment/USB. | A built-app Playwright smoke test boots under the delivered headers and finds no undeclared origin. COOP/COEP cost nothing once every asset is same-origin and give Task 3.3 `crossOriginIsolated` for WASM threads. Full workflow egress testing waits for 5.2. |
@@ -2009,9 +2043,8 @@ every bitmap and clears the map.
 ## Verification
 
 **Static quality gate.** `pnpm verify:static` runs ESLint over ts/tsx/astro/jsx,
-json/jsonc, markdown, yaml and html, then `eslint-config-prettier`'s CLI helper to
-prove no enabled rule conflicts with the formatter, then `prettier --check .` over the
-same languages plus bash and Dockerfile, then `astro check && tsc --noEmit`. ESLint
+json/jsonc, markdown, yaml and html, then `prettier --check .` over the same languages
+plus bash and Dockerfile, then `astro check && tsc --noEmit`. ESLint
 always precedes Prettier and CI never rewrites files. `shellcheck` and `hadolint` cover
 the two languages ESLint cannot parse. The CI `lint` job gates `test` and `build`, so a
 formatting or lint failure stops the pipeline before Vitest and Playwright run.
