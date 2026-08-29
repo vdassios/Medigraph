@@ -853,11 +853,11 @@ here is genuinely wrong, change this section first, then the code.
 
 ### Runtime and package manager baseline
 
-| Thing      | Pin                    | Declared in                                      | Why this value                                                                                                                                                                                                                                                                                                                 |
-| ---------- | ---------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Node       | `24.20.0` (active LTS) | `.nvmrc`, `engines.node`, CI `node-version-file` | The lowest line satisfying every tool below: `eslint-plugin-astro@3` needs `^22.22.3 \|\| ^24.16.0 \|\| >=26.3.0`, `lint-staged@17` needs `>=22.22.1`, `@eslint/json` and `@eslint/markdown` need `>=24`. Node 26 is `latest`, not LTS, until Oct 2026.                                                                        |
-| pnpm       | `11.24.0`              | `packageManager`, enabled via Corepack           | The project installs with **pnpm** (`engines.node >=22.13`, already satisfied). `pnpm-lock.yaml` is the single lockfile authority and is committed; `pnpm install --frozen-lockfile` is used everywhere non-interactive, so a lockfile that disagrees with `package.json` fails the build instead of being silently rewritten. |
-| TypeScript | `6.0.3`                | `devDependencies`                                | `typescript-eslint@8.68.0` peer-supports `>=4.8.4 <6.1.0`. TypeScript 7 is `latest` on the registry but is **not** yet supported by typescript-eslint, so it is out of scope until that peer range moves.                                                                                                                      |
+| Thing      | Pin                                                      | Declared in                                      | Why this value                                                                                                                                                                                                                                                                                                                 |
+| ---------- | -------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node       | `24.20.0` in `.nvmrc`, `>=24.20.0 <25` in `engines.node` | `.nvmrc`, `engines.node`, CI `node-version-file` | The lowest line satisfying every tool below: `eslint-plugin-astro@3` needs `^22.22.3 \|\| ^24.16.0 \|\| >=26.3.0`, `lint-staged@17` needs `>=22.22.1`, `@eslint/json` and `@eslint/markdown` need `>=24`. Node 26 is `latest`, not LTS, until Oct 2026.                                                                        |
+| pnpm       | `11.24.0`                                                | `packageManager`, enabled via Corepack           | The project installs with **pnpm** (`engines.node >=22.13`, already satisfied). `pnpm-lock.yaml` is the single lockfile authority and is committed; `pnpm install --frozen-lockfile` is used everywhere non-interactive, so a lockfile that disagrees with `package.json` fails the build instead of being silently rewritten. |
+| TypeScript | `6.0.3`                                                  | `devDependencies`                                | `typescript-eslint@8.68.0` peer-supports `>=4.8.4 <6.1.0`. TypeScript 7 is `latest` on the registry but is **not** yet supported by typescript-eslint, so it is out of scope until that peer range moves.                                                                                                                      |
 
 **Version pinning is exact.** Every `devDependencies` entry is written without `^` or
 `~`, matching the existing "pin exact versions" rule in Architecture. Set
@@ -918,6 +918,7 @@ one-word edit into a paragraph-sized hunk.
 pnpm-lock.yaml
 dist/
 .astro/
+.husky/_/
 coverage/
 public/ocr/
 public/pdf/

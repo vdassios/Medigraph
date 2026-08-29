@@ -1,6 +1,7 @@
 pnpm-lock.yaml
 dist/
 .astro/
+.husky/_/
 coverage/
 public/ocr/
 public/pdf/
