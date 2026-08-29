@@ -1,0 +1,18 @@
+{
+  "plugins": ["prettier-plugin-astro", "prettier-plugin-sh"],
+  "printWidth": 100,
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "overrides": [
+    { "files": "*.astro", "options": { "parser": "astro" } },
+    { "files": ["*.sh", "*.bash", "*.zsh"], "options": { "parser": "sh" } },
+    {
+      "files": ["Dockerfile", "Dockerfile.*", "*.dockerfile"],
+      "options": { "parser": "dockerfile" }
+    },
+    { "files": ["*.md"], "options": { "proseWrap": "preserve", "printWidth": 88 } },
+    { "files": ["*.yml", "*.yaml"], "options": { "singleQuote": false } }
+  ]
+}

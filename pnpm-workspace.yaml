@@ -1,0 +1,18 @@
+# pnpm 11 no longer reads the "pnpm" field in package.json; settings live here.
+
+# Narrow peer exception, per the plan's "pnpm peer-conflict note":
+# eslint-plugin-astro@3.1.0 peer-requires eslint-plugin-jsx-a11y >=6.10.2, but
+# jsx-a11y@6.10.2 still declares eslint as "^3 || ... || ^9" and has published no
+# ESLint 10 range. Scope the exception to exactly that edge — never disable peer
+# checking tree-wide. Delete this the moment jsx-a11y ships an ESLint 10 peer range.
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-jsx-a11y>eslint: "10"
+
+# pnpm 11 blocks dependency build scripts until each is named here (this replaced
+# pnpm 10's onlyBuiltDependencies list). esbuild fetches the platform binary that
+# Vite/Astro/Vitest need; sharp builds Astro's image pipeline. Declared rather than
+# approved interactively so a clean checkout and CI behave identically.
+allowBuilds:
+  esbuild: true
+  sharp: true

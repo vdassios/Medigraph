@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+dist/
+.astro/
+coverage/
+public/ocr/
+public/pdf/
+fixtures/**/*.medigraph
+fixtures/**/expected.json
+fixtures/**/textitems.json

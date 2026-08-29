@@ -1024,7 +1024,7 @@ core CSS parser, so no separate configuration is needed and the block is covered
    rule is wrong. Prove the config stays clean with the bundled CLI helper, which
    reports any rule left on that conflicts with Prettier:
 
-   ```
+   ```sh
    pnpm exec eslint-config-prettier src/ui/MedigraphApp.tsx
    ```
 
