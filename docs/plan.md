@@ -1822,7 +1822,7 @@ state reach the DOM without a CSP-blocked style attribute.
 
 ## The `.medigraph` file format
 
-```jsonc
+```json
 {
   "format": "medigraph",
   "v": 1,

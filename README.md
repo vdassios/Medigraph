@@ -282,7 +282,7 @@ string, in both languages, is reviewed against it.
 
 A transparent, plaintext JSON envelope around one validated `Profile`:
 
-```jsonc
+```json
 {
   "format": "medigraph",
   "v": 1,
