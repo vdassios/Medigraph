@@ -24,6 +24,7 @@ reported; it never interprets it.
 | **Review session** | One attach batch's transactional draft. All gates must resolve before one atomic Confirm. |
 | **Marker** | A biological quantity tracked over time. |
 | **Marker key** | A stable canonical id, or `x:<normalised-label>` for a reviewed unknown marker. |
+| **Marker seed** | The sourced Greek/English vocabulary extracted from ΚΕΟΚΕΕ (Task 0.5c) that registry aliases may be authored from. It is vocabulary, not a registry. |
 | **Report** | The confirmed measurements from one collection event, identified by an opaque UUID and user-confirmed local civil date/time. Equal dates do not imply the same Report. |
 | **Measurement** | One confirmed marker result in native lab value, unit and reference range. Marker keys are unique within a Report. |
 | **Reference range** | A closed, minimum-only or maximum-only interval printed by the lab for one Measurement. It is not a property of the Marker. |
@@ -37,12 +38,17 @@ reported; it never interprets it.
   neither Medigraph's own nor a third party's. No telemetry, no error reporting.
 - Third-party *inbound* asset fetches are permitted only from a declared `connect-src`
   origin allowlist, empty in v1; requests to a non-`self` origin carry no query, body
-  or app-set header. No remote E2 code ships in v1, and declaring an origin can never
+  or app-set header. No E2-remote code ships in v1 — off-device inference is barred
+  whether the server is a third party's or our own — and declaring an origin can never
   authorise it.
 - Source files, raw text, crops, bitmaps, object URLs and review drafts never enter
   IndexedDB, Cache Storage or `.medigraph`.
 - A Profile has no patient identity. Appending or merging requires an explicit
   same-person confirmation but does not persist that answer.
+- A source file holds at most one visit's results and is never split across Reports;
+  several sources commonly form one Report, since a visit is often emailed as one
+  file per department. Grouping is proposed from shared date **and** marker-set
+  disjointness, and always confirmed by the user.
 - Review resolves dates, source grouping, duplicate markers and every identifier
   candidate before Confirm.
 - A Report has at most one Measurement per marker key. Equal dates never auto-merge.
@@ -66,3 +72,4 @@ reported; it never interprets it.
 - `docs/adr/0008-csp-style-attribute-amendment.md`
 - `docs/adr/0009-egress-data-rule-and-origin-allowlist.md` (supersedes 0001)
 - `docs/adr/0010-display-only-positioning.md`
+- `docs/adr/0011-no-vision-language-model-for-v1.md` (amends 0002)

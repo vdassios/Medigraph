@@ -36,6 +36,17 @@ range its own lab printed. Default view is a panel of every
 marker in the most recent report; tapping a marker opens its history over time
 against its reference range. The user can switch the panel to any other report.
 
+**Input shape.** The user attaches PDFs (and photos/scans, which route through E1).
+One source file holds **at most one visit's results** — a file is never split across
+Reports, which is why `regroupSources` takes a partition of source ids rather than a
+finer-grained mapping. The converse is **not** true and is common in practice: one
+visit is frequently emailed as several files, typically one per department
+(haematology, biochemistry, hormones). Merging several sources into one Report is
+therefore a first-class flow, not an edge case, and the grouping proposal must be good
+at it. Reports usually fall roughly one per year because that is how often people test,
+but nothing in the model assumes that: dates are read from the documents and a Profile
+may hold any number of Reports in a year.
+
 **The hard constraint.** The Medigraph operator never receives or stores medical
 data, and **no medical data leaves the user's device.** That is the invariant. The
 browser does store the confirmed `Profile` locally in plaintext IndexedDB, and an
@@ -49,16 +60,29 @@ in D1's `connect-src` allowlist, which is empty in v1.
 
 **Why this shape.** Keeping content on-device sharply reduces what the operator can
 access, but it is not a legal conclusion and it does not eliminate device, browser,
-XSS or software-supply-chain risk. The trade is accuracy: a local rules parser is
-weaker than a vision model, so a mandatory **review-and-correct** step sits between
-extraction and charting. That step is not a fallback — it is the product's honesty
-mechanism.
+XSS or software-supply-chain risk. There is an accuracy trade — a local rules parser
+is weaker than a large vision model — but the mandatory **review-and-correct** step
+between extraction and charting does not rest on that trade alone, and so does not
+disappear if extraction improves. It stands on three independent grounds:
+
+1. **Silent-failure containment.** The parser fails loudly: it emits `ParseFlag`s and
+   a `Confidence` that review sorts on. A generative extractor resolves an ambiguous
+   `1`/`7` silently and reports nothing. A wrong-but-plausible value that never
+   surfaces in review is the worst outcome this product has.
+2. **The D7 identifier scrub**, a hard persistence gate that no extractor discharges.
+3. **The D6 date, grouping and same-person gates**, which are user confirmations
+   rather than extraction results.
+
+That step is not a fallback — it is the product's honesty mechanism. The
+vision-model appendix records why no extractor, on-device or off-device, removes it.
 
 **Deliberately left open.** v1 does everything client-side: pdf.js for text-layer
 PDFs, the OCR engine selected by Task 0.7 for images, and a marker-anchored parser
-over both. A future document-vision adapter remains possible behind the extraction
-seam, but a remote adapter would replace D1 with a different privacy posture; it is
-not a D1-conforming tier and no dormant remote-upload code ships in v1.
+over both. A future *on-device* document-vision adapter (**E2-local**) remains
+possible behind the extraction seam. An *off-device* one (**E2-remote**) — whether a
+third-party API or a server we operate ourselves — would replace D1 with a different
+privacy posture; it is not a D1-conforming tier and no dormant remote-upload code
+ships in v1.
 
 **Delegation.** The work below is decomposed for less-capable builder models. Every
 task names exact files, exact exported signatures, exhaustive behaviour rules,
@@ -72,7 +96,7 @@ decision. The decisions all live in this document.
 | # | Decision | Rationale |
 |---|---|---|
 | D1 | **No user-data egress.** No document content, raw or OCR text, crop, identifier, confirmed value or anything derived from them leaves the device — not to Medigraph's own origin, not to any third party. There is no telemetry and no error reporting. Third-party *inbound* asset fetches are permitted but must be **declared**: `connect-src` carries an explicit origin allowlist (empty in v1, because every runtime asset is self-hosted), and any request to a non-`self` origin must be a GET or HEAD with no query string, no request body and no app-set header. `WebSocket`, `EventSource`, `sendBeacon` and `RTCPeerConnection` are never constructed. Adding an allowlisted origin is an ordinary code-review decision checked against the data rule; transmitting user data requires an ADR superseding this one. | The enforceable line is *what leaves the device*, not *which origins are contacted*. Stated as a data rule it stays honest under GDPR — Medigraph is never a controller for health data it never receives — while leaving room to add a third-party asset host without amending this plan. Self-hosting remains the default because it is free on the Cloudflare Pages target and avoids the consent obligation a third-party fetch would trigger (a CDN fetch discloses the visitor's IP; see ADR-0009). The v1 CSP, service-worker policy and the slimmed Task 5.2 regression test enforce the allowlist and the request-shape rule together; none of them is a security proof against already-malicious same-origin code. |
-| D1a | **Extraction modes (`E0`/`E1`; `E2` is a future privacy replacement).** **E0** = pdf.js text layer. **E1** = the Task 0.7-selected in-browser Greek OCR engine. E1 is a shipping default only after the real image→OCR release gate passes; otherwise it ships clearly labelled assisted/beta while E0 remains supported. **E2** names a possible future document-VLM adapter, but a remote E2 implementation transmits document content off-device and therefore violates D1's data rule and requires a new ADR, privacy copy, threat model and separately built consent flow. No remote E2 code or endpoint is present in v1. | E0/E1 keep document content on the device. Note that D1's origin allowlist does *not* open a path for E2: E2 is barred by the data rule, not by the origin rule, so declaring an origin can never authorise it. Keeping the adapter seam does not require pretending a future upload is compatible with the current privacy promise. |
+| D1a | **Extraction modes (`E0`/`E1`; `E2` splits into `E2-local` and `E2-remote`).** **E0** = pdf.js text layer. **E1** = the Task 0.7-selected in-browser Greek OCR engine. E1 is a shipping default only after the real image→OCR release gate passes; otherwise it ships clearly labelled assisted/beta while E0 remains supported. **E2-local** names a possible future *on-device* document-VLM adapter: it conforms to D1's data rule, and is blocked today on Greek coverage, on the absence of a browser runtime path, and on the Task 5.5 device gate — not on privacy. **E2-remote** names *off-device* inference of any kind, **including a server we operate ourselves**; it transmits document content off the device, therefore violates D1's data rule, and requires a new ADR, privacy copy, threat model and separately built consent flow. No E2 code or endpoint of either kind is present in v1. | E0/E1 keep document content on the device, and E2-local would too. The split exists because the undifferentiated `E2` invited two errors: reading "vision model" as inherently privacy-breaking, and reading "self-hosted" as inherently privacy-preserving. Neither holds — the test is whether the bytes leave the device, so our own VPS is barred on exactly the same rule as a third-party API. Note also that D1's origin allowlist does *not* open a path for E2-remote: it is barred by the data rule, not the origin rule, so declaring an origin can never authorise it. See ADR-0011 and the vision-model appendix. |
 | D2 | **Astro 5 static output + one Preact application island.** Deployed to Cloudflare Pages as pure static assets. No Workers, adapter or SSR. Marketing/privacy routes hydrate nothing; `MedigraphApp` alone owns interactive state. | Static delivery preserves the deployment/privacy shape, while one island gives the attach→review→commit transaction a single owner. |
 | D3 | **All v1 extraction is local and deterministic.** `pdfjs-dist` handles E0. Task 0.7 must prove PP-OCRv5 Greek ONNX (`PP-OCRv5_mobile_det` + `el_PP-OCRv5_mobile_rec`) in supported browsers; if it fails, the recorded fallback is `tesseract.js` with `ell+eng`. The selected engine, models, dictionary and WASM are self-hosted under `public/` and loaded lazily. | PP-OCRv5 has the better model fit but no official Greek ONNX browser path. The spike decides before Wave 3, and the OCR corpus—not vendor accuracy—decides whether E1 is release-ready. |
 | D4 | **One extraction seam, two observation shapes, one review draft.** An `ExtractionAdapter` emits either positioned `TextItem` observations or direct `ParsedRow` observations. Both converge into an `ExtractionResult` containing rows, date candidates, identifier candidates and source references before review. E0/E1 must provide row/evidence provenance; direct rows may omit it but must still provide date/identifier evidence. `TextItem.confidence` remains optional. | This keeps parser fixtures independent of PDF/OCR while preserving the evidence mandatory review needs. Domain-valued provenance enables page/crop inspection without coupling downstream code to an adapter; a future direct adapter can report source-unavailable explicitly. |
@@ -92,10 +116,12 @@ along with ADR-0008, which scopes the CSP style directives. **ADR-0009 supersede
 ADR-0001** and is the current record for D1: the original decision mandated self-hosted
 content-hashed assets and forbade all third-party origins, which was stricter than the
 requirement and imposed permanent build tooling for a threat model it could not prove
-anything about. ADR-0010 records D13. The domain vocabulary below is mirrored in root
-`CONTEXT.md`. Any future remote E2 proposal must supersede D1/D1a explicitly rather
-than weakening their tests behind a feature flag; declaring an allowlisted origin is
-never sufficient to authorise it.
+anything about. ADR-0010 records D13. **ADR-0011** records why no vision-language
+model ships in v1 — in any deployment, ours included — and splits E2 into E2-local and
+E2-remote. The domain vocabulary below is mirrored in root `CONTEXT.md`. Any future
+E2-remote proposal must supersede D1/D1a explicitly rather than weakening their tests
+behind a feature flag; declaring an allowlisted origin is never sufficient to
+authorise it.
 
 ---
 
@@ -625,7 +651,9 @@ constructible without TextItem provenance, while `sourceRef` remains optional fo
 review. A direct-row adapter must supply date and identifier candidates and declare
 whether source evidence is available; when false, review displays “source preview
 unavailable” instead of inventing one. A builder that reaches through the seam has
-broken D1a even if tests pass.
+broken D1a even if tests pass. The `'E2'` tier literal is unchanged and denotes
+**E2-local** — the only kind of vision adapter that could ship under D1. E2-remote
+cannot appear behind this seam; it needs an ADR superseding D1/D1a first (ADR-0011).
 
 **Dependencies (pin exact versions).** Baseline: `astro@5`, `@astrojs/preact@4`,
 `preact@10`, `pdfjs-dist@5`, `idb@8`, `vitest`, `@playwright/test`. Task 0.7 adds
@@ -1430,10 +1458,22 @@ DateCandidates rather than inventing a Report date downstream.
 
 ### Report grouping, identity and conflicts (`profile.ts`)
 
+- **One source belongs to exactly one Report; several sources may share one.** A
+  source file holds at most one visit's results, so it is never split — hence
+  `regroupSources`' partition rule. The reverse is common: one visit is often emailed
+  as several files, one per department. Multi-source Reports are the normal case, not
+  an edge case.
 - Equal dates **never merge automatically**. Within one attach batch, review may
-  propose that files with the same best date belong to one collection event, but the
-  user must confirm or split every proposed group. The two synthetic fixture PDFs are
-  accepted as one Report only after this grouping confirmation.
+  propose that files belong to one collection event, but the user must confirm or split
+  every proposed group. The two synthetic fixture PDFs are accepted as one Report only
+  after this grouping confirmation.
+- **Grouping proposal uses two signals, not one.** Same best date is necessary but not
+  sufficient. Add **marker-set disjointness**: sources sharing a date whose marker keys
+  barely overlap are probably one visit split by department, and are proposed as one
+  group; sources sharing a date whose marker keys substantially overlap are probably
+  distinct collections (a retest, or two labs) and are proposed separately. Overlap is
+  computed on canonical marker keys only, ignoring `x:*` rows, and the proposal is a
+  default the user confirms — never an inference that bypasses the gate.
 - A confirmed group creates one Report UUID. A later attach is a new Report even on
   the same date unless the user explicitly selects “add to existing report”; that
   selection stores `targetReportId` and rebuilds conflicts against its Measurements.
@@ -1535,12 +1575,70 @@ interface MarkerDef {
    (`Σάκχαρο ορού` / `Σάκχαρο αίματος` / `Γλυκόζη`).
 3. Include the common Greeklish/Latin-script forms labs actually print.
 4. **Never invent an alias.** Every alias must be either (a) present in a corpus
-   fixture, or (b) on the supplied seed list in the issue. Unsourced aliases are the
-   main way a builder model silently poisons this file — an alias that matches the
-   wrong marker produces a wrong health chart.
+   fixture, or (b) on the supplied seed list in the issue — which is the ΚΕΟΚΕΕ
+   extract produced by Task 0.5c, not a model's recollection of Greek lab vocabulary.
+   Unsourced aliases are the main way a builder model silently poisons this file — an
+   alias that matches the wrong marker produces a wrong health chart. Bulk-importing a
+   seed by string similarity is the same failure wearing a citation: see the four
+   real mis-matches recorded under *Sourcing the registry*.
 5. `plausibleRange` is a deliberately wide sanity bound. An outside value is kept,
    tagged `implausible-value`, forced to low confidence and reviewed; it is never
    treated as a clinical range and never silently rejected.
+
+#### Sourcing the registry — ΚΕΟΚΕΕ is the sanctioned seed
+
+Alias rule 4 requires every alias to come from a corpus fixture or a **supplied seed
+list**. That seed list is the Greek Ministry of Health's **ΚΕΟΚΕΕ** (Κατάλογος Ενιαίας
+Ονοματολογίας και Κωδικοποίησης Εργαστηριακών Εξετάσεων) — the official unified
+nomenclature and coding catalogue for laboratory tests, drafted in 2013 by a committee
+of laboratory scientists on the EDMA reagent catalogue and explicitly intended to
+correlate with ΕΟΠΥΥ prescription codes
+([Ministry of Health](https://www.moh.gov.gr/articles/epitroph-promhtheiwn-ygeias/katalogos-eniaias-onomatologias-kai-kwdikopoihshs-ergasthriakwn-eksetasewn-keokee/2026-keokee);
+described in [Arch Hellen Med 2015, 32(6):777-788](https://www.mednet.gr/archives/2015-6/pdf/777.pdf)).
+
+Use **v5, April 2016, XLSX** (`?fdl=9688`, 352 KB,
+`sha256:d73ef10530de0453ad5f4a4d04d06e7672a8c5a30cbf06fe269bcf4143642418`), which is
+the only machine-readable release. Its columns map almost directly onto `MarkerDef`:
+
+| ΚΕΟΚΕΕ column | `MarkerDef` field |
+|---|---|
+| `Αγγλική Ονομασία` | `en` |
+| `Ελληνική Ονομασία` | `el` |
+| `Συντομογραφία` | `abbreviations[]` — supplies the exact `ALT/SGPT`, `AST/SGOT`, `Γ-GT` pairs the T1 tier needs |
+| `Άλλη Ονομασία` | `aliases[]` (one synonym only) |
+| `GR code` | category hierarchy → `sectionHint` |
+
+It holds 2,403 tests across 8 categories. Only four are quantitative markers a report
+plots over time — **11** Clinical chemistry (131 leaves), **12** Immunochemistry (328),
+**13** Haematology (270) and **18** Immunology (167): 896 tests, 435 carrying an
+abbreviation and 74 an alternative name. Categories 14–17 (cultures, infection
+serology, genetics, cytology) are largely non-numeric and out of scope.
+
+**Two limits that decide how it may be used.**
+
+1. **It is an *ordering* nomenclature, so panel-internal indices are absent.** The CBC
+   is one entry — `13.01.01.01.001 ΠΛΗΡΗΣ ΓΕΝΙΚΗ ΑΙΜΑΤΟΣ ΜΕ ΔΙΑΧΩΡΙΣΜΟ 3/5` — because
+   the indices it reports are not separately orderable. **MCV, MCH, MCHC, RDW, PDW,
+   MPV, WBC and the differential do not appear anywhere in ΚΕΟΚΕΕ**, and those are the
+   most frequently printed rows on any Greek report. `haematology.ts` must therefore be
+   authored from the Task 0.5a corpus; `biochemistry.ts`, `lipids.ts`, `hormones.ts`,
+   `vitamins.ts` and `inflammation.ts` are well served by ΚΕΟΚΕΕ.
+2. **Its names are administrative, not printed.** ΚΕΟΚΕΕ says
+   `ΑΜΙΝΟΤΡΑΝΣΦΕΡΑΣΗ ΑΛΑΝΙΝΗΣ`; a lab prints `SGPT` or `Τρανσαμινάσες SGPT`. Treat it
+   as authoritative for **marker identity, canonical Greek/English name and
+   abbreviation**, and the corpus as the source for printed alias variants.
+
+**Curate; never bulk-import.** A trial substring match of 48 routine markers against
+this catalogue returned four confidently wrong identities — `Haemoglobin` matched the
+HbA1c row, `RBC` matched erythrocyte folate, `Cortisol` matched 11-deoxycortisol, and
+`Platelets` matched a platelet-function assay. Every one would have produced a wrong
+health chart. This is alias rule 4's failure mode demonstrated, and it is why the seed
+enters the registry through human review, one panel at a time.
+
+**Secondary cross-check: the LOINC Greek linguistic variant**, restored in LOINC 2.79
+(February 2025). Using it to *find* Greek name variants does not violate D10, which
+bars LOINC **codes from our data model** — no `loincCode` field appears in `MarkerDef`
+and none may be added.
 
 **Coverage target for v1:** ≥120 markers, covering 100% of sourced marker identities
 in the Task 0.5a training corpus and standard Greek general-checkup seed list. The
@@ -1763,6 +1861,7 @@ spec is ambiguous, stop and comment on the issue instead of choosing."*
 | 0.4 | **Static security foundation—not the final privacy E2E.** Self-host every browser byte under `public/`. There is **no** generated asset manifest and **no** generated CSP hash list: the policy is a committed static string. Commit `_headers` with CSP `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'`. `connect-src` carries D1's origin allowlist and is `'self'` alone in v1; adding an origin edits this one line. Set `build.inlineStylesheets: 'never'` so component `<style>` blocks always emit as external `'self'` stylesheets and no style hash is ever required. Emit no inline `<script>`, so `script-src` needs no hash, nonce, `'unsafe-inline'` or `'unsafe-hashes'`. `style-src-attr 'unsafe-inline'` is the deliberate, scoped exception recorded in [ADR-0008](adr/0008-csp-style-attribute-amendment.md); record which target browsers honour `style-src-attr` and which fall back to `style-src`. Add COOP `same-origin`, COEP `require-corp`, CORP `same-origin`, `Referrer-Policy: no-referrer`, HSTS, `X-Content-Type-Options: nosniff`, and a Permissions Policy allowing only same-origin camera while disabling microphone/geolocation/payment/USB. | A built-app Playwright smoke test boots under the delivered headers and finds no undeclared origin. COOP/COEP cost nothing once every asset is same-origin and give Task 3.3 `crossOriginIsolated` for WASM threads. Full workflow egress testing waits for 5.2. |
 | 0.5a | **Parser corpus.** Collect hand-checked TextItem + expected fixtures from ≥8 Greek labs, covering fragmented and whole-line text, diverse layouts and all date/range cases. Reserve at least one lab as a blind holdout: its labels and expected output may not be used to author aliases or thresholds before the first release score is recorded. | Measures parser/registry behavior without pretending to test OCR. Human/capable-model task. |
 | 0.5b | **Real OCR corpus.** From public specimen or wholly synthetic documents, commit source images/scanned PDFs plus expected rows for ≥3 labs, each with a clean scan and at least two phone-photo variants (skew, shadow, perspective or blur). Keep OCR output as a generated test artifact, not the authored input. Include one lab not used to tune preprocessing. | Exercises image→preprocess→detection→recognition→parse, including real box geometry. Human/capable-model task. |
+| 0.5c | **ΚΕΟΚΕΕ marker seed list (capable model/human).** Fetch ΚΕΟΚΕΕ v5 XLSX from the Ministry of Health, verify the recorded sha256, and extract categories 11, 12, 13 and 18 into a committed reviewable TSV under `fixtures/registry-seed/` with columns `grCode, en, abbreviation, el, otherName`. Do **not** emit `MarkerDef`s and do **not** match seed rows to markers automatically — this task produces the *sourced vocabulary* that alias rule 4(b) requires, nothing more. Record in the issue that ΚΕΟΚΕΕ omits all CBC indices (MCV, MCH, MCHC, RDW, PDW, MPV, WBC, differential) because it is an ordering nomenclature, so `haematology.ts` is corpus-authored. | Pass/fail: the committed TSV has ≥890 rows, every row carries a `grCode` matching `^1[1238](\.\d+){4}$`, and a spot-check of 20 rows against the source file matches byte-for-byte. Feeds 1.6b-core and 2.5r. |
 | 0.6 | **Metric definitions and generic scorer.** Implement fixture-schema validation and pure `score(expected, actual)` for marker recall, value/comparator precision, unit precision and range precision, grouped per lab and aggregate. It accepts supplied predictions and has no dependency on `extract.ts`; Task 2.5b wires the parser into it. | Metric denominator, numeric tolerance and missing/comparator behavior have golden tests, breaking the old scorer↔extract cycle. |
 | 0.7 | **E1 feasibility spike (capable model/human; start with 0.5b).** Compare PP-OCRv5 Greek ONNX against `tesseract.js` `ell+eng` on a small 0.5b sample in Chromium and Safari. For PP-OCR, prove conversion, dictionary wiring, det+rec, confidence and coordinate normalization behind 0.4 headers. Store candidate bytes locally and record exact checksums, first/steady latency and failures in ADR-0003. | Select one `OcrEngine` or update D3/ADR to the fallback **before** Wave 3. No CDN/HF runtime option. This is feasibility evidence, not the E1 release gate. |
 
@@ -1798,7 +1897,7 @@ spec is ambiguous, stop and comment on the issue instead of choosing."*
 | 1.4 | `units.ts` — normalisation + the enumerated conversion table | 0.2, 1.1 |
 | 1.5 | `dates.ts` — parse, classify and score every candidate; ambiguity/time precision | 0.2, 1.1 |
 | 1.6a | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic | 0.2, 1.1 |
-| 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3 |
+| 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
 | 1.7 | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks | 0.2, 1.1 |
 | 1.8 | `rows.ts` — vertical clustering (shared by both passes; spec in B1) | 0.2, 0.3 |
 | 1.9 | `review.ts` — immutable marker reassignment, identifier/conflict resolution and `canConfirm`; changing marker keys immediately rebuilds duplicate conflicts | 0.2, 1.6b-core, 1.7 |
@@ -1821,7 +1920,7 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 | 2.4 | `grammar.ts` — **Pass B** whole-line/fragmented grammar and nine ordered rules | 1.1–1.4, 2.3 |
 | 2.5a | `extract.ts` core — date/identifier passes, both measurement passes, reconciliation, flags/confidence and `unrecognised[]` | 2.1–2.4, 1.5, 1.7 |
 | 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout | 2.5a, 0.5a, 0.6 |
-| 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and supplied seed lists; never inspect the holdout to add aliases. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel. | 1.6b-core, 0.5a, 2.5b |
+| 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel. | 1.6b-core, 0.5a, 2.5b |
 | 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors | 2.5r |
 | 2.6 | `profile.ts` — proposed groups, explicit report construction, mandatory conflict resolution, same-person append and id-based profile merge | 2.5a, 1.6b-core, 1.9 |
 | 2.7 | `series.ts` — ordering, canonical target units, range co-conversion, native preservation, explicit gaps and unit splits | 2.6, 1.4 |
@@ -1888,6 +1987,7 @@ every bitmap and clears the map.
 | 4.0 | `appState.ts` + MedigraphApp evidence owner — reducer/events, one batch transaction, sourceId-keyed inspection callback and deterministic reference/URL/bitmap release on Confirm/Cancel/error/unmount |
 | 4.1 | `FileDrop` — drag/drop, picker and mobile capture; enforce 3.4 limits; per-file/page progress; render each typed `RouteFailure`. `too-many-files`, `too-many-pages` and `cancelled` are batch errors; `unsupported-type`, `file-too-large`, `decode-failed` and `ocr-failed` identify a source. Source failures do not discard successful siblings. |
 | 4.2 | `ReviewTable` — one session grouped by proposed Report. Preserve an ephemeral `ParsedRow.id`→edited draft mapping until Report construction; it never enters Profile. Every group requires date confirmation and source grouping/splitting; rows support edit/delete and searchable canonical marker reassignment or approved unknown. Reassignment recomputes duplicate conflicts. Conflicts require choose/edit; source page/crop opens beside a row. Low/flagged rows sort first. Identifier panel requires Redact (mask evidence and remove the substring from every derived field), Delete affected row, or False positive for every candidate; unknown labels always appear. Confirm remains disabled until all gates pass, then writes all Reports atomically and disposes evidence. |
+| 4.2a | **Review-friction reduction.** A presentation layer over `ReviewTable`: it adds no domain function, weakens no gate and changes no `ReviewSession` shape. (a) **Confidence triage** — a row with `confidence: 'high'` and an empty `flags` array renders collapsed inside a pre-accepted group showing a count and a “review these anyway” disclosure; every other row renders expanded, flagged first, exactly as in 4.2. (b) **Batch confirm** — the primary action accepts all pre-accepted rows at once, with per-row exception still available. It stays disabled until every D6 and D7 gate passes, unchanged from 4.2: triage must never collapse an unresolved identifier candidate, an unconfirmed date, an unresolved conflict or an unapproved unknown marker, and those render expanded regardless of confidence. (c) **Inline correction** — editing a row opens its `SourceRef` crop beside the field rather than in a separate view, reusing the 4.0 `onInspectSource` callback. State in the issue that registry coverage (D5a) is the largest single lever on how many rows need touching, and that this task reduces review effort without reducing review authority. **Pass/fail (Playwright):** a fixture whose rows are all high-confidence and unflagged reaches Confirm in one action; a fixture with one `implausible-value` row and one identifier candidate renders both expanded and holds Confirm disabled until each is resolved. |
 | 4.3 | `PanelView` — Report selector and factual meter list exactly per chart spec; empty/missing/split-unit states included |
 | 4.4 | `TrendView` — single-Series SVG, one-sided/stepped bands, censored and gap behavior, crosshair and fully equivalent table exactly per chart spec |
 | 4.5 | `DataManager` — plaintext export warning; import preview with Cancel/Replace/Merge, same-person gate and same-day time resolution; delete one Report; “Delete everything from this device” unregisters the service worker and clears Profile, caches and live review resources after confirmation; show persistence-denied/eviction education and export nudge. Empty storage always offers Attach and Import. |
@@ -1964,65 +2064,196 @@ and the plaintext warning. Record device/browser versions and observations.
 
 ---
 
-## Appendix — OCR / vision-model research (Aug 2026)
+## Appendix — OCR / vision-model research (rev. Aug 2026)
 
-Question asked: which vision model can we self-host for Greek lab reports on a cheap
-VPS (OVHcloud **VPS-1 2027: 2 vCores, 4 GB RAM, 40 GB NVMe, no GPU, ~$4.54/mo**)?
+The original version of this appendix asked "which vision model can we self-host for
+Greek lab reports on a €4.54/mo OVH VPS-1?" and answered "none, and we don't need
+one". That conclusion stands. The question was too narrow, though: the real question
+is whether *any* vision model — on-device, on a server we run, or behind a third-party
+API — could be trusted well enough to **delete the mandatory review step (D6)**, which
+is the app's worst user experience. This revision answers that, and prices the server
+option in full rather than dismissing it on cost.
 
-**Answer: none of them, and we don't need one.** The right tool is a specialised OCR
-model, not a document VLM.
+**Two findings up front.** No vision model removes review. And the server option is
+*cheap* — roughly €3/month of real compute, not the €184–569/mo that "a VPS" implies —
+so cost is not why we reject it. Both matter: the second one means this decision has
+to be defended on its actual grounds, because the next person to propose a server will
+be right about the money.
 
-### Candidates evaluated
+### 1. Why no vision model removes the review step
 
-| Model | Size | Greek | Fits VPS-1? | Notes |
-|---|---|---|---|---|
-| **PP-OCRv5 `el` mobile** | **~15 MB** (det 4.94 MB + rec ~10 MB) | ✅ **dedicated `el_PP-OCRv5_mobile_rec`, 89.28 %** | ✅ **comfortably** | **Leading candidate, conditional on 0.7/3.9/5.5.** Greek and English in one model. |
-| PaddleOCR-VL-0.9B | 0.9B | ✅ confirmed (edit distance 0.135) | ❌ | Greek is real, but no vendor publishes *any* CPU numbers; smallest hardware benchmarked is an RTX 3060. |
-| Granite-Docling-258M | 258M | ❌ English + experimental AR/ZH/JA | — | Rejected on Greek alone, despite being the best size fit. |
-| PP-OCRv6 tiny/small/medium | 1.5–34.5M | ❌ | ✅ (but useless) | v6's 50 languages are ZH/EN/JA + **46 Latin-script**. Greek support exists in v5 but was dropped in v6. **Do not "upgrade" v5→v6.** |
-| dots.ocr | 3B | ✅ | ❌ | Needs a consumer GPU. |
-| Tesseract `ell` | ~1.4 MB data | ✅ | ✅ | **Named fallback.** Was the original v1 baseline; PP-OCRv5 beats it on accuracy at comparable footprint, but tesseract.js is the more mature browser integration. If the Task 0.7 spike fails, D3 falls back to tesseract.js (`ell`+`eng`). |
+This section is model-independent. It applies to a browser VLM, a VLM on our own
+hardware, and a hosted API equally.
 
-### Why a VLM is not viable on this box
+- **On Greek specifically**, VLMs exhibit visual-grounding failure: they generate
+  plausible Greek from language priors instead of reading pixels, producing confident
+  output that does not correspond to the image ([arXiv 2605.27750](https://arxiv.org/abs/2605.27750)).
+  That is our exact language and our exact intolerable failure mode.
+- **On medical reports specifically**, character-level errors on fine-print numeric
+  values and units are a recurring end-to-end VLM failure pattern
+  ([MedRepBench, arXiv 2508.16674](https://arxiv.org/abs/2508.16674)).
+- **The failure *shape* is the problem, not the rate.** Our parser fails loudly: it
+  emits `ParseFlag`s (`ambiguous-thousands`, `implausible-value`, `unrecognised-unit`,
+  `low-ocr-confidence`) and a `Confidence`, and review sorts on them. A generative
+  extractor resolves an ambiguous `1`/`7` silently. A wrong-but-plausible ferritin
+  value that never surfaces in review is the worst outcome this product has, and a
+  model that raises average accuracy while removing the signal that says *which rows
+  to distrust* is a net loss for us even at a better headline score.
+- **It would degrade review even where it improved extraction.** A VLM enters the D4
+  seam through the `parsedRows` branch with `evidenceAvailable: false`, so review
+  shows "source preview unavailable". We would lose crop inspection — the thing that
+  makes review *fast* — and bypass the marker registry that D5a calls the product's
+  core asset.
+- **Review is not only a correction step.** The D7 identifier scrub is a hard
+  persistence gate, and the D6 date, grouping and same-person questions are user
+  confirmations rather than extraction results. No extractor discharges them.
+- D13 (display-only, MDR Rule 11) is also easier to defend with a deterministic parser
+  than with a generative model.
 
-Qwen2.5-3B **text-only** runs ~8.37 tok/s CPU at ~3.3 GB RAM. A document VLM emitting
-~1–2k tokens for one lab page therefore lands around **2–4 minutes per page on 2
-cores**, before the vision-encoder prefill, and sits at the very edge of 4 GB with the
-OS. The complete absence of published CPU benchmarks for PaddleOCR-VL is itself the
-signal: it is not a CPU-targeted model. A VLM would need roughly a 8–16 GB box, and
-even then would be far slower than the OCR path.
+The achievable prize is therefore demoting review from "correct every row" to "glance
+and confirm". That is a UX problem, addressed in the review-friction task, not a model
+problem.
 
-### Why PP-OCRv5 is the leading candidate, not a foregone conclusion
+### 2. Would accepting PDFs only remove it?
 
-1. **It emits positioned text boxes — natively our `TextItem[]` (D4).** Detection
-   yields boxes, recognition yields text per box; together that *is* the seam's input
-   type. It feeds the marker-anchored parser unchanged. A document VLM instead emits
-   prose/markdown that would have to be re-parsed, discarding Waves 1–2.
-2. **Published clean-input accuracy makes it a strong candidate at comparable
-   footprint**, but that number is not evidence on Medigraph phone photos. Task 0.7
-   decides integration feasibility; Tasks 3.9 and 5.5 decide quality and device
-   readiness. Tesseract remains the named fallback rather than being pre-dismissed.
-3. **It runs in the browser.** Official `@paddleocr/paddleocr-js` on onnxruntime-web
-   (WASM + SIMD + threads, WebGPU when available, INT8 dynamic quantisation), plus
-   community ports. Verified real and actively maintained — but its documented path
-   is the built-in models, and no official ONNX export of the Greek rec model
-   exists; conversion and custom-model wiring are exactly what 0.7 must prove. At
-   ~15 MB it is comparable to the tessdata + WASM it replaces — an accuracy upgrade
-   that **costs no privacy and needs no server**.
+No, but it is the strongest *available* accuracy lever and it is already the E0 path.
+The distinction that matters is not PDF-versus-image but **text-layer versus
+raster** — a scanned report wrapped in a PDF still needs OCR, which is why Task 3.4
+routes per page rather than per file.
+
+Restricting to text-layer PDFs eliminates the recognition error class outright: pdf.js
+yields exact character codes, so `low-ocr-confidence` disappears. What survives:
+
+- **Recognition is solved; parsing is not.** Deciding that `245` is the value and
+  `30 - 400` is the range — rather than a previous-visit column, a footnote marker or
+  an age-banded second range — is the hard part, and a perfect text layer does not
+  help with it. Greek labs that print a prior result beside the current one are the
+  dangerous case: both numbers are read perfectly and charting the wrong one is silent.
+- **Text layers are not always honest.** Content-stream order is not reading order,
+  and subsetted fonts with broken `ToUnicode` CMaps yield mojibake or Latin lookalikes
+  (`Α`/`A`, `Ρ`/`P`, `Ο`/`O`) that are especially damaging in Greek. Task 3.4 already
+  assumes garbage text layers exist and gates on usability.
+- **D6 and D7 are untouched.** A text-layer PDF carries the patient's name and AMKA in
+  *machine-readable* form, so the scrub gate matters at least as much. Collection,
+  report, print and birth dates all appear; `DateCandidate.kind` exists precisely
+  because choosing among them is not automatic.
+- **Registry misses and duplicate-marker conflicts** remain review actions by
+  construction.
+
+So PDF-only shrinks review's workload substantially without removing it. Whether it
+shrinks it *enough* to feel effortless is measurable rather than arguable: the corpus
+scorer's `valuePrecision`, `unitPrecision` and `rangePrecision` against the Task 3.9
+floors answer it directly, on our own documents. Note the product cost before treating
+it as free — phone photos of paper reports are plausibly the dominant input for older
+Greek results, and "your PDF is the wrong kind of PDF" is a confusing rejection. As a
+*sequencing* decision (ship E0 first, hold E1 to its gates) it is sound and already
+what D1a describes; as a claim that review becomes unnecessary, it is not supported.
+
+### 3. On-device (E2-local): blocked on capability, not on privacy
+
+| Model | Greek | Browser path | Weight budget |
+|---|---|---|---|
+| **PP-OCRv5 `el` mobile** | ✅ dedicated `el_PP-OCRv5_mobile_rec`, 89.28 % | ✅ onnxruntime-web | **~15 MB** (det 4.94 MB + rec ~10 MB) |
+| Tesseract `ell` | ✅ | ✅ mature | ~1.4 MB data |
+| PaddleOCR-VL 0.9B / 1.5 / 1.6 | ✅ edit distance **0.135** ([arXiv 2510.14528](https://arxiv.org/abs/2510.14528)) | ❌ no ONNX export; Paddle-framework | ~500–700 MB at Q4 |
+| SmolVLM | ❌ 6 languages, no Greek | ✅ | — |
+| Granite-Docling-258M | ❌ English + experimental AR/ZH/JA | ✅ | best size fit, no Greek |
+| LFM-2.5VL-1.6B | ❌ not claimed | ✅ shipped WebGPU demo | **~1.5 GB, ~90 s first load** |
+| dots.ocr | ✅ | ❌ | 3B — consumer GPU |
+| PP-OCRv6 tiny/small/medium | ❌ | ✅ (but useless) | 1.5–34.5M |
+
+Greek is PaddleOCR-VL's second-worst script (0.135 against 0.013 for Latin — roughly
+ten times the error rate) and that is on clean benchmark scans, not phone photos.
+GGUF/llama.cpp support for it landed 2026-03-06 and wllama v3 added WebGPU with
+multimodal, so a browser path is newly *conceivable*; nobody has published one. That
+is a research project, not an integration.
+
+**The device gate settles it regardless of Greek.** A 0.9B model at Q4 is ~500–700 MB
+(≈40× PP-OCRv5) with a 1–2 GB working set. Task 5.5 gates on a mid-range Android and a
+four-year-old iPhone at ≤512 MiB peak and ≤15 s/page, and Safari's WebGPU Metal
+backend caps buffers at ~256 MB on iPhone (~993 MB on iPad Pro). It does not fit.
+
+**Weight delivery never requires a server.** Cloudflare Pages caps one asset at
+25 MiB, but ONNX external-data sharding splits a 600 MB model across ~25 files against
+a 20,000-file limit, and an R2 public bucket serves multi-GB files with no egress fee.
+If it runs on the device, our existing hosting delivers it. If it needs a server, it is
+not on-device — the document has left, and D1 is gone. **There is no version of
+"run it locally" that forces us to provision a VPS.**
+
+### 4. Off-device (E2-remote): cheap, and still rejected
+
+**A cheap CPU box is dead on measured numbers.** PaddleOCR-VL 1.6 takes ~53 s/page on
+an Apple M5 Pro CPU; two shared vCores are a small fraction of that machine, putting a
+page in the several-minute range. That corroborates the original estimate here with
+measurement rather than extrapolation. The CPU escape route also got worse: Hetzner
+raised dedicated-vCPU CCX prices 113–176 % in June 2026 (CCX63 now €853.49/mo).
+
+**Flat-rate GPU hosting is the wrong shape for this workload.**
+
+| Option | Price | Notes |
+|---|---|---|
+| Hetzner GEX44 (RTX 4000 SFF Ada, 20 GB) | €184/mo + €79 setup | EU |
+| Scaleway L4 (24 GB) | €0.79/GPU/hr ≈ €569/mo always-on | EU |
+| GPU Mart RTX A4000 (16 GB) | $119/mo | US — triggers Chapter V transfer machinery |
+
+VRAM is a non-issue (~1 GB INT8, ~2 GB FP16). Throughput is ~45 pages/min peak on an
+L40S and roughly half that sustained; a RTX 4000 is a fraction again. That is far more
+capacity than we need, running permanently, for a workload where each user attaches a
+handful of pages a few times a *year*. At 100 active users/month × ~15 pages, a
+€184/mo box costs ~€0.12/page while scale providers charge ~$0.0007 — about 170×
+worse, because the box idles more than 99 % of the time.
+
+**The right shape, if one accepted the premise, is serverless GPU.** Bursty
+scale-to-zero traffic is what per-second billing exists for. 1,500 pages/month at ~4 s
+of GPU each is ~100 GPU-minutes: **roughly €2–4/month.** Infrastructure cost is a
+rounding error and "a VPS" was never the right question.
+
+**So the rejection rests entirely on the following, and must be stated that way.**
+
+- **The legal posture inverts.** We would receive Article 9 special-category health
+  data and become a controller: explicit consent under Art. 9(2)(a), Art. 13
+  transparency, a **DPIA under Art. 35** (likely mandatory), Art. 30 records,
+  Art. 33/34 breach notification within 72 hours, an Art. 37 DPO assessment, an
+  Art. 28 processor agreement with the host, and Chapter V transfer machinery if the
+  hardware sits outside the EEA — which eliminates the cheapest row in the table above.
+- **It contradicts the project's binding constraint.** The constraint is GDPR-shaped:
+  *no sensitive user data on Medigraph's server.* A VPS is Medigraph's server. This
+  option collides with that constraint more directly than a third-party API does,
+  because it puts the data on the one machine the constraint names.
+- **It demolishes the architecture.** It supersedes D1, D1a and D2, voids ADR-0009,
+  rewrites the Task 0.4 CSP, deletes the Task 5.2 egress regression test, and requires
+  a new threat model and privacy page. D2's pure-static, no-Workers, no-SSR property —
+  the shape the whole plan is built on — is gone.
+- **It carries permanent operational duty**: upload endpoint, consent flow, auth, rate
+  limiting, abuse prevention, queue, DDoS, secrets, monitoring, patching, on-call,
+  deletion guarantees, no-training warranties, audit logging.
+- **And it still does not delete review** (§1).
 
 ### Consequences for this plan
 
-- **No VPS.** It was investigated and is not needed: both E1 candidates run
-  client-side. Do not provision one. If E1 proves inadequate, improve preprocessing
-  and quantisation or ship it as assisted/beta; do not quietly add a server fallback.
-- **Any server-side deployment breaks D1's invariant** — document content would leave
-  the device. It is a different product posture requiring an ADR that supersedes
-  D1/D1a, a new threat/legal review, rewritten privacy copy, explicit per-use consent
-  and a separate build. This plan neither approves nor implements it.
+- **No VPS, and not because of the price.** Both E1 candidates run client-side, so no
+  server is needed; and if one were provisioned anyway it would cost about €3/month in
+  compute while costing the project its privacy posture. Do not provision one. If E1
+  proves inadequate, improve preprocessing and quantisation, restrict to E0, or ship
+  E1 as assisted/beta — do not quietly add a server fallback.
+- **Any off-device deployment breaks D1's invariant**, whether the server is a third
+  party's or our own. It is a different product posture requiring an ADR that
+  supersedes D1/D1a, a new threat/legal review, rewritten privacy copy, explicit
+  per-use consent and a separate build. This plan neither approves nor implements it.
 - **Do not adopt PP-OCRv6.** It is newer, smaller and faster, and it cannot read
-  Greek — its 50 languages are ZH/EN/JA plus 46 *Latin-script* ones. Record this in
-  the D3 ADR so nobody "upgrades" into a regression.
+  Greek — its 50 languages are ZH/EN/JA plus 46 *Latin-script* ones. Greek support
+  exists in v5 and was dropped in v6. Recorded in the D3 ADR so nobody "upgrades" into
+  a regression.
 - **Do not swap in Granite-Docling** on size grounds either; it has no Greek.
+- **PP-OCRv5 remains the leading E1 candidate, not a foregone conclusion.** It emits
+  positioned text boxes — natively our `TextItem[]` (D4) — feeding the marker-anchored
+  parser unchanged, where a document VLM emits prose that would have to be re-parsed.
+  Its published accuracy is clean-input accuracy and is not evidence about Medigraph
+  phone photos: Task 0.7 decides integration feasibility, Tasks 3.9 and 5.5 decide
+  quality and device readiness, and `tesseract.js` with `ell+eng` remains the named
+  fallback rather than being pre-dismissed. No official ONNX export of the Greek
+  recognition model exists; conversion and dictionary wiring are exactly what 0.7 must
+  prove. At ~15 MB it is an accuracy upgrade that costs no privacy and needs no server.
 
 ## Known risks
 
@@ -2064,7 +2295,7 @@ even then would be far slower than the OCR path.
 - **Anonymous single-Profile storage can still mix people.** The same-person gate is
   explicit but cannot be verified without storing identity. Never auto-append/import;
   make Replace/Merge and report counts visible, and preserve cancellation.
-- **Guard the D4 seam even though E2 is not implemented.** Optional source evidence
+- **Guard the D4 seam even though no E2 tier is implemented.** Optional source evidence
   must not become a required pdf.js/OCR object, and direct-row adapters must still
   satisfy date and identifier review contracts.
 - **Marker alignment across labs will occasionally be wrong.** v1 mitigation is

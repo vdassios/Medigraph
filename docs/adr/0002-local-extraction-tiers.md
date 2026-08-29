@@ -20,17 +20,25 @@ v1 has two local extraction modes:
 E1 is called a shipping default only after real image-to-OCR quality and supported
 phone performance gates pass. Otherwise it remains available as assisted/beta with
 honest copy. **E2** is reserved vocabulary for a possible future document-VLM
-adapter; no remote E2 code, endpoint, key flow or dormant upload feature ships in v1.
+adapter; no E2 code, endpoint, key flow or dormant upload feature ships in v1.
 
-A future remote E2 proposal requires a separate build and an ADR explicitly
+A future E2-remote proposal requires a separate build and an ADR explicitly
 superseding D1 and this ADR, plus new threat/legal review, privacy copy and per-use
 consent. Merely supplying one's own API key does not make data egress D1-conforming.
 
+**Amended 2026-08-29 ([ADR-0011](0011-no-vision-language-model-for-v1.md)):** E2 now
+splits into **E2-local** (on-device inference, D1-conforming, blocked on Greek model
+coverage and device limits rather than on privacy) and **E2-remote** (off-device
+inference of any kind, *including a server we operate ourselves*, barred by the data
+rule). The undifferentiated term invited two errors: treating a vision model as
+inherently privacy-breaking, and treating "self-hosted" as inherently
+privacy-preserving. The test is whether the bytes leave the device.
+
 **Amended 2026-08-29 ([ADR-0009](0009-egress-data-rule-and-origin-allowlist.md)):** D1
 now permits declared third-party *inbound* asset fetches via a `connect-src` allowlist.
-This does not soften the E2 boundary. E2 is barred because it transmits document
-content off the device, which the data rule forbids outright — not because it contacts
-a foreign origin. Declaring an origin in the allowlist can never authorise E2, and the
+This does not soften the E2-remote boundary. E2-remote is barred because it transmits
+document content off the device, which the data rule forbids outright — not because it
+contacts a foreign origin. Declaring an origin can never authorise E2-remote, and the
 non-`self` request-shape rule (GET/HEAD, no query, no body, no app-set header) makes an
 inference API structurally unreachable through it.
 

@@ -44,8 +44,9 @@ escape, because none has an inbound-asset use case.
 
 **Adding an allowlisted origin is an ordinary code-review decision**, checked against
 the data rule. Transmitting user data requires an ADR superseding this one. Declaring
-an origin can never authorise E2 (see [ADR-0002](0002-local-extraction-tiers.md)):
-E2 is barred by the data rule, not by the origin rule.
+an origin can never authorise E2-remote (see
+[ADR-0002](0002-local-extraction-tiers.md)): E2-remote is barred by the data rule, not
+by the origin rule.
 
 **Self-hosting is retained as the default, but as a choice rather than a mandate.**
 It is free on the Cloudflare Pages target (20,000 files, 25 MiB per file, unlimited
