@@ -31,7 +31,7 @@ Refs: #42
    whole task.
 
 If the request to commit is explicit, follow the structure below and then also append
-the identity trailers described under *Identity trailers*.
+the identity trailers described under _Identity trailers_.
 
 ## Header
 
@@ -45,8 +45,8 @@ Follows [`@commitlint/config-conventional`](https://github.com/conventional-chan
   `profile`, `series`, `ui`, `storage`, `fileformat`, `ci`, `deps`, `fixtures`.
   Omit the scope when a change genuinely spans many areas.
 - **subject** is not empty, does not end in a period, and is not sentence-case,
-  start-case, pascal-case or upper-case. Write it in the imperative: *add*, not
-  *added* or *adds*.
+  start-case, pascal-case or upper-case. Write it in the imperative: _add_, not
+  _added_ or _adds_.
 - The whole header is **≤ 100 characters**.
 
 ## Body
@@ -67,7 +67,7 @@ Follows [`@commitlint/config-conventional`](https://github.com/conventional-chan
   work was undertaken. Reasoning belongs in an ADR, not a commit message.
 - Each line is **≤ 100 characters**. Wrap a long entry onto a continuation line
   indented to align under the entry text, not under the `-`.
-- Do not use blank lines *inside* the body, and do not use sub-bullets, prose
+- Do not use blank lines _inside_ the body, and do not use sub-bullets, prose
   paragraphs or nested lists.
 
 ## Footer

@@ -19,8 +19,8 @@ would the server cost? An earlier appendix had answered a narrower version ("whi
 fits a €4.54/mo VPS-1") with "none, and we don't need one" — a correct conclusion
 reached on cost grounds that do not actually hold.
 
-Two terms were doing damage. "**Local**" was ambiguous between *on the user's device*
-and *on hardware we own*, which are opposite privacy postures. And "**E2**" named a
+Two terms were doing damage. "**Local**" was ambiguous between _on the user's device_
+and _on hardware we own_, which are opposite privacy postures. And "**E2**" named a
 single hypothetical future tier without distinguishing them, which invited two
 symmetrical errors: treating any vision model as inherently privacy-breaking, and
 treating "self-hosted" as inherently privacy-preserving.
@@ -59,10 +59,10 @@ VLM, our own hardware and a hosted API equally.
 - On medical reports specifically, character-level errors on fine-print numeric values
   and units are a recurring end-to-end VLM failure pattern
   ([MedRepBench, arXiv 2508.16674](https://arxiv.org/abs/2508.16674)).
-- The failure *shape* matters more than the rate. Our parser emits `ParseFlag`s and a
+- The failure _shape_ matters more than the rate. Our parser emits `ParseFlag`s and a
   `Confidence` that review sorts on; a generative extractor resolves an ambiguous
   `1`/`7` silently. A model that raises average accuracy while removing the signal
-  identifying *which rows to distrust* is a net loss at a better headline score.
+  identifying _which rows to distrust_ is a net loss at a better headline score.
 - A VLM would also enter the D4 seam with `evidenceAvailable: false`, costing us crop
   inspection — the thing that makes review fast — and bypassing the D5a registry.
 
@@ -80,7 +80,7 @@ If it runs on the device, our existing hosting delivers it; if it needs a server
 not on-device. **No "run it locally" option forces us to provision a VPS.**
 
 **E2-remote is cheap.** This must be recorded, because it is the strongest argument
-*for* the option and an ADR that omitted it would not survive scrutiny. A dedicated
+_for_ the option and an ADR that omitted it would not survive scrutiny. A dedicated
 GPU box is €184–569/mo and is the wrong shape — the workload is a handful of pages per
 user a few times a year, so the box idles over 99 % of the time and costs ~€0.12/page
 against ~$0.0007 at scale providers. The right shape is serverless GPU with per-second
@@ -95,7 +95,7 @@ strongest accuracy lever available and is already the E0 path — but parse-role
 ambiguity survives (deciding that `245` is the value and `30 - 400` the range, not a
 previous-visit column), subsetted fonts with broken `ToUnicode` CMaps yield Greek
 mojibake and Latin lookalikes, and D6/D7 are untouched. Whether it shrinks review
-*enough* is measurable against the Task 3.9 corpus floors rather than arguable.
+_enough_ is measurable against the Task 3.9 corpus floors rather than arguable.
 
 ## Alternatives considered
 
@@ -106,16 +106,16 @@ mojibake and Latin lookalikes, and D6/D7 are untouched. Whether it shrinks revie
   processor agreement, and Chapter V machinery if the hardware sits outside the EEA).
   It supersedes D1, D1a and D2, voids ADR-0009, rewrites the Task 0.4 CSP, deletes the
   Task 5.2 egress test, and ends D2's pure-static deployment. It also contradicts the
-  project's binding constraint — *no sensitive user data on Medigraph's server* — more
+  project's binding constraint — _no sensitive user data on Medigraph's server_ — more
   directly than a third-party API would, because it puts the data on the one machine
   the constraint names. And it still would not delete review.
 - **A hosted third-party vision API:** rejected. Confirmed 2026-08-29 that outward flow
-  of document content remains barred; only third-party *inbound* asset fetches are
+  of document content remains barred; only third-party _inbound_ asset fetches are
   permitted, and those only via D1's declared allowlist.
 - **An on-device VLM in v1 (E2-local now):** rejected on capability — no Greek model
   with a browser path, and the weight and memory budget fails Task 5.5. Revisit only
-  if a Greek-capable model gains a real browser runtime *and* clears the device gate.
-- **Accept PDFs only and drop review:** rejected. Worth considering as a *sequencing*
+  if a Greek-capable model gains a real browser runtime _and_ clears the device gate.
+- **Accept PDFs only and drop review:** rejected. Worth considering as a _sequencing_
   choice (ship E0, hold E1 to its gates), which D1a already permits; not as grounds
   for removing review.
 - **Keep review but justify it on accuracy alone:** rejected. That framing is what
@@ -127,8 +127,8 @@ mojibake and Latin lookalikes, and D6/D7 are untouched. Whether it shrinks revie
 D1a is rewritten to carry the E2-local / E2-remote split; ADR-0002 is amended with the
 same split; the plan's "Why this shape" paragraph restates review on three independent
 grounds; and the OCR/vision-model appendix is replaced with the evidence above. Task
-4.2a is added to Wave 4 to reduce review *friction* — confidence triage, batch confirm,
-inline crop-adjacent correction — without reducing review *authority*.
+4.2a is added to Wave 4 to reduce review _friction_ — confidence triage, batch confirm,
+inline crop-adjacent correction — without reducing review _authority_.
 
 Nothing about the extraction seam changes: D4 still admits a direct-row adapter, and
 the `'E2'` tier literal in `ExtractionResult` and `ExtractionAdapter` is unchanged and

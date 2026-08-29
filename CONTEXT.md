@@ -14,29 +14,29 @@ reported; it never interprets it.
 
 ## Ubiquitous language
 
-| Term | Meaning |
-|---|---|
-| **Source file** | A PDF or image attached for one review session. It is transient. |
-| **TextItem** | A positioned text observation with a stable id, page-normalised rectangle and optional recognition confidence. |
-| **Row** | TextItems clustered by vertical overlap. |
-| **ParsedRow** | An ephemeral measurement candidate with parse status, confidence, flags and optional source evidence. |
-| **ExtractionResult** | One source file's ephemeral rows, date candidates, identifier candidates and optional evidence pages. |
-| **Review session** | One attach batch's transactional draft. All gates must resolve before one atomic Confirm. |
-| **Marker** | A biological quantity tracked over time. |
-| **Marker key** | A stable canonical id, or `x:<normalised-label>` for a reviewed unknown marker. |
-| **Marker seed** | The sourced Greek/English vocabulary extracted from ΚΕΟΚΕΕ (Task 0.5c) that registry aliases may be authored from. It is vocabulary, not a registry. |
-| **Report** | The confirmed measurements from one collection event, identified by an opaque UUID and user-confirmed local civil date/time. Equal dates do not imply the same Report. |
-| **Measurement** | One confirmed marker result in native lab value, unit and reference range. Marker keys are unique within a Report. |
-| **Reference range** | A closed, minimum-only or maximum-only interval printed by the lab for one Measurement. It is not a property of the Marker. |
-| **Series** | One marker's compatible-unit Measurements across Reports, ordered by collection date/time. |
-| **Profile** | One anonymous person's complete confirmed local dataset. It is the only medical-data object persisted or exported. |
-| **Conflict** | Duplicate candidate rows for one marker in a proposed Report; review must choose or edit exactly one Measurement. |
+| Term                 | Meaning                                                                                                                                                                |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source file**      | A PDF or image attached for one review session. It is transient.                                                                                                       |
+| **TextItem**         | A positioned text observation with a stable id, page-normalised rectangle and optional recognition confidence.                                                         |
+| **Row**              | TextItems clustered by vertical overlap.                                                                                                                               |
+| **ParsedRow**        | An ephemeral measurement candidate with parse status, confidence, flags and optional source evidence.                                                                  |
+| **ExtractionResult** | One source file's ephemeral rows, date candidates, identifier candidates and optional evidence pages.                                                                  |
+| **Review session**   | One attach batch's transactional draft. All gates must resolve before one atomic Confirm.                                                                              |
+| **Marker**           | A biological quantity tracked over time.                                                                                                                               |
+| **Marker key**       | A stable canonical id, or `x:<normalised-label>` for a reviewed unknown marker.                                                                                        |
+| **Marker seed**      | The sourced Greek/English vocabulary extracted from ΚΕΟΚΕΕ (Task 0.5c) that registry aliases may be authored from. It is vocabulary, not a registry.                   |
+| **Report**           | The confirmed measurements from one collection event, identified by an opaque UUID and user-confirmed local civil date/time. Equal dates do not imply the same Report. |
+| **Measurement**      | One confirmed marker result in native lab value, unit and reference range. Marker keys are unique within a Report.                                                     |
+| **Reference range**  | A closed, minimum-only or maximum-only interval printed by the lab for one Measurement. It is not a property of the Marker.                                            |
+| **Series**           | One marker's compatible-unit Measurements across Reports, ordered by collection date/time.                                                                             |
+| **Profile**          | One anonymous person's complete confirmed local dataset. It is the only medical-data object persisted or exported.                                                     |
+| **Conflict**         | Duplicate candidate rows for one marker in a proposed Report; review must choose or edit exactly one Measurement.                                                      |
 
 ## Invariants
 
 - Runtime processing is local; no source or derived user data is sent to any origin —
   neither Medigraph's own nor a third party's. No telemetry, no error reporting.
-- Third-party *inbound* asset fetches are permitted only from a declared `connect-src`
+- Third-party _inbound_ asset fetches are permitted only from a declared `connect-src`
   origin allowlist, empty in v1; requests to a non-`self` origin carry no query, body
   or app-set header. No E2-remote code ships in v1 — off-device inference is barred
   whether the server is a third party's or our own — and declaring an origin can never

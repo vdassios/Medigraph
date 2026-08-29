@@ -4,7 +4,7 @@
 
 People accumulate lab results as loose PDFs and phone photos: one per year, from
 different labs, in different languages. Any single report tells you whether a marker
-is in range *today*. What nobody can see is all of it at once — every ferritin result
+is in range _today_. What nobody can see is all of it at once — every ferritin result
 you have ever been given, side by side, each against the reference range its own lab
 printed at the time.
 
@@ -110,7 +110,7 @@ never enter IndexedDB, Cache Storage or an export.
 
 Layouts differ per lab — column counts, header wording, sections, gutters, whether
 units are glued to values, whether ranges even have a column. What barely differs is
-the *marker*. So Medigraph anchors on the marker and reads outward, instead of
+the _marker_. So Medigraph anchors on the marker and reads outward, instead of
 reconstructing the table and hoping the marker is in column one.
 
 ```mermaid
@@ -253,23 +253,23 @@ The [decision table](docs/plan.md#decisions-already-made-do-not-re-litigate) is 
 menu. Do not re-litigate an entry: if one is genuinely wrong, change `docs/plan.md`
 first, record it as an ADR, and only then change code.
 
-| # | Decision | ADR |
-| --- | --- | --- |
-| **D1** | **No user-data egress.** Nothing derived from a document leaves the device — not to Medigraph's origin, not to a third party. No telemetry, no error reporting. Inbound third-party asset fetches must be declared in the `connect-src` allowlist (empty in v1) and be GET/HEAD with no query, body or app-set header. `WebSocket`, `EventSource`, `sendBeacon`, `RTCPeerConnection` are never constructed. | [0009](docs/adr/0009-egress-data-rule-and-origin-allowlist.md) *(supersedes [0001](docs/adr/0001-no-user-data-egress.md))* |
-| **D1a** | **Extraction modes.** E0 = pdf.js text layer. E1 = the selected in-browser Greek OCR engine. E2 names a possible future document-VLM adapter; a remote E2 violates D1's data rule and needs a new ADR. No remote E2 code ships in v1. | [0002](docs/adr/0002-local-extraction-tiers.md) |
-| **D2** | **Astro 5 static + one Preact island.** Cloudflare Pages, pure static assets, no SSR. | — |
-| **D3** | **All v1 extraction is local and deterministic.** Task 0.7 proves PP-OCRv5 Greek ONNX or falls back to `tesseract.js`; the corpus, not vendor accuracy, decides release readiness. | [0003](docs/adr/0003-gated-local-ocr.md) |
-| **D4** | **One extraction seam, two observation shapes, one review draft.** Adapters emit positioned `TextItem`s or direct `ParsedRow`s; both converge into `ExtractionResult` before review. | [0004](docs/adr/0004-extraction-observation-seam.md) |
-| **D5** | **Marker-anchored parsing is primary; layout parsing is secondary.** | — |
-| **D5a** | **The marker registry is the product's core asset**, versioned, corpus-tested and scored. | — |
-| **D6** | **Mandatory transactional review.** One batch, one session, one atomic Confirm. | [0005](docs/adr/0005-transactional-review-and-identifier-gate.md) |
-| **D7** | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields; unknown labels always appear in the scrub surface. | [0005](docs/adr/0005-transactional-review-and-identifier-gate.md) |
-| **D8** | **Plaintext IndexedDB for one anonymous local Profile.** Appending to a non-empty Profile requires explicit same-person confirmation. | [0006](docs/adr/0006-plaintext-local-profile-storage.md) |
-| **D9** | **Plaintext, versioned `.medigraph` JSON.** No encryption, no passphrase. Import previews Cancel/Replace/Merge and never silently overwrites. | [0007](docs/adr/0007-plaintext-medigraph-files.md) |
-| **D10** | **No LOINC codes in v1.** Our own stable string ids. | — |
-| **D11** | **Charts are hand-written SVG Preact components.** No charting library. | — |
-| **D12** | **No dual-axis charts, ever.** Different units are never overlaid on one y-scale. | — |
-| **D13** | **Display only.** No severity language, no clinical inference, no trend direction, slope, rate of change or delta badge, in any view or in any product copy. | [0010](docs/adr/0010-display-only-positioning.md) |
+| #       | Decision                                                                                                                                                                                                                                                                                                                                                                                                    | ADR                                                                                                                        |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **D1**  | **No user-data egress.** Nothing derived from a document leaves the device — not to Medigraph's origin, not to a third party. No telemetry, no error reporting. Inbound third-party asset fetches must be declared in the `connect-src` allowlist (empty in v1) and be GET/HEAD with no query, body or app-set header. `WebSocket`, `EventSource`, `sendBeacon`, `RTCPeerConnection` are never constructed. | [0009](docs/adr/0009-egress-data-rule-and-origin-allowlist.md) _(supersedes [0001](docs/adr/0001-no-user-data-egress.md))_ |
+| **D1a** | **Extraction modes.** E0 = pdf.js text layer. E1 = the selected in-browser Greek OCR engine. E2 names a possible future document-VLM adapter; a remote E2 violates D1's data rule and needs a new ADR. No remote E2 code ships in v1.                                                                                                                                                                       | [0002](docs/adr/0002-local-extraction-tiers.md)                                                                            |
+| **D2**  | **Astro 5 static + one Preact island.** Cloudflare Pages, pure static assets, no SSR.                                                                                                                                                                                                                                                                                                                       | —                                                                                                                          |
+| **D3**  | **All v1 extraction is local and deterministic.** Task 0.7 proves PP-OCRv5 Greek ONNX or falls back to `tesseract.js`; the corpus, not vendor accuracy, decides release readiness.                                                                                                                                                                                                                          | [0003](docs/adr/0003-gated-local-ocr.md)                                                                                   |
+| **D4**  | **One extraction seam, two observation shapes, one review draft.** Adapters emit positioned `TextItem`s or direct `ParsedRow`s; both converge into `ExtractionResult` before review.                                                                                                                                                                                                                        | [0004](docs/adr/0004-extraction-observation-seam.md)                                                                       |
+| **D5**  | **Marker-anchored parsing is primary; layout parsing is secondary.**                                                                                                                                                                                                                                                                                                                                        | —                                                                                                                          |
+| **D5a** | **The marker registry is the product's core asset**, versioned, corpus-tested and scored.                                                                                                                                                                                                                                                                                                                   | —                                                                                                                          |
+| **D6**  | **Mandatory transactional review.** One batch, one session, one atomic Confirm.                                                                                                                                                                                                                                                                                                                             | [0005](docs/adr/0005-transactional-review-and-identifier-gate.md)                                                          |
+| **D7**  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields; unknown labels always appear in the scrub surface.                                                                                                                                                                                                                                                            | [0005](docs/adr/0005-transactional-review-and-identifier-gate.md)                                                          |
+| **D8**  | **Plaintext IndexedDB for one anonymous local Profile.** Appending to a non-empty Profile requires explicit same-person confirmation.                                                                                                                                                                                                                                                                       | [0006](docs/adr/0006-plaintext-local-profile-storage.md)                                                                   |
+| **D9**  | **Plaintext, versioned `.medigraph` JSON.** No encryption, no passphrase. Import previews Cancel/Replace/Merge and never silently overwrites.                                                                                                                                                                                                                                                               | [0007](docs/adr/0007-plaintext-medigraph-files.md)                                                                         |
+| **D10** | **No LOINC codes in v1.** Our own stable string ids.                                                                                                                                                                                                                                                                                                                                                        | —                                                                                                                          |
+| **D11** | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                                                                                                                                                                                                                     | —                                                                                                                          |
+| **D12** | **No dual-axis charts, ever.** Different units are never overlaid on one y-scale.                                                                                                                                                                                                                                                                                                                           | —                                                                                                                          |
+| **D13** | **Display only.** No severity language, no clinical inference, no trend direction, slope, rate of change or delta badge, in any view or in any product copy.                                                                                                                                                                                                                                                | [0010](docs/adr/0010-display-only-positioning.md)                                                                          |
 
 [ADR-0008](docs/adr/0008-csp-style-attribute-amendment.md) scopes the CSP style
 directives. D13 keeps Medigraph outside MDR Rule 11, and its failure mode is gradual —
@@ -324,14 +324,14 @@ flowchart LR
   style FR fill:#fff7e6,stroke:#d97706
 ```
 
-| Wave | Contents |
-| --- | --- |
-| **0** | Domain baseline ✅ · scaffold + toolchain · contracts · synthetic seed fixtures · CSP/headers · parser and OCR corpora · scorer · OCR feasibility spike |
-| **1** | Pure domain functions, each a table-driven test file: text, numbers, ranges, units, dates, fuzzy, registry seed, identifiers, rows, review |
-| **2** | Anchors, read-out, columns, grammar, reconciliation, corpus scoring, registry expansion, release baseline, profile, series |
+| Wave  | Contents                                                                                                                                                          |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0** | Domain baseline ✅ · scaffold + toolchain · contracts · synthetic seed fixtures · CSP/headers · parser and OCR corpora · scorer · OCR feasibility spike           |
+| **1** | Pure domain functions, each a table-driven test file: text, numbers, ranges, units, dates, fuzzy, registry seed, identifiers, rows, review                        |
+| **2** | Anchors, read-out, columns, grammar, reconciliation, corpus scoring, registry expansion, release baseline, profile, series                                        |
 | **3** | pdf.js text + raster, preprocessing, OCR engine, file router, file format, storage, service worker, **E0/E1 walking slices + `types.ts` freeze**, E1 quality gate |
-| **4** | `MedigraphApp` state machine and evidence owner, FileDrop, ReviewTable, PanelView, TrendView, DataManager, Astro routes and privacy copy |
-| **5** | Happy-path E2E, D1 egress regression, bundle budget, accessibility, mobile E1 release gate, safety/lifecycle E2E |
+| **4** | `MedigraphApp` state machine and evidence owner, FileDrop, ReviewTable, PanelView, TrendView, DataManager, Astro routes and privacy copy                          |
+| **5** | Happy-path E2E, D1 egress regression, bundle budget, accessibility, mobile E1 release gate, safety/lifecycle E2E                                                  |
 
 Two empirical gates decide product shape rather than being decided in advance: **Task
 0.7** picks the OCR engine before Wave 3, and **Tasks 3.9 + 5.5** decide whether E1
@@ -345,13 +345,13 @@ hidden upload path.
 Every gate below is defined in [Verification](docs/plan.md#verification) and becomes
 runnable as its wave lands.
 
-| Command | Gate |
-| --- | --- |
-| `pnpm verify:static` | ESLint → `eslint-config-prettier` conflict check → `prettier --check` → `astro check && tsc --noEmit`. CI never rewrites files. |
-| `pnpm vitest run` | Pure domain tables, validator boundaries, merge transactions, file-format negative paths |
-| `pnpm corpus:score` | Parser floors: aggregate marker recall ≥95%, value+comparator precision ≥99%, unit ≥95%, range ≥95%; every lab independently ≥90% / ≥98%. Pass A alone ≥90% / ≥99%. |
-| `pnpm ocr:score` | E1 floors from **source pixels**, never from committed OCR TextItems: aggregate recall ≥90%, value precision ≥99%, unit/range ≥90% |
-| `pnpm playwright test` | E2E happy path, the D1 egress regression and the safety/lifecycle suite, against the exact static build under production headers |
+| Command                | Gate                                                                                                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm verify:static`   | ESLint → `eslint-config-prettier` conflict check → `prettier --check` → `astro check && tsc --noEmit`. CI never rewrites files.                                     |
+| `pnpm vitest run`      | Pure domain tables, validator boundaries, merge transactions, file-format negative paths                                                                            |
+| `pnpm corpus:score`    | Parser floors: aggregate marker recall ≥95%, value+comparator precision ≥99%, unit ≥95%, range ≥95%; every lab independently ≥90% / ≥98%. Pass A alone ≥90% / ≥99%. |
+| `pnpm ocr:score`       | E1 floors from **source pixels**, never from committed OCR TextItems: aggregate recall ≥90%, value precision ≥99%, unit/range ≥90%                                  |
+| `pnpm playwright test` | E2E happy path, the D1 egress regression and the safety/lifecycle suite, against the exact static build under production headers                                    |
 
 The CI `lint` job gates `test` and `build`, so a formatting or lint failure stops the
 pipeline before Vitest and Playwright run.
@@ -367,7 +367,7 @@ text-only rendering are part of the same control, not claims delegated to Playwr
 
 ## Corpus and fixture rules — non-negotiable
 
-- Prefer published specimen reports (*υπόδειγμα αποτελεσμάτων*): already synthetic,
+- Prefer published specimen reports (_υπόδειγμα αποτελεσμάτων_): already synthetic,
   already public.
 - **Never commit a real patient's PDF.** Real-report-derived parser fixtures commit
   redacted TextItems only. OCR source images must be public specimens or synthetic
@@ -399,12 +399,12 @@ Read [`AGENTS.md`](AGENTS.md) first, then [`docs/plan.md`](docs/plan.md).
 
 ## Documentation map
 
-| Document | What it is for |
-| --- | --- |
+| Document                       | What it is for                                                                                            |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | [`docs/plan.md`](docs/plan.md) | **Normative.** Architecture, decisions, field contracts, pipeline, chart specs, toolchain, task breakdown |
-| [`CONTEXT.md`](CONTEXT.md) | Compact vocabulary map and invariants; defer to the plan on conflict |
-| [`docs/adr/`](docs/adr/) | Accepted decision records with context and consequences |
-| [`AGENTS.md`](AGENTS.md) | Entry point and working rules for contributors and agents |
+| [`CONTEXT.md`](CONTEXT.md)     | Compact vocabulary map and invariants; defer to the plan on conflict                                      |
+| [`docs/adr/`](docs/adr/)       | Accepted decision records with context and consequences                                                   |
+| [`AGENTS.md`](AGENTS.md)       | Entry point and working rules for contributors and agents                                                 |
 
 ---
 

@@ -6,7 +6,7 @@
 
 ## Context
 
-ADR-0001 stated D1 as two coupled rules: no user data may leave the device, *and*
+ADR-0001 stated D1 as two coupled rules: no user data may leave the device, _and_
 every runtime byte must be served from a first-party content-hashed path with no
 third-party origin contacted at all. Only the first was ever the requirement.
 
@@ -16,7 +16,7 @@ already-malicious same-origin code" — while imposing permanent cost: a generat
 asset manifest, generated CSP script and style hashes regenerated from exact build
 output, checked-in hashes churning on every model upgrade, an `assetLoader`
 indirection, and a canary-based three-mode egress suite. It also produced a footgun:
-because it forbade *requests* rather than *transmission*, any future legitimate
+because it forbade _requests_ rather than _transmission_, any future legitimate
 inbound fetch would fail CI and require a plan amendment to unblock.
 
 The actual constraint is GDPR-shaped. Medigraph must not put sensitive user data on
@@ -24,7 +24,7 @@ its own infrastructure; data held on the user's own device is fine. Notably, the
 strict rule was not even the conservative choice on its own terms: a third-party CDN
 fetch discloses the visitor's IP address to that host, which is itself a
 GDPR-relevant transfer — the point of the Google Fonts ruling, LG München
-3 O 17493/20 — so a CDN would have *added* a consent obligation rather than removed
+3 O 17493/20 — so a CDN would have _added_ a consent obligation rather than removed
 one.
 
 ## Decision
@@ -62,7 +62,7 @@ XSS containment for the plaintext `Profile` in IndexedDB — a narrow, defensibl
 
 - **Keep ADR-0001 unchanged:** rejected. It bought build complexity and future
   friction for a threat model it explicitly declined to claim coverage of.
-- **Fully open third-party fetching, CDN-hosted models:** rejected as the *default*,
+- **Fully open third-party fetching, CDN-hosted models:** rejected as the _default_,
   though now permitted by declaration. On the deployment target it saves no money,
   and it would require a blocking consent interstitial before the app could load its
   own runtime — worse cost and worse UX than self-hosting.
@@ -79,6 +79,6 @@ non-`self` request-shape check and the banned-API assertions, dropping canary se
 and the cold/warm/offline matrix. Task 5.3 drops hash verification. COOP/COEP are
 retained and become free, giving Task 3.3 `crossOriginIsolated` for WASM threads.
 
-The egress test now guards against *accidental* egress. It was never a defence
+The egress test now guards against _accidental_ egress. It was never a defence
 against deliberate egress by compromised same-origin code, and ADR-0001's stricter
 rule did not make it one.

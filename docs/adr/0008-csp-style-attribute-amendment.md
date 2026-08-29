@@ -64,7 +64,7 @@ default, and ESLint reports a style attribute as an error waivable per line by a
   and produces silent runtime breakage, in exchange for closing a channel that
   `default-src 'none'` and the `'self'`-bounded fetch directives already close.
 - **`style-src 'self' 'unsafe-inline'` across the board.** Rejected: it would also
-  permit injected `<style>` *elements*, which is a strictly larger surface than the
+  permit injected `<style>` _elements_, which is a strictly larger surface than the
   attribute case that motivated the change. Splitting into `style-src-elem` and
   `style-src-attr` keeps stylesheet elements as strict as before.
 - **`'unsafe-hashes'` with a hash per style-attribute value.** Rejected: it covers

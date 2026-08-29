@@ -24,7 +24,7 @@
 
 **The problem.** People accumulate lab results as loose PDFs and phone photos, one
 per year, from different labs, in different languages. Any single report tells you
-whether a marker is in range *today*. What nobody can see is all of it at once:
+whether a marker is in range _today_. What nobody can see is all of it at once:
 every ferritin result they have ever been given, side by side, with the reference
 range each lab printed at the time. That data is already in the user's possession —
 it is just trapped in unstructured documents.
@@ -55,7 +55,7 @@ the operator, but they remain sensitive on a shared, lost or compromised device.
 Source documents, raw OCR text and review evidence are transient and are never
 persisted. All runtime code, models, workers and WASM are self-hosted static assets —
 a cost and compliance choice rather than a mandate — and there is no telemetry and no
-error reporting. Third-party *inbound* asset fetches are permitted but must be declared
+error reporting. Third-party _inbound_ asset fetches are permitted but must be declared
 in D1's `connect-src` allowlist, which is empty in v1.
 
 **Why this shape.** Keeping content on-device sharply reduces what the operator can
@@ -78,8 +78,8 @@ vision-model appendix records why no extractor, on-device or off-device, removes
 
 **Deliberately left open.** v1 does everything client-side: pdf.js for text-layer
 PDFs, the OCR engine selected by Task 0.7 for images, and a marker-anchored parser
-over both. A future *on-device* document-vision adapter (**E2-local**) remains
-possible behind the extraction seam. An *off-device* one (**E2-remote**) — whether a
+over both. A future _on-device_ document-vision adapter (**E2-local**) remains
+possible behind the extraction seam. An _off-device_ one (**E2-remote**) — whether a
 third-party API or a server we operate ourselves — would replace D1 with a different
 privacy posture; it is not a D1-conforming tier and no dormant remote-upload code
 ships in v1.
@@ -93,23 +93,23 @@ decision. The decisions all live in this document.
 
 ## Decisions already made (do not re-litigate)
 
-| # | Decision | Rationale |
-|---|---|---|
-| D1 | **No user-data egress.** No document content, raw or OCR text, crop, identifier, confirmed value or anything derived from them leaves the device — not to Medigraph's own origin, not to any third party. There is no telemetry and no error reporting. Third-party *inbound* asset fetches are permitted but must be **declared**: `connect-src` carries an explicit origin allowlist (empty in v1, because every runtime asset is self-hosted), and any request to a non-`self` origin must be a GET or HEAD with no query string, no request body and no app-set header. `WebSocket`, `EventSource`, `sendBeacon` and `RTCPeerConnection` are never constructed. Adding an allowlisted origin is an ordinary code-review decision checked against the data rule; transmitting user data requires an ADR superseding this one. | The enforceable line is *what leaves the device*, not *which origins are contacted*. Stated as a data rule it stays honest under GDPR — Medigraph is never a controller for health data it never receives — while leaving room to add a third-party asset host without amending this plan. Self-hosting remains the default because it is free on the Cloudflare Pages target and avoids the consent obligation a third-party fetch would trigger (a CDN fetch discloses the visitor's IP; see ADR-0009). The v1 CSP, service-worker policy and the slimmed Task 5.2 regression test enforce the allowlist and the request-shape rule together; none of them is a security proof against already-malicious same-origin code. |
-| D1a | **Extraction modes (`E0`/`E1`; `E2` splits into `E2-local` and `E2-remote`).** **E0** = pdf.js text layer. **E1** = the Task 0.7-selected in-browser Greek OCR engine. E1 is a shipping default only after the real image→OCR release gate passes; otherwise it ships clearly labelled assisted/beta while E0 remains supported. **E2-local** names a possible future *on-device* document-VLM adapter: it conforms to D1's data rule, and is blocked today on Greek coverage, on the absence of a browser runtime path, and on the Task 5.5 device gate — not on privacy. **E2-remote** names *off-device* inference of any kind, **including a server we operate ourselves**; it transmits document content off the device, therefore violates D1's data rule, and requires a new ADR, privacy copy, threat model and separately built consent flow. No E2 code or endpoint of either kind is present in v1. | E0/E1 keep document content on the device, and E2-local would too. The split exists because the undifferentiated `E2` invited two errors: reading "vision model" as inherently privacy-breaking, and reading "self-hosted" as inherently privacy-preserving. Neither holds — the test is whether the bytes leave the device, so our own VPS is barred on exactly the same rule as a third-party API. Note also that D1's origin allowlist does *not* open a path for E2-remote: it is barred by the data rule, not the origin rule, so declaring an origin can never authorise it. See ADR-0011 and the vision-model appendix. |
-| D2 | **Astro 5 static output + one Preact application island.** Deployed to Cloudflare Pages as pure static assets. No Workers, adapter or SSR. Marketing/privacy routes hydrate nothing; `MedigraphApp` alone owns interactive state. | Static delivery preserves the deployment/privacy shape, while one island gives the attach→review→commit transaction a single owner. |
-| D3 | **All v1 extraction is local and deterministic.** `pdfjs-dist` handles E0. Task 0.7 must prove PP-OCRv5 Greek ONNX (`PP-OCRv5_mobile_det` + `el_PP-OCRv5_mobile_rec`) in supported browsers; if it fails, the recorded fallback is `tesseract.js` with `ell+eng`. The selected engine, models, dictionary and WASM are self-hosted under `public/` and loaded lazily. | PP-OCRv5 has the better model fit but no official Greek ONNX browser path. The spike decides before Wave 3, and the OCR corpus—not vendor accuracy—decides whether E1 is release-ready. |
-| D4 | **One extraction seam, two observation shapes, one review draft.** An `ExtractionAdapter` emits either positioned `TextItem` observations or direct `ParsedRow` observations. Both converge into an `ExtractionResult` containing rows, date candidates, identifier candidates and source references before review. E0/E1 must provide row/evidence provenance; direct rows may omit it but must still provide date/identifier evidence. `TextItem.confidence` remains optional. | This keeps parser fixtures independent of PDF/OCR while preserving the evidence mandatory review needs. Domain-valued provenance enables page/crop inspection without coupling downstream code to an adapter; a future direct adapter can report source-unavailable explicitly. |
-| D5 | **Marker-anchored parsing is primary; layout parsing is secondary.** We locate known biological markers anywhere on the page, then read outward from each one. Layout/column analysis runs as a *second* pass, only to discover measurements whose label we don't recognise. | Layouts differ per lab; marker names barely do. Anchoring on the marker makes the parser layout-agnostic by construction. See the pipeline spec. |
-| D5a | **The marker registry is the product's core asset, not a lookup table.** Its Greek alias coverage determines extraction quality more than any other single factor, and it is versioned, corpus-tested and scored. | Direct consequence of D5: if the parser is marker-driven, registry coverage *is* parser quality. |
-| D6 | **Mandatory transactional review.** One attach batch produces one review session. Nothing is charted or persisted until all dates, report groupings, conflicts and identifier candidates are resolved and the user confirms the whole batch. Low-confidence rows sort first; every row can be edited, deleted or reassigned, and every E0/E1 row can be inspected at its source page/crop. | A silent misparse becomes a wrong health chart. A batch transaction prevents half-reviewed files from leaking into history. |
-| D7 | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. Every identifier candidate must be redacted, have its row deleted, or be explicitly dismissed as a false positive before Confirm enables. Unknown labels are always included in the scrub surface. All references to source files, object URLs, bitmaps, raw text and crops are released on confirm/cancel and never enter IndexedDB, Cache Storage or export. | Merely displaying PII candidates does not enforce the promise. The residual free-text path is an approved unknown-marker label, so it needs both review and a final safety validator. |
-| D8 | **Plaintext IndexedDB for one anonymous local Profile.** The app persists only confirmed `Profile` data. Before appending to a non-empty Profile, the user must confirm that the new reports belong to the same person; no patient identity is stored. | This provides useful returning-user history without implying at-rest protection. The privacy page must disclose shared-device, XSS, backup/sync and browser-eviction risks. |
-| D9 | **Plaintext, versioned `.medigraph` JSON; no encryption or decryption.** Export is a transparent JSON envelope around one validated `Profile`, with explicit sensitivity warnings and size limits. Import offers previewed Cancel/Replace/Merge semantics and never silently overwrites local data. | Passphrases and recovery complexity are unnecessary for v1. Plaintext is an intentional usability trade-off, not a security feature; users must be told to store the file as they would the original lab reports. |
-| D10 | **No LOINC codes in v1.** Canonical marker registry uses our own stable string IDs. | LOINC codes are a hallucination magnet for builder models and buy nothing at this stage. |
-| D11 | **Charts are hand-written SVG Preact components.** No charting library. | Only two chart forms are needed, both simple; a library costs more bundle than it saves, and hand-rolled SVG gives us the accessibility and touch behaviour the spec below requires. |
-| D12 | **No dual-axis charts, ever.** Markers with different units are never overlaid on one y-scale. | Universal data-viz rule; see chart specs. |
-| D13 | **Display only: Medigraph never characterises a value or a trend.** Every status string is traceable to the reference range the lab itself printed. No severity language, no clinical inference, no trend direction, slope, rate of change or delta badge, in any view or in any product copy. Marketing copy states a capability (see your own data over time), never a clinical insight. | Under [MDCG 2019-11](https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2019_11_guidance_en_0.pdf) the manufacturer's stated **intended purpose** is the primary qualification trigger, and interpretive software lands under MDR Rule 11 at Class IIa or above — notified body, CE marking, QMS. Display-only positioning stays outside that regime at almost no cost, because the chart specs were already written this way. This is a design constraint recorded for engineering purposes, not legal advice. |
+| #   | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **No user-data egress.** No document content, raw or OCR text, crop, identifier, confirmed value or anything derived from them leaves the device — not to Medigraph's own origin, not to any third party. There is no telemetry and no error reporting. Third-party _inbound_ asset fetches are permitted but must be **declared**: `connect-src` carries an explicit origin allowlist (empty in v1, because every runtime asset is self-hosted), and any request to a non-`self` origin must be a GET or HEAD with no query string, no request body and no app-set header. `WebSocket`, `EventSource`, `sendBeacon` and `RTCPeerConnection` are never constructed. Adding an allowlisted origin is an ordinary code-review decision checked against the data rule; transmitting user data requires an ADR superseding this one.                                                                               | The enforceable line is _what leaves the device_, not _which origins are contacted_. Stated as a data rule it stays honest under GDPR — Medigraph is never a controller for health data it never receives — while leaving room to add a third-party asset host without amending this plan. Self-hosting remains the default because it is free on the Cloudflare Pages target and avoids the consent obligation a third-party fetch would trigger (a CDN fetch discloses the visitor's IP; see ADR-0009). The v1 CSP, service-worker policy and the slimmed Task 5.2 regression test enforce the allowlist and the request-shape rule together; none of them is a security proof against already-malicious same-origin code. |
+| D1a | **Extraction modes (`E0`/`E1`; `E2` splits into `E2-local` and `E2-remote`).** **E0** = pdf.js text layer. **E1** = the Task 0.7-selected in-browser Greek OCR engine. E1 is a shipping default only after the real image→OCR release gate passes; otherwise it ships clearly labelled assisted/beta while E0 remains supported. **E2-local** names a possible future _on-device_ document-VLM adapter: it conforms to D1's data rule, and is blocked today on Greek coverage, on the absence of a browser runtime path, and on the Task 5.5 device gate — not on privacy. **E2-remote** names _off-device_ inference of any kind, **including a server we operate ourselves**; it transmits document content off the device, therefore violates D1's data rule, and requires a new ADR, privacy copy, threat model and separately built consent flow. No E2 code or endpoint of either kind is present in v1. | E0/E1 keep document content on the device, and E2-local would too. The split exists because the undifferentiated `E2` invited two errors: reading "vision model" as inherently privacy-breaking, and reading "self-hosted" as inherently privacy-preserving. Neither holds — the test is whether the bytes leave the device, so our own VPS is barred on exactly the same rule as a third-party API. Note also that D1's origin allowlist does _not_ open a path for E2-remote: it is barred by the data rule, not the origin rule, so declaring an origin can never authorise it. See ADR-0011 and the vision-model appendix.                                                                                               |
+| D2  | **Astro 5 static output + one Preact application island.** Deployed to Cloudflare Pages as pure static assets. No Workers, adapter or SSR. Marketing/privacy routes hydrate nothing; `MedigraphApp` alone owns interactive state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Static delivery preserves the deployment/privacy shape, while one island gives the attach→review→commit transaction a single owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| D3  | **All v1 extraction is local and deterministic.** `pdfjs-dist` handles E0. Task 0.7 must prove PP-OCRv5 Greek ONNX (`PP-OCRv5_mobile_det` + `el_PP-OCRv5_mobile_rec`) in supported browsers; if it fails, the recorded fallback is `tesseract.js` with `ell+eng`. The selected engine, models, dictionary and WASM are self-hosted under `public/` and loaded lazily.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | PP-OCRv5 has the better model fit but no official Greek ONNX browser path. The spike decides before Wave 3, and the OCR corpus—not vendor accuracy—decides whether E1 is release-ready.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| D4  | **One extraction seam, two observation shapes, one review draft.** An `ExtractionAdapter` emits either positioned `TextItem` observations or direct `ParsedRow` observations. Both converge into an `ExtractionResult` containing rows, date candidates, identifier candidates and source references before review. E0/E1 must provide row/evidence provenance; direct rows may omit it but must still provide date/identifier evidence. `TextItem.confidence` remains optional.                                                                                                                                                                                                                                                                                                                                                                                                                               | This keeps parser fixtures independent of PDF/OCR while preserving the evidence mandatory review needs. Domain-valued provenance enables page/crop inspection without coupling downstream code to an adapter; a future direct adapter can report source-unavailable explicitly.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| D5  | **Marker-anchored parsing is primary; layout parsing is secondary.** We locate known biological markers anywhere on the page, then read outward from each one. Layout/column analysis runs as a _second_ pass, only to discover measurements whose label we don't recognise.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Layouts differ per lab; marker names barely do. Anchoring on the marker makes the parser layout-agnostic by construction. See the pipeline spec.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| D5a | **The marker registry is the product's core asset, not a lookup table.** Its Greek alias coverage determines extraction quality more than any other single factor, and it is versioned, corpus-tested and scored.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Direct consequence of D5: if the parser is marker-driven, registry coverage _is_ parser quality.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| D6  | **Mandatory transactional review.** One attach batch produces one review session. Nothing is charted or persisted until all dates, report groupings, conflicts and identifier candidates are resolved and the user confirms the whole batch. Low-confidence rows sort first; every row can be edited, deleted or reassigned, and every E0/E1 row can be inspected at its source page/crop.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | A silent misparse becomes a wrong health chart. A batch transaction prevents half-reviewed files from leaking into history.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| D7  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. Every identifier candidate must be redacted, have its row deleted, or be explicitly dismissed as a false positive before Confirm enables. Unknown labels are always included in the scrub surface. All references to source files, object URLs, bitmaps, raw text and crops are released on confirm/cancel and never enter IndexedDB, Cache Storage or export.                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Merely displaying PII candidates does not enforce the promise. The residual free-text path is an approved unknown-marker label, so it needs both review and a final safety validator.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| D8  | **Plaintext IndexedDB for one anonymous local Profile.** The app persists only confirmed `Profile` data. Before appending to a non-empty Profile, the user must confirm that the new reports belong to the same person; no patient identity is stored.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | This provides useful returning-user history without implying at-rest protection. The privacy page must disclose shared-device, XSS, backup/sync and browser-eviction risks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| D9  | **Plaintext, versioned `.medigraph` JSON; no encryption or decryption.** Export is a transparent JSON envelope around one validated `Profile`, with explicit sensitivity warnings and size limits. Import offers previewed Cancel/Replace/Merge semantics and never silently overwrites local data.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Passphrases and recovery complexity are unnecessary for v1. Plaintext is an intentional usability trade-off, not a security feature; users must be told to store the file as they would the original lab reports.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| D10 | **No LOINC codes in v1.** Canonical marker registry uses our own stable string IDs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | LOINC codes are a hallucination magnet for builder models and buy nothing at this stage.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| D11 | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Only two chart forms are needed, both simple; a library costs more bundle than it saves, and hand-rolled SVG gives us the accessibility and touch behaviour the spec below requires.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| D12 | **No dual-axis charts, ever.** Markers with different units are never overlaid on one y-scale.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Universal data-viz rule; see chart specs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| D13 | **Display only: Medigraph never characterises a value or a trend.** Every status string is traceable to the reference range the lab itself printed. No severity language, no clinical inference, no trend direction, slope, rate of change or delta badge, in any view or in any product copy. Marketing copy states a capability (see your own data over time), never a clinical insight.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Under [MDCG 2019-11](https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2019_11_guidance_en_0.pdf) the manufacturer's stated **intended purpose** is the primary qualification trigger, and interpretive software lands under MDR Rule 11 at Class IIa or above — notified body, CE marking, QMS. Display-only positioning stays outside that regime at almost no cost, because the chart specs were already written this way. This is a design constraint recorded for engineering purposes, not legal advice.                                                                                                                                                                                                        |
 
 The accepted ADRs for D1, D1a, D3, D4, D6/D7, D8, D9 and D13 live under `docs/adr/`,
 along with ADR-0008, which scopes the CSP style directives. **ADR-0009 supersedes
@@ -127,21 +127,21 @@ authorise it.
 
 ## Glossary (use these exact terms in code, tests, issues and UI)
 
-| Term | Meaning |
-|---|---|
-| **Source file** | A PDF or image the user attaches. |
-| **TextItem** | One positioned text observation with stable `id`, text, rectangle and optional adapter confidence. Coordinates are page-normalised: top-left origin, y increasing downward, all values in `[0,1]`. |
-| **Row** | TextItems clustered by vertical overlap. |
-| **ParsedRow** | One ephemeral measurement candidate with a complete parse status, confidence, flags and optional source reference. It is not a persisted Measurement. |
-| **ExtractionResult** | One source file's ephemeral review draft: ParsedRows plus date and identifier candidates and optional evidence pages. |
-| **Review session** | The transactional draft for one attach batch. It groups sources into proposed Reports and must be fully resolved before Confirm. |
-| **Marker** | A biological quantity measured over time (e.g. ferritin). Identified by a **marker key**. |
-| **Marker key** | Stable string id. Canonical (`ferritin`) when the registry recognises the label, else derived (`x:<normalised-label>`). |
-| **Report** | The confirmed measurements from one collection event. It has a stable opaque id and a user-confirmed local civil date, optionally a minute-precision time. Equal calendar dates do not imply equal Reports. |
-| **Measurement** | One confirmed marker result within one Report, stored in the lab's native value, unit and range. A Report contains at most one Measurement per marker key. |
-| **Series** | One marker's measurements across all Reports, ordered by date. |
-| **Profile** | One anonymous person's complete local dataset. It is the only medical-data object persisted or exported. |
-| **Reference range** | The lab's normal interval for a marker, as printed on that report. Belongs to the Measurement, not the Marker — it varies by lab and by year. |
+| Term                 | Meaning                                                                                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source file**      | A PDF or image the user attaches.                                                                                                                                                                           |
+| **TextItem**         | One positioned text observation with stable `id`, text, rectangle and optional adapter confidence. Coordinates are page-normalised: top-left origin, y increasing downward, all values in `[0,1]`.          |
+| **Row**              | TextItems clustered by vertical overlap.                                                                                                                                                                    |
+| **ParsedRow**        | One ephemeral measurement candidate with a complete parse status, confidence, flags and optional source reference. It is not a persisted Measurement.                                                       |
+| **ExtractionResult** | One source file's ephemeral review draft: ParsedRows plus date and identifier candidates and optional evidence pages.                                                                                       |
+| **Review session**   | The transactional draft for one attach batch. It groups sources into proposed Reports and must be fully resolved before Confirm.                                                                            |
+| **Marker**           | A biological quantity measured over time (e.g. ferritin). Identified by a **marker key**.                                                                                                                   |
+| **Marker key**       | Stable string id. Canonical (`ferritin`) when the registry recognises the label, else derived (`x:<normalised-label>`).                                                                                     |
+| **Report**           | The confirmed measurements from one collection event. It has a stable opaque id and a user-confirmed local civil date, optionally a minute-precision time. Equal calendar dates do not imply equal Reports. |
+| **Measurement**      | One confirmed marker result within one Report, stored in the lab's native value, unit and range. A Report contains at most one Measurement per marker key.                                                  |
+| **Series**           | One marker's measurements across all Reports, ordered by date.                                                                                                                                              |
+| **Profile**          | One anonymous person's complete local dataset. It is the only medical-data object persisted or exported.                                                                                                    |
+| **Reference range**  | The lab's normal interval for a marker, as printed on that report. Belongs to the Measurement, not the Marker — it varies by lab and by year.                                                               |
 
 ### Field-level contracts
 
@@ -164,11 +164,20 @@ type ParseFlag =
   | 'competing-anchor'
   | 'low-ocr-confidence';
 
-interface Rect { x: number; y: number; w: number; h: number }
-interface SourceTextRange { itemId: string; start: number; end: number } // UTF-16 [start,end)
+interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+interface SourceTextRange {
+  itemId: string;
+  start: number;
+  end: number;
+} // UTF-16 [start,end)
 interface SourceRef {
   sourceId: string;
-  page: number;               // 1-based
+  page: number; // 1-based
   box?: Rect;
   itemIds?: string[];
   textRange?: SourceTextRange; // exact span for a whole-line anchor
@@ -176,21 +185,21 @@ interface SourceRef {
 interface TextItem extends Rect {
   id: string;
   text: string;
-  confidence?: number;       // [0,1], absent when the adapter has none
+  confidence?: number; // [0,1], absent when the adapter has none
 }
 
 interface LexicalToken {
   text: string;
   parentItemId: string;
-  start: number;             // UTF-16 code-unit offset, inclusive
-  end: number;               // UTF-16 code-unit offset, exclusive
+  start: number; // UTF-16 code-unit offset, inclusive
+  end: number; // UTF-16 code-unit offset, exclusive
 }
 
 interface Row {
   id: string;
   sourceId: string;
   page: number;
-  items: TextItem[];          // x-ascending, original observations preserved
+  items: TextItem[]; // x-ascending, original observations preserved
   y: number;
   h: number;
 }
@@ -207,8 +216,17 @@ interface Anchor {
 }
 
 type ColumnRole = 'label' | 'value' | 'unit' | 'range' | 'unknown';
-interface Column { role: ColumnRole; xMin: number; xMax: number }
-interface ColumnModel { page: number; yMin: number; yMax: number; columns: Column[] }
+interface Column {
+  role: ColumnRole;
+  xMin: number;
+  xMax: number;
+}
+interface ColumnModel {
+  page: number;
+  yMin: number;
+  yMax: number;
+  columns: Column[];
+}
 
 interface ParsedNumber {
   value: number;
@@ -241,8 +259,8 @@ interface ParsedRow {
 interface DateCandidate {
   id: string;
   raw: string;
-  date: string;               // YYYY-MM-DD
-  time: string | null;        // HH:mm, local civil time
+  date: string; // YYYY-MM-DD
+  time: string | null; // HH:mm, local civil time
   precision: 'day' | 'minute';
   ambiguous: boolean;
   kind: 'collection' | 'report' | 'print' | 'birth' | 'unknown';
@@ -253,7 +271,7 @@ interface DateCandidate {
 interface IdentifierCandidate {
   id: string;
   kind: 'name' | 'national-id' | 'patient-id' | 'phone' | 'email' | 'address' | 'other'; // AMKA is national-id
-  text: string;               // transient; never copied into Profile
+  text: string; // transient; never copied into Profile
   sourceRef?: SourceRef;
 }
 
@@ -271,31 +289,31 @@ interface ExtractionResult {
 }
 
 interface CollectedAt {
-  date: string;               // YYYY-MM-DD, local civil date
-  time: string | null;        // required to distinguish two same-day Reports
+  date: string; // YYYY-MM-DD, local civil date
+  time: string | null; // required to distinguish two same-day Reports
   precision: 'day' | 'minute';
 }
 
 interface Measurement {
   markerKey: string;
-  label?: string;             // allowed only for an approved x:* marker
+  label?: string; // allowed only for an approved x:* marker
   status: ParseStatus;
-  value: number | null;       // native lab value
+  value: number | null; // native lab value
   comparator: Comparator | null;
-  unit: string | null;        // native lab unit
+  unit: string | null; // native lab unit
   referenceRange: ReferenceRange | null; // native lab range
   sourceOrder: number;
 }
 
 interface Report {
-  id: string;                 // UUID created only when review is confirmed
+  id: string; // UUID created only when review is confirmed
   collectedAt: CollectedAt;
   measurements: Measurement[]; // markerKey unique within this array
 }
 
 interface Profile {
   schemaVersion: 1;
-  id: string;                 // opaque UUID, never a patient identifier
+  id: string; // opaque UUID, never a patient identifier
   reports: Report[];
 }
 
@@ -303,12 +321,15 @@ interface Conflict {
   id: string;
   markerKey: string;
   candidateRowIds: string[];
-  resolution: { kind: 'choose'; rowId: string } | { kind: 'edited'; measurement: Measurement } | null;
+  resolution:
+    | { kind: 'choose'; rowId: string }
+    | { kind: 'edited'; measurement: Measurement }
+    | null;
 }
 
 type IdentifierResolution = 'redacted' | 'deleted-row' | 'false-positive';
 interface ReviewReportDraft {
-  id: string;                 // ephemeral; never persisted as the Report id
+  id: string; // ephemeral; never persisted as the Report id
   sourceIds: string[];
   groupingConfirmed: boolean;
   targetReportId: string | null; // explicit “add to existing report”, never inferred
@@ -352,7 +373,7 @@ interface SeriesPoint {
   reportId: string;
   collectedAt: CollectedAt;
   status: ParseStatus;
-  value: number | null;       // converted to Series.unit when possible
+  value: number | null; // converted to Series.unit when possible
   comparator: Comparator | null;
   referenceRange: ReferenceRange | null; // converted by the same factor
   nativeValue: number | null;
@@ -361,7 +382,7 @@ interface SeriesPoint {
 }
 
 interface Series {
-  id: string;                 // `${markerKey}@${unit-or-none}`
+  id: string; // `${markerKey}@${unit-or-none}`
   markerKey: string;
   label: string;
   unit: string | null;
@@ -404,18 +425,34 @@ export function parseNumber(tokens: readonly string[]): ParsedNumber | null;
 export function parseRange(tokens: readonly string[]): ReferenceRange | null;
 export function normaliseUnit(value: string): string;
 export function isKnownUnit(value: string): boolean;
-export function convert(value: number, from: string, to: string, markerKey: string): number | null;
-export function findDateCandidates(sourceId: string, pages: readonly (readonly TextItem[])[]): DateCandidate[];
+export function convert(
+  value: number,
+  from: string,
+  to: string,
+  markerKey: string,
+): number | null;
+export function findDateCandidates(
+  sourceId: string,
+  pages: readonly (readonly TextItem[])[],
+): DateCandidate[];
 
 // fuzzy.ts / markerKey.ts / rows.ts
 export function damerauLevenshtein(a: string, b: string, maxDistance: number): number;
 export const REGISTRY_VERSION: number;
 export function markerKey(label: string): string;
-export function clusterRows(sourceId: string, pages: readonly (readonly TextItem[])[]): Row[];
+export function clusterRows(
+  sourceId: string,
+  pages: readonly (readonly TextItem[])[],
+): Row[];
 
 // anchors.ts / readout.ts / columns.ts / grammar.ts / extract.ts
 export function findAnchors(rows: readonly Row[]): Anchor[];
-export function readAnchor(anchor: Anchor, row: Row, allRows: readonly Row[], anchors: readonly Anchor[]): ParsedRow;
+export function readAnchor(
+  anchor: Anchor,
+  row: Row,
+  allRows: readonly Row[],
+  anchors: readonly Anchor[],
+): ParsedRow;
 export function inferColumns(rows: readonly Row[]): ColumnModel[];
 export function parseLayoutRow(row: Row, model: ColumnModel | null): ParsedRow | null;
 export interface TextExtractionInput {
@@ -427,36 +464,97 @@ export interface TextExtractionInput {
 export function extract(input: TextExtractionInput): ExtractionResult;
 
 // identifiers.ts / profile.ts / series.ts
-export function findIdentifierCandidates(sourceId: string, pages: readonly (readonly TextItem[])[]): IdentifierCandidate[];
-export function proposeReportGroups(results: readonly ExtractionResult[]): ReviewReportDraft[];
-export function regroupSources(session: ReviewSession, groups: readonly (readonly string[])[]): ReviewSession;
+export function findIdentifierCandidates(
+  sourceId: string,
+  pages: readonly (readonly TextItem[])[],
+): IdentifierCandidate[];
+export function proposeReportGroups(
+  results: readonly ExtractionResult[],
+): ReviewReportDraft[];
+export function regroupSources(
+  session: ReviewSession,
+  groups: readonly (readonly string[])[],
+): ReviewSession;
 export function confirmGrouping(session: ReviewSession, draftId: string): ReviewSession;
-export function setReportDate(session: ReviewSession, draftId: string, collectedAt: CollectedAt): ReviewSession;
-export function targetExistingReport(session: ReviewSession, draftId: string, reportId: string | null): ReviewSession;
-export function stageExistingReportDate(session: ReviewSession, reportId: string, collectedAt: CollectedAt): ReviewSession;
-export function reassignMarker(session: ReviewSession, rowId: string, markerKey: string, approvedUnknownLabel: string | null): ReviewSession;
-export function approveUnknownMarker(session: ReviewSession, rowId: string): ReviewSession;
+export function setReportDate(
+  session: ReviewSession,
+  draftId: string,
+  collectedAt: CollectedAt,
+): ReviewSession;
+export function targetExistingReport(
+  session: ReviewSession,
+  draftId: string,
+  reportId: string | null,
+): ReviewSession;
+export function stageExistingReportDate(
+  session: ReviewSession,
+  reportId: string,
+  collectedAt: CollectedAt,
+): ReviewSession;
+export function reassignMarker(
+  session: ReviewSession,
+  rowId: string,
+  markerKey: string,
+  approvedUnknownLabel: string | null,
+): ReviewSession;
+export function approveUnknownMarker(
+  session: ReviewSession,
+  rowId: string,
+): ReviewSession;
 export function deleteRow(session: ReviewSession, rowId: string): ReviewSession;
-export function resolveIdentifier(session: ReviewSession, candidateId: string, resolution: IdentifierResolution): ReviewSession;
-export function resolveConflict(session: ReviewSession, conflictId: string, resolution: Conflict['resolution']): ReviewSession;
+export function resolveIdentifier(
+  session: ReviewSession,
+  candidateId: string,
+  resolution: IdentifierResolution,
+): ReviewSession;
+export function resolveConflict(
+  session: ReviewSession,
+  conflictId: string,
+  resolution: Conflict['resolution'],
+): ReviewSession;
 export function canConfirm(session: ReviewSession, existing: Profile | null): boolean;
-export function buildProfileChange(session: ReviewSession, existing: Profile | null): ProfileChange;
-export function applyProfileChange(existing: Profile | null, change: ProfileChange, samePersonConfirmed: boolean): Profile;
-export function planProfileMerge(existing: Profile, incoming: Profile): ProfileMergePlan;
-export function resolveSameDayPrecision(plan: ProfileMergePlan, existingReportId: string, incomingReportId: string, existingTime: string, incomingTime: string): ProfileMergePlan;
-export function applyProfileMerge(existing: Profile, plan: ProfileMergePlan): ProfileMergeResult;
+export function buildProfileChange(
+  session: ReviewSession,
+  existing: Profile | null,
+): ProfileChange;
+export function applyProfileChange(
+  existing: Profile | null,
+  change: ProfileChange,
+  samePersonConfirmed: boolean,
+): Profile;
+export function planProfileMerge(
+  existing: Profile,
+  incoming: Profile,
+): ProfileMergePlan;
+export function resolveSameDayPrecision(
+  plan: ProfileMergePlan,
+  existingReportId: string,
+  incomingReportId: string,
+  existingTime: string,
+  incomingTime: string,
+): ProfileMergePlan;
+export function applyProfileMerge(
+  existing: Profile,
+  plan: ProfileMergePlan,
+): ProfileMergeResult;
 export function buildSeries(profile: Profile): Series[];
 export function removeReport(profile: Profile, reportId: string): Profile | null;
 
 // corpus scorer
-export interface MetricCount { correct: number; total: number }
+export interface MetricCount {
+  correct: number;
+  total: number;
+}
 export interface CorpusScore {
   markerRecall: MetricCount;
   valuePrecision: MetricCount;
   unitPrecision: MetricCount;
   rangePrecision: MetricCount;
 }
-export function score(expected: readonly ParsedRow[], actual: readonly ParsedRow[]): CorpusScore;
+export function score(
+  expected: readonly ParsedRow[],
+  actual: readonly ParsedRow[],
+): CorpusScore;
 
 // adapter.ts / pdfText.ts / pdfRaster.ts / preprocess.ts / ocr.ts
 export interface ExtractionAdapter {
@@ -465,19 +563,42 @@ export interface ExtractionAdapter {
   supports(file: File): boolean;
   extract(file: File, sourceId: string, signal: AbortSignal): Promise<AdapterOutput>;
 }
-export function loadRuntimeAsset(path: string, signal: AbortSignal): Promise<ArrayBuffer>;
+export function loadRuntimeAsset(
+  path: string,
+  signal: AbortSignal,
+): Promise<ArrayBuffer>;
 export function extractPdfText(file: File, signal: AbortSignal): Promise<TextItem[][]>;
-export function rasterisePdfPage(file: File, page: number, signal: AbortSignal): Promise<ImageBitmap>;
-export interface PreparedImage { image: ImageBitmap; dispose(): void }
-export function preprocess(image: ImageBitmap, signal: AbortSignal): Promise<PreparedImage>;
+export function rasterisePdfPage(
+  file: File,
+  page: number,
+  signal: AbortSignal,
+): Promise<ImageBitmap>;
+export interface PreparedImage {
+  image: ImageBitmap;
+  dispose(): void;
+}
+export function preprocess(
+  image: ImageBitmap,
+  signal: AbortSignal,
+): Promise<PreparedImage>;
 export interface OcrEngine {
   readonly id: string;
   recognise(image: ImageBitmap, page: number, signal: AbortSignal): Promise<TextItem[]>;
 }
-export interface RouteProgress { sourceIndex: number; sourceCount: number; page: number; pageCount: number }
+export interface RouteProgress {
+  sourceIndex: number;
+  sourceCount: number;
+  page: number;
+  pageCount: number;
+}
 export type FileRouteErrorCode =
-  | 'unsupported-type' | 'file-too-large' | 'too-many-files' | 'too-many-pages'
-  | 'decode-failed' | 'ocr-failed' | 'cancelled';
+  | 'unsupported-type'
+  | 'file-too-large'
+  | 'too-many-files'
+  | 'too-many-pages'
+  | 'decode-failed'
+  | 'ocr-failed'
+  | 'cancelled';
 export type RouteFailure =
   | { scope: 'batch'; code: 'too-many-files' | 'too-many-pages' | 'cancelled' }
   | {
@@ -486,18 +607,35 @@ export type RouteFailure =
       fileName: string;
       code: 'unsupported-type' | 'file-too-large' | 'decode-failed' | 'ocr-failed';
     };
-export interface RouteBatchResult { results: ExtractionResult[]; failures: RouteFailure[] }
-export function routeFiles(files: readonly File[], signal: AbortSignal, onProgress: (progress: RouteProgress) => void): Promise<RouteBatchResult>;
+export interface RouteBatchResult {
+  results: ExtractionResult[];
+  failures: RouteFailure[];
+}
+export function routeFiles(
+  files: readonly File[],
+  signal: AbortSignal,
+  onProgress: (progress: RouteProgress) => void,
+): Promise<RouteBatchResult>;
 
 // fileFormat.ts / storage.ts
 export type MedigraphReadError =
-  | 'file-too-large' | 'malformed-json' | 'not-medigraph'
-  | 'unsupported-version' | 'invalid-profile';
-export type ImportResult<T> = { ok: true; value: T } | { ok: false; error: MedigraphReadError };
-export interface ImportPreview { profile: Profile; plan: ProfileMergePlan | null }
+  | 'file-too-large'
+  | 'malformed-json'
+  | 'not-medigraph'
+  | 'unsupported-version'
+  | 'invalid-profile';
+export type ImportResult<T> =
+  { ok: true; value: T } | { ok: false; error: MedigraphReadError };
+export interface ImportPreview {
+  profile: Profile;
+  plan: ProfileMergePlan | null;
+}
 export function serialiseMedigraph(profile: Profile): string;
 export function parseMedigraph(bytes: Uint8Array): ImportResult<Profile>;
-export function previewImport(bytes: Uint8Array, existing: Profile | null): ImportResult<ImportPreview>;
+export function previewImport(
+  bytes: Uint8Array,
+  existing: Profile | null,
+): ImportResult<ImportPreview>;
 export function saveProfile(profile: Profile): Promise<void>;
 export function loadProfile(): Promise<Profile | null>;
 export function replaceProfile(profile: Profile): Promise<void>;
@@ -506,8 +644,11 @@ export function clearAll(): Promise<void>;
 // appState.ts
 export type AppPhase = 'idle' | 'extracting' | 'reviewing' | 'committing' | 'viewing';
 export type AppErrorCode =
-  | FileRouteErrorCode | MedigraphReadError
-  | 'report-id-conflict' | 'same-day-precision-conflict' | 'commit-failed';
+  | FileRouteErrorCode
+  | MedigraphReadError
+  | 'report-id-conflict'
+  | 'same-day-precision-conflict'
+  | 'commit-failed';
 export interface AppState {
   phase: AppPhase;
   profile: Profile | null;
@@ -552,7 +693,10 @@ export interface PanelViewProps {
   onSelectSeries(seriesId: string): void;
 }
 export function PanelView(props: PanelViewProps): JSX.Element;
-export interface TrendViewProps { series: Series; onBack(): void }
+export interface TrendViewProps {
+  series: Series;
+  onBack(): void;
+}
 export function TrendView(props: TrendViewProps): JSX.Element;
 export interface DataManagerProps {
   profile: Profile | null;
@@ -628,7 +772,7 @@ extraction-agnostic. Swapping an E0/E1 adapter changes `io/`, not review or doma
 
 ```ts
 interface ExtractionAdapter {
-  readonly id: string;                 // 'pdf-text' | 'ppocr-v5-el' | 'vlm-*' | …
+  readonly id: string; // 'pdf-text' | 'ppocr-v5-el' | 'vlm-*' | …
   readonly tier: 'E0' | 'E1' | 'E2';
   supports(file: File): boolean;
   extract(file: File, sourceId: string, signal: AbortSignal): Promise<AdapterOutput>;
@@ -709,11 +853,11 @@ here is genuinely wrong, change this section first, then the code.
 
 ### Runtime and package manager baseline
 
-| Thing | Pin | Declared in | Why this value |
-|---|---|---|---|
-| Node | `24.20.0` (active LTS) | `.nvmrc`, `engines.node`, CI `node-version-file` | The lowest line satisfying every tool below: `eslint-plugin-astro@3` needs `^22.22.3 \|\| ^24.16.0 \|\| >=26.3.0`, `lint-staged@17` needs `>=22.22.1`, `@eslint/json` and `@eslint/markdown` need `>=24`. Node 26 is `latest`, not LTS, until Oct 2026. |
-| pnpm | `11.24.0` | `packageManager`, enabled via Corepack | The project installs with **pnpm** (`engines.node >=22.13`, already satisfied). `pnpm-lock.yaml` is the single lockfile authority and is committed; `pnpm install --frozen-lockfile` is used everywhere non-interactive, so a lockfile that disagrees with `package.json` fails the build instead of being silently rewritten. |
-| TypeScript | `6.0.3` | `devDependencies` | `typescript-eslint@8.68.0` peer-supports `>=4.8.4 <6.1.0`. TypeScript 7 is `latest` on the registry but is **not** yet supported by typescript-eslint, so it is out of scope until that peer range moves. |
+| Thing      | Pin                    | Declared in                                      | Why this value                                                                                                                                                                                                                                                                                                                 |
+| ---------- | ---------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node       | `24.20.0` (active LTS) | `.nvmrc`, `engines.node`, CI `node-version-file` | The lowest line satisfying every tool below: `eslint-plugin-astro@3` needs `^22.22.3 \|\| ^24.16.0 \|\| >=26.3.0`, `lint-staged@17` needs `>=22.22.1`, `@eslint/json` and `@eslint/markdown` need `>=24`. Node 26 is `latest`, not LTS, until Oct 2026.                                                                        |
+| pnpm       | `11.24.0`              | `packageManager`, enabled via Corepack           | The project installs with **pnpm** (`engines.node >=22.13`, already satisfied). `pnpm-lock.yaml` is the single lockfile authority and is committed; `pnpm install --frozen-lockfile` is used everywhere non-interactive, so a lockfile that disagrees with `package.json` fails the build instead of being silently rewritten. |
+| TypeScript | `6.0.3`                | `devDependencies`                                | `typescript-eslint@8.68.0` peer-supports `>=4.8.4 <6.1.0`. TypeScript 7 is `latest` on the registry but is **not** yet supported by typescript-eslint, so it is out of scope until that peer range moves.                                                                                                                      |
 
 **Version pinning is exact.** Every `devDependencies` entry is written without `^` or
 `~`, matching the existing "pin exact versions" rule in Architecture. Set
@@ -729,11 +873,11 @@ own reformat and nothing else.
 only newer published versions are `4.0.0-alpha.*` behind the `next` tag and are out
 of scope for v1.
 
-| Package | Version | Covers |
-|---|---|---|
-| `prettier` | `3.9.6` | ts, tsx, js, jsx, mjs, cjs, **html**, css, json, jsonc, json5, markdown, yaml — all core parsers |
-| `prettier-plugin-astro` | `0.14.1` | `.astro` |
-| `prettier-plugin-sh` | `0.19.0` | bash/sh via the `sh` parser (shfmt), **Dockerfile** via the `dockerfile` parser, plus `.env`/`.gitignore`/`.properties` |
+| Package                 | Version  | Covers                                                                                                                  |
+| ----------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `prettier`              | `3.9.6`  | ts, tsx, js, jsx, mjs, cjs, **html**, css, json, jsonc, json5, markdown, yaml — all core parsers                        |
+| `prettier-plugin-astro` | `0.14.1` | `.astro`                                                                                                                |
+| `prettier-plugin-sh`    | `0.19.0` | bash/sh via the `sh` parser (shfmt), **Dockerfile** via the `dockerfile` parser, plus `.env`/`.gitignore`/`.properties` |
 
 **HTML, JSON, Markdown and YAML need no plugin.** Prettier's built-in `html`, `json`,
 `markdown` and `yaml` parsers own those languages; adding a third-party plugin for
@@ -754,7 +898,10 @@ shell/Dockerfile fall outside core, and those are the only two plugins we instal
   "overrides": [
     { "files": "*.astro", "options": { "parser": "astro" } },
     { "files": ["*.sh", "*.bash", "*.zsh"], "options": { "parser": "sh" } },
-    { "files": ["Dockerfile", "Dockerfile.*", "*.dockerfile"], "options": { "parser": "dockerfile" } },
+    {
+      "files": ["Dockerfile", "Dockerfile.*", "*.dockerfile"],
+      "options": { "parser": "dockerfile" }
+    },
     { "files": ["*.md"], "options": { "proseWrap": "preserve", "printWidth": 88 } },
     { "files": ["*.yml", "*.yaml"], "options": { "singleQuote": false } }
   ]
@@ -790,29 +937,29 @@ protect.
 by ESLint 10 and must not appear. `eslint-plugin-astro` is ESM-only, which is already
 satisfied because the Astro package is `"type": "module"`.
 
-| Package | Version | Covers |
-|---|---|---|
-| `eslint` | `10.9.1` | the runner |
-| `@eslint/js` | `10.0.1` | core JS recommended rules |
-| `typescript-eslint` | `8.68.0` | ts, tsx — type-aware linting |
-| `eslint-plugin-astro` | `3.1.0` | `.astro` components (brings `astro-eslint-parser`) |
-| `eslint-plugin-jsx-a11y` | `6.10.2` | JSX/Astro accessibility — feeds Task 5.4 |
-| `eslint-plugin-react-hooks` | `7.1.1` | Preact hook rules in the `MedigraphApp` island |
-| `@eslint/json` | `2.0.1` | json, jsonc (`language: "json/json"` / `"json/jsonc"`) |
-| `@eslint/markdown` | `8.0.3` | md, plus linting of fenced code blocks |
-| `eslint-plugin-yml` | `3.8.1` | yml, yaml (brings `yaml-eslint-parser`) |
-| `@html-eslint/eslint-plugin` | `0.65.0` | html (`language: "html/html"`; no separate parser package needed) |
-| `eslint-config-prettier` | `10.1.8` | **the conflict eliminator — see below** |
-| `globals` | `17.11.0` | environment global sets |
+| Package                      | Version   | Covers                                                            |
+| ---------------------------- | --------- | ----------------------------------------------------------------- |
+| `eslint`                     | `10.9.1`  | the runner                                                        |
+| `@eslint/js`                 | `10.0.1`  | core JS recommended rules                                         |
+| `typescript-eslint`          | `8.68.0`  | ts, tsx — type-aware linting                                      |
+| `eslint-plugin-astro`        | `3.1.0`   | `.astro` components (brings `astro-eslint-parser`)                |
+| `eslint-plugin-jsx-a11y`     | `6.10.2`  | JSX/Astro accessibility — feeds Task 5.4                          |
+| `eslint-plugin-react-hooks`  | `7.1.1`   | Preact hook rules in the `MedigraphApp` island                    |
+| `@eslint/json`               | `2.0.1`   | json, jsonc (`language: "json/json"` / `"json/jsonc"`)            |
+| `@eslint/markdown`           | `8.0.3`   | md, plus linting of fenced code blocks                            |
+| `eslint-plugin-yml`          | `3.8.1`   | yml, yaml (brings `yaml-eslint-parser`)                           |
+| `@html-eslint/eslint-plugin` | `0.65.0`  | html (`language: "html/html"`; no separate parser package needed) |
+| `eslint-config-prettier`     | `10.1.8`  | **the conflict eliminator — see below**                           |
+| `globals`                    | `17.11.0` | environment global sets                                           |
 
 **Dockerfile and bash are not ESLint-able.** ESLint has no Dockerfile or shell
 language plugin, and inventing one is out of scope. Prettier formats both (above);
 linting them uses the standard native tools, wired as separate CI steps:
 
-| Language | Linter | How it runs |
-|---|---|---|
-| bash / sh | `shellcheck` | Invoked directly. Preinstalled on `ubuntu-latest`; installed locally via Homebrew/apt. Covers `scripts/*.sh` **and** `.husky/*`, whose hooks are shell scripts with no extension that no `*.sh` glob matches. |
-| Dockerfile | `hadolint` | Invoked directly from lint-staged, and `hadolint/hadolint-action@v3.5.0` in CI guarded by `hashFiles('Dockerfile')`. Both stay inert until the app is containerised — the planned final step. |
+| Language   | Linter       | How it runs                                                                                                                                                                                                   |
+| ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bash / sh  | `shellcheck` | Invoked directly. Preinstalled on `ubuntu-latest`; installed locally via Homebrew/apt. Covers `scripts/*.sh` **and** `.husky/*`, whose hooks are shell scripts with no extension that no `*.sh` glob matches. |
+| Dockerfile | `hadolint`   | Invoked directly from lint-staged, and `hadolint/hadolint-action@v3.5.0` in CI guarded by `hashFiles('Dockerfile')`. Both stay inert until the app is containerised — the planned final step.                 |
 
 `eslint.config.js`:
 
@@ -832,14 +979,19 @@ import globals from 'globals';
 import prettier from 'eslint-config-prettier/flat';
 
 export default defineConfig([
-  { ignores: ['dist/**', '.astro/**', 'coverage/**', 'public/ocr/**', 'pnpm-lock.yaml'] },
+  {
+    ignores: ['dist/**', '.astro/**', 'coverage/**', 'public/ocr/**', 'pnpm-lock.yaml'],
+  },
 
   // Scoped to code files. Applied unscoped, these also match .json/.md/.yaml,
   // whose languages provide no getAllComments() and crash core rules.
   { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'], extends: [js.configs.recommended] },
   {
     files: ['**/*.{ts,tsx}'],
-    extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
+    extends: [
+      tseslint.configs.strictTypeChecked,
+      tseslint.configs.stylisticTypeChecked,
+    ],
     languageOptions: {
       parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
       globals: globals.browser,
@@ -853,7 +1005,12 @@ export default defineConfig([
   astro.configs.recommended,
   astro.configs['jsx-a11y-recommended'],
 
-  { files: ['**/*.json'], plugins: { json }, language: 'json/json', extends: ['json/recommended'] },
+  {
+    files: ['**/*.json'],
+    plugins: { json },
+    language: 'json/json',
+    extends: ['json/recommended'],
+  },
   {
     files: ['**/*.jsonc', 'tsconfig*.json', '.vscode/*.json'],
     plugins: { json },
@@ -901,7 +1058,7 @@ export default defineConfig([
         {
           selector: "JSXAttribute[name.name='style']",
           message:
-            'Prefer a class in the component\'s <style> block, an SVG presentation ' +
+            "Prefer a class in the component's <style> block, an SVG presentation " +
             'attribute, or a CSS custom property set via CSSOM. If an inline style ' +
             'is genuinely the better fit, waive this line with an eslint-disable ' +
             'comment stating why.',
@@ -929,7 +1086,7 @@ it. Settings live in `pnpm-workspace.yaml`:
 ```yaml
 peerDependencyRules:
   allowedVersions:
-    eslint-plugin-jsx-a11y>eslint: "10"
+    eslint-plugin-jsx-a11y>eslint: '10'
 ```
 
 The same file also carries **`allowBuilds`**, which pnpm 11 requires before any
@@ -991,7 +1148,7 @@ documented escape hatch**, rather than being absent:
 ```astro
 <!-- eslint-disable-next-line no-restricted-syntax -- measured popover offset;
      no class can express a value only known after layout -->
-<div class="marker-popover" style={`--offset:${offsetPx}px`}>
+<div class="marker-popover" style={`--offset:${offsetPx}px`}></div>
 ```
 
 An error that a comment can waive keeps the default enforced and makes each deviation
@@ -1014,11 +1171,11 @@ Decorative and positional refinements are fine; load-bearing structure is not.
 **Dynamic values — the preferred mechanisms.** These still cover every dynamic case in
 this plan without reaching for an attribute at all:
 
-| Need | Mechanism | Why it is preferred |
-|---|---|---|
-| Chart geometry — point positions, bar widths, axis ticks (D11) | SVG **presentation attributes** (`x`, `y`, `cx`, `cy`, `d`, `points`, `width`) | These are markup attributes, not CSS. No `style-src` directive applies to them in any browser. This is the normal way to write the hand-rolled SVG charts. |
-| A value that must reach CSS — a computed length, a per-series colour slot | A **CSS custom property set via CSSOM** from the island: `el.style.setProperty('--trend-x', …)`, consumed as `var(--trend-x)` by a class in the `<style>` block | `style-src` governs stylesheet and style-attribute *parsing*, not CSSOM mutation from already-executing script. Works identically regardless of `style-src-attr` support, so it has no browser caveat. |
-| A binary or enumerated state — in-range/high/low, selected, loading | **Toggle a class**, with the appearance defined in `<style>` | Keeps status styling in one reviewable place, which is also what the monochrome and forced-colours requirements in [Theming](#theming) and Task 5.4 need. |
+| Need                                                                      | Mechanism                                                                                                                                                       | Why it is preferred                                                                                                                                                                                    |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Chart geometry — point positions, bar widths, axis ticks (D11)            | SVG **presentation attributes** (`x`, `y`, `cx`, `cy`, `d`, `points`, `width`)                                                                                  | These are markup attributes, not CSS. No `style-src` directive applies to them in any browser. This is the normal way to write the hand-rolled SVG charts.                                             |
+| A value that must reach CSS — a computed length, a per-series colour slot | A **CSS custom property set via CSSOM** from the island: `el.style.setProperty('--trend-x', …)`, consumed as `var(--trend-x)` by a class in the `<style>` block | `style-src` governs stylesheet and style-attribute _parsing_, not CSSOM mutation from already-executing script. Works identically regardless of `style-src-attr` support, so it has no browser caveat. |
+| A binary or enumerated state — in-range/high/low, selected, loading       | **Toggle a class**, with the appearance defined in `<style>`                                                                                                    | Keeps status styling in one reviewable place, which is also what the monochrome and forced-colours requirements in [Theming](#theming) and Task 5.4 need.                                              |
 
 **Formatting.** `prettier-plugin-astro` formats the `<style>` block with Prettier's
 core CSS parser, so no separate configuration is needed and the block is covered by
@@ -1037,7 +1194,7 @@ core CSS parser, so no separate configuration is needed and the block is covered
    (`eslint-config-prettier/flat`) and is the **last element of the exported array**.
    Placed anywhere earlier, a later config re-enables the rules it just turned off.
 4. **`eslint-plugin-prettier` is explicitly rejected and must not be installed.** It
-   runs Prettier *inside* ESLint as a lint rule, which inverts the required order,
+   runs Prettier _inside_ ESLint as a lint rule, which inverts the required order,
    reports whole-file formatting as hundreds of per-character rule violations, and
    makes every lint run pay the formatter's cost. `eslint-config-prettier` (turn
    rules off) and `eslint-plugin-prettier` (run the formatter as a rule) are different
@@ -1148,17 +1305,17 @@ jobs:
     name: Lint and format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7            # pin to the full commit SHA
-      - uses: pnpm/action-setup@v6.0.10      # must precede setup-node for `cache: pnpm`
+      - uses: actions/checkout@v7 # pin to the full commit SHA
+      - uses: pnpm/action-setup@v6.0.10 # must precede setup-node for `cache: pnpm`
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint                       # 1. ESLint first
-      - run: pnpm format:check               # 2. Prettier second, check-only
+      - run: pnpm lint # 1. ESLint first
+      - run: pnpm format:check # 2. Prettier second, check-only
       - run: pnpm typecheck
-      - run: pnpm lint:shell                 # shellcheck: preinstalled on ubuntu-latest
+      - run: pnpm lint:shell # shellcheck: preinstalled on ubuntu-latest
       - uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: Dockerfile
@@ -1209,7 +1366,7 @@ models will otherwise invent behaviour.
 
 **The governing idea.** Layouts differ per lab — column counts, column order, header
 wording, sections, gutters, whether units are glued to values, whether ranges even
-have a column. What barely differs is the *marker*: every Greek lab that measures
+have a column. What barely differs is the _marker_: every Greek lab that measures
 ferritin prints a token normalising to `φερριτινη`, and every lab that measures red
 cell count prints `(RBC)` somewhere on that line. So we anchor on the marker and read
 outward, instead of reconstructing the table and hoping the marker is in column one.
@@ -1220,7 +1377,7 @@ The pipeline therefore runs **two passes over the same `TextItem[]`** and reconc
   page. For each, search a spatial neighbourhood for its value, unit and range.
   Layout-independent. Produces high-confidence rows.
 - **Pass B — layout (discovery only).** Rows → columns → grammar, as a table reader.
-  Its job is *not* to parse the document; it is to surface measurement-shaped lines
+  Its job is _not_ to parse the document; it is to surface measurement-shaped lines
   that Pass A didn't claim, so unknown markers still get charted and so registry gaps
   become visible.
 
@@ -1260,14 +1417,14 @@ alias**, not the full 1–5-token context used to find it. Anchor geometry/sourc
 that exact span's parent box (and `textRange` in line mode), so choosing a longer
 context cannot swallow a neighbouring value or marker.
 
-| Tier | Rule | Confidence |
-|---|---|---|
-| **T1 — Abbreviation** | The candidate contains a registry abbreviation as a standalone token or parenthesised: `RBC`, `HCT`, `HGB`/`HGb`, `MCV`, `MCH`, `MCHC`, `RDW`, `PLT`, `PDW`, `MPV`, `WBC`, `HDL`, `LDL`, `SGOT`/`AST`, `SGPT`/`ALT`, `γ-GT`/`GGT`, `ALP`, `CPK`/`CK`, `TSH`, `FT4`, `FT3`, `PSA`, `CRP`, `ESR`, `HbA1c`, `eGFR`, `Lp(a)`, `INR`, `PT`, `APTT` … | `high` |
-| **T2 — Exact normalised** | `normaliseLabel(candidate)` equals a label-normalised registry alias exactly | `high` |
-| **T3 — Alias containment** | A registry alias is a whole-word substring of the normalised candidate (catches `Τρανσαμινάσες SGOT`, `Fe ΣΙΔΗΡΟΣ ΟΡΟΥ`, `Βιταμίνη D3 -25-(OH)`) | `high` |
-| **T4 — Bounded fuzzy** | Damerau–Levenshtein on label-normalised strings: max distance 0 for length < 5, 1 for 5–7, 2 for ≥ 8. If nearest markers tie, a unique matching `sectionHint` may break the tie; otherwise reject it. | `medium` |
+| Tier                       | Rule                                                                                                                                                                                                                                                                                                                                            | Confidence |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **T1 — Abbreviation**      | The candidate contains a registry abbreviation as a standalone token or parenthesised: `RBC`, `HCT`, `HGB`/`HGb`, `MCV`, `MCH`, `MCHC`, `RDW`, `PLT`, `PDW`, `MPV`, `WBC`, `HDL`, `LDL`, `SGOT`/`AST`, `SGPT`/`ALT`, `γ-GT`/`GGT`, `ALP`, `CPK`/`CK`, `TSH`, `FT4`, `FT3`, `PSA`, `CRP`, `ESR`, `HbA1c`, `eGFR`, `Lp(a)`, `INR`, `PT`, `APTT` … | `high`     |
+| **T2 — Exact normalised**  | `normaliseLabel(candidate)` equals a label-normalised registry alias exactly                                                                                                                                                                                                                                                                    | `high`     |
+| **T3 — Alias containment** | A registry alias is a whole-word substring of the normalised candidate (catches `Τρανσαμινάσες SGOT`, `Fe ΣΙΔΗΡΟΣ ΟΡΟΥ`, `Βιταμίνη D3 -25-(OH)`)                                                                                                                                                                                                | `high`     |
+| **T4 — Bounded fuzzy**     | Damerau–Levenshtein on label-normalised strings: max distance 0 for length < 5, 1 for 5–7, 2 for ≥ 8. If nearest markers tie, a unique matching `sectionHint` may break the tie; otherwise reject it.                                                                                                                                           | `medium`   |
 
-Abbreviations (T1) are deliberately first: they are lab-invariant *and*
+Abbreviations (T1) are deliberately first: they are lab-invariant _and_
 language-invariant, so they are the single most reliable signal on a Greek report.
 `Αριθμός ερυθρών (RBC)`, `Ερυθρά αιμοσφαίρια (RBC)` and `RBC` all resolve identically.
 
@@ -1303,7 +1460,7 @@ such as `70`, `-`, `110`. Then assign roles:
 
 - A two-sided or textual `Έως n` / `μέχρι n` group is always a **range**, including
   when no value exists; textual “up to” stores `{kind:'maxOnly', comparator:'<=',
-  max:n}`. Symbolic one-sided ranges preserve their printed strictness exactly.
+max:n}`. Symbolic one-sided ranges preserve their printed strictness exactly.
 - In Pass A, the first exact standalone number is the **value**. A comparator group
   is the value when it has a glued/immediately-following recognised unit. Once a value
   exists, the first remaining comparator group is a one-sided range.
@@ -1320,7 +1477,7 @@ such as `70`, `-`, `110`. Then assign roles:
 - Stop at the y-position of the next anchor below.
 - Stop after a horizontal gap greater than 25 % of page width with nothing found.
 - If no value is found within the neighbourhood, emit `value: null,
-  status: 'missing'` — do **not** widen the search. This is what correctly reads
+status: 'missing'` — do **not** widen the search. This is what correctly reads
   `Βασεόφιλα %` (blank result cell) and `Δικτυοερυθροκύτταρα (ΔΕΚ%)` (range, no
   value) in the fixtures, instead of stealing a neighbour's number.
 
@@ -1396,7 +1553,7 @@ adjacent tokens (`70`, `-`, `110`) are assembled before matching.
 Rules, applied in order:
 
 1. **A number token must be standalone.** `Β12`, `D3`, `1η`, `-25-(OH)` are
-   alphanumeric and are therefore *label* tokens, never values. This rule alone
+   alphanumeric and are therefore _label_ tokens, never values. This rule alone
    handles `Βιταμίνη Β12  530  pg/mL  200-900` correctly.
 2. **Split glued units.** A token like `5%` or `46,2%` splits into value `5` and
    unit `%`. For separate text such as `4,83 Κ/μl`, normalise `Κ/μl` before testing
@@ -1447,7 +1604,7 @@ Demotion always takes the worse of current and target (`high` → `medium` → `
 no rule can promote a `low` row to `medium`:
 
 - Demote to `low` if: the value is `missing`; the read-out hit a stop condition
-  before finding a unit *and* a range; the value-bearing OCR box confidence is below
+  before finding a unit _and_ a range; the value-bearing OCR box confidence is below
   0.85; the row mean OCR confidence is below 0.75; a shared number parse is
   `ambiguous-thousands`; or the value is outside the MarkerDef's `plausibleRange`.
 - Demote to `medium` if: the reference range failed to parse; the unit is
@@ -1589,14 +1746,14 @@ Split one file per panel so tasks parallelise and diffs stay readable:
 
 ```ts
 interface MarkerDef {
-  id: string;                 // stable: 'ferritin', never renamed once shipped
-  en: string;                 // display name, English
-  el: string;                 // display name, Greek
-  abbreviations: string[];    // T1 tier — lab- and language-invariant
-  aliases: string[];          // T2/T3/T4 tier — Greek and English spellings
+  id: string; // stable: 'ferritin', never renamed once shipped
+  en: string; // display name, English
+  el: string; // display name, Greek
+  abbreviations: string[]; // T1 tier — lab- and language-invariant
+  aliases: string[]; // T2/T3/T4 tier — Greek and English spellings
   canonicalUnit: string;
-  plausibleRange?: [number, number];  // sanity bound, NOT a reference range
-  sectionHint?: string;       // unique T4 tie-break only
+  plausibleRange?: [number, number]; // sanity bound, NOT a reference range
+  sectionHint?: string; // unique T4 tie-break only
 }
 ```
 
@@ -1614,7 +1771,7 @@ interface MarkerDef {
    Unsourced aliases are the main way a builder model silently poisons this file — an
    alias that matches the wrong marker produces a wrong health chart. Bulk-importing a
    seed by string similarity is the same failure wearing a citation: see the four
-   real mis-matches recorded under *Sourcing the registry*.
+   real mis-matches recorded under _Sourcing the registry_.
 5. `plausibleRange` is a deliberately wide sanity bound. An outside value is kept,
    tagged `implausible-value`, forced to low confidence and reviewed; it is never
    treated as a clinical range and never silently rejected.
@@ -1634,13 +1791,13 @@ Use **v5, April 2016, XLSX** (`?fdl=9688`, 352 KB,
 `sha256:d73ef10530de0453ad5f4a4d04d06e7672a8c5a30cbf06fe269bcf4143642418`), which is
 the only machine-readable release. Its columns map almost directly onto `MarkerDef`:
 
-| ΚΕΟΚΕΕ column | `MarkerDef` field |
-|---|---|
-| `Αγγλική Ονομασία` | `en` |
-| `Ελληνική Ονομασία` | `el` |
-| `Συντομογραφία` | `abbreviations[]` — supplies the exact `ALT/SGPT`, `AST/SGOT`, `Γ-GT` pairs the T1 tier needs |
-| `Άλλη Ονομασία` | `aliases[]` (one synonym only) |
-| `GR code` | category hierarchy → `sectionHint` |
+| ΚΕΟΚΕΕ column       | `MarkerDef` field                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------------- |
+| `Αγγλική Ονομασία`  | `en`                                                                                          |
+| `Ελληνική Ονομασία` | `el`                                                                                          |
+| `Συντομογραφία`     | `abbreviations[]` — supplies the exact `ALT/SGPT`, `AST/SGOT`, `Γ-GT` pairs the T1 tier needs |
+| `Άλλη Ονομασία`     | `aliases[]` (one synonym only)                                                                |
+| `GR code`           | category hierarchy → `sectionHint`                                                            |
 
 It holds 2,403 tests across 8 categories. Only four are quantitative markers a report
 plots over time — **11** Clinical chemistry (131 leaves), **12** Immunochemistry (328),
@@ -1650,7 +1807,7 @@ serology, genetics, cytology) are largely non-numeric and out of scope.
 
 **Two limits that decide how it may be used.**
 
-1. **It is an *ordering* nomenclature, so panel-internal indices are absent.** The CBC
+1. **It is an _ordering_ nomenclature, so panel-internal indices are absent.** The CBC
    is one entry — `13.01.01.01.001 ΠΛΗΡΗΣ ΓΕΝΙΚΗ ΑΙΜΑΤΟΣ ΜΕ ΔΙΑΧΩΡΙΣΜΟ 3/5` — because
    the indices it reports are not separately orderable. **MCV, MCH, MCHC, RDW, PDW,
    MPV, WBC and the differential do not appear anywhere in ΚΕΟΚΕΕ**, and those are the
@@ -1670,7 +1827,7 @@ health chart. This is alias rule 4's failure mode demonstrated, and it is why th
 enters the registry through human review, one panel at a time.
 
 **Secondary cross-check: the LOINC Greek linguistic variant**, restored in LOINC 2.79
-(February 2025). Using it to *find* Greek name variants does not violate D10, which
+(February 2025). Using it to _find_ Greek name variants does not violate D10, which
 bars LOINC **codes from our data model** — no `loincCode` field appears in `MarkerDef`
 and none may be added.
 
@@ -1690,18 +1847,18 @@ allowlist after normalization; an unknown is retained and flagged. Known mapping
 `convert(value, from, to, markerKey)` supports **only** this enumerated table; any
 other pair returns `null` and the caller must not convert:
 
-| Marker(s) | From → To | Factor |
-|---|---|---|
-| glucose | mg/dL → mmol/L | × 0.05551 |
+| Marker(s)             | From → To      | Factor    |
+| --------------------- | -------------- | --------- |
+| glucose               | mg/dL → mmol/L | × 0.05551 |
 | cholesterol, hdl, ldl | mg/dL → mmol/L | × 0.02586 |
-| triglycerides | mg/dL → mmol/L | × 0.01129 |
-| creatinine | mg/dL → µmol/L | × 88.4 |
-| uric-acid | mg/dL → µmol/L | × 59.48 |
-| haemoglobin, mchc | g/dL → g/L | × 10 |
-| ferritin | ng/mL → µg/L | × 1 |
-| vitamin-b12 | pg/mL → ng/L | × 1 |
-| folate | ng/mL → nmol/L | × 2.266 |
-| vitamin-d | ng/mL → nmol/L | × 2.496 |
+| triglycerides         | mg/dL → mmol/L | × 0.01129 |
+| creatinine            | mg/dL → µmol/L | × 88.4    |
+| uric-acid             | mg/dL → µmol/L | × 59.48   |
+| haemoglobin, mchc     | g/dL → g/L     | × 10      |
+| ferritin              | ng/mL → µg/L   | × 1       |
+| vitamin-b12           | pg/mL → ng/L   | × 1       |
+| folate                | ng/mL → nmol/L | × 2.266   |
+| vitamin-d             | ng/mL → nmol/L | × 2.496   |
 
 Inverse direction = divide by the same factor. For a canonical marker, Series.unit is
 its registry `canonicalUnit`; convert each value **and its ReferenceRange bounds by
@@ -1728,7 +1885,7 @@ scrollable list of rows, one per marker:
 - Native value + comparator + unit, right-aligned with tabular figures. A missing
   result renders `—`, not zero; a printed ReferenceRange remains visible separately.
 - Status uses neutral factual language only: `within reported range`, `below reported
-  range`, `above reported range`, or `range comparison unavailable`. There is no
+range`, `above reported range`, or `range comparison unavailable`. There is no
   `good`, `warning`, `critical`, percentage-outside heuristic or clinical severity
   inference. Exact non-comparator values can be classified against their own range;
   comparator/censored values are always comparison-unavailable because their actual
@@ -1881,28 +2038,28 @@ Each task below becomes one GitHub issue labelled `ready-for-agent`
 **Every issue body must include, verbatim:** the exact file paths to create, the
 exact exported function signatures, the behaviour rules copied from the relevant
 section above, the fixture path and expected output, the command that proves it
-(`pnpm vitest run <path>`), and this line: *"Do not make design decisions. If the
-spec is ambiguous, stop and comment on the issue instead of choosing."*
+(`pnpm vitest run <path>`), and this line: _"Do not make design decisions. If the
+spec is ambiguous, stop and comment on the issue instead of choosing."_
 
 ### Wave 0 — foundations and empirical gates
 
-| # | Task | Deliverable |
-|---|---|---|
-| 0.0 | **Domain baseline.** Commit root `CONTEXT.md` and accepted ADRs for D1, D1a, D3, D4, D6/D7, D8, D9 and D13, plus ADR-0008 (CSP style-directive scope), ADR-0009 (supersedes ADR-0001; D1's data rule and origin allowlist) and ADR-0010 (D13 display-only positioning), before implementation issues are opened. | Vocabulary and changed binding decisions are reviewable independently of code. |
-| 0.1 | **Scaffold.** Astro 5 static output, one Preact `MedigraphApp` island entry, strict TypeScript, Vitest, Playwright and pnpm. Materialise **[Frontend toolchain](#frontend-toolchain--formatting-linting-and-static-gates)** exactly: Node/pnpm/TypeScript pins, `prettier@3.9.6` with its two plugins, ESLint 10 flat config with every listed language plugin, `eslint-config-prettier` last, husky + lint-staged hooks, and `.github/workflows/ci.yml` with the `lint` job gating `test` and `build`. Do not substitute versions, add `eslint-plugin-prettier`, or reorder ESLint and Prettier. Later score, privacy and bundle gates attach to the same workflow. | Empty static app builds and tests green; `pnpm verify:static` passes on a clean checkout. |
-| 0.2 | **Implement provisional contracts.** Create `types.ts` exactly from “Field-level contracts”, plus structural `validateProfile(x: unknown): Profile` and semantic `assertProfileSafe(profile: Profile): void`. Validate finite numbers, coordinate bounds, discriminated ranges, ids, timestamps, uniqueness, cardinality, status/value consistency and free-text policy. | Contract tests reject every malformed boundary. These shapes freeze only after 3.8, not here. |
-| 0.3 | **Synthetic/redacted seed fixtures.** Build content-equivalent synthetic PDFs and hand-checked TextItem/expected JSON; do **not** copy the identifying root PDFs. Correct mapping: `MedilabRslt29384Page2.pdf` is the 25-marker **biochemistry** layout; `Page3.pdf` is the multi-region **haematology/CBC** layout. Commit only `fixtures/seed/biochemistry.{pdf,textitems.json,expected.json}` and `haematology.{pdf,textitems.json,expected.json}` with specimen identity and content-based names. Include fragmented and whole-line versions. | No real identity substring or document metadata survives. Expected output includes dates, comparators, missing status, retained ranges and SourceRefs. Human/capable-model task. |
-| 0.4 | **Static security foundation—not the final privacy E2E.** Self-host every browser byte under `public/`. There is **no** generated asset manifest and **no** generated CSP hash list: the policy is a committed static string. Commit `_headers` with CSP `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'`. `connect-src` carries D1's origin allowlist and is `'self'` alone in v1; adding an origin edits this one line. Set `build.inlineStylesheets: 'never'` so component `<style>` blocks always emit as external `'self'` stylesheets and no style hash is ever required. Emit no inline `<script>`, so `script-src` needs no hash, nonce, `'unsafe-inline'` or `'unsafe-hashes'`. `style-src-attr 'unsafe-inline'` is the deliberate, scoped exception recorded in [ADR-0008](adr/0008-csp-style-attribute-amendment.md); record which target browsers honour `style-src-attr` and which fall back to `style-src`. Add COOP `same-origin`, COEP `require-corp`, CORP `same-origin`, `Referrer-Policy: no-referrer`, HSTS, `X-Content-Type-Options: nosniff`, and a Permissions Policy allowing only same-origin camera while disabling microphone/geolocation/payment/USB. | A built-app Playwright smoke test boots under the delivered headers and finds no undeclared origin. COOP/COEP cost nothing once every asset is same-origin and give Task 3.3 `crossOriginIsolated` for WASM threads. Full workflow egress testing waits for 5.2. |
-| 0.5a | **Parser corpus.** Collect hand-checked TextItem + expected fixtures from ≥8 Greek labs, covering fragmented and whole-line text, diverse layouts and all date/range cases. Reserve at least one lab as a blind holdout: its labels and expected output may not be used to author aliases or thresholds before the first release score is recorded. | Measures parser/registry behavior without pretending to test OCR. Human/capable-model task. |
-| 0.5b | **Real OCR corpus.** From public specimen or wholly synthetic documents, commit source images/scanned PDFs plus expected rows for ≥3 labs, each with a clean scan and at least two phone-photo variants (skew, shadow, perspective or blur). Keep OCR output as a generated test artifact, not the authored input. Include one lab not used to tune preprocessing. | Exercises image→preprocess→detection→recognition→parse, including real box geometry. Human/capable-model task. |
-| 0.5c | **ΚΕΟΚΕΕ marker seed list (capable model/human).** Fetch ΚΕΟΚΕΕ v5 XLSX from the Ministry of Health, verify the recorded sha256, and extract categories 11, 12, 13 and 18 into a committed reviewable TSV under `fixtures/registry-seed/` with columns `grCode, en, abbreviation, el, otherName`. Do **not** emit `MarkerDef`s and do **not** match seed rows to markers automatically — this task produces the *sourced vocabulary* that alias rule 4(b) requires, nothing more. Record in the issue that ΚΕΟΚΕΕ omits all CBC indices (MCV, MCH, MCHC, RDW, PDW, MPV, WBC, differential) because it is an ordering nomenclature, so `haematology.ts` is corpus-authored. | Pass/fail: the committed TSV has ≥890 rows, every row carries a `grCode` matching `^1[1238](\.\d+){4}$`, and a spot-check of 20 rows against the source file matches byte-for-byte. Feeds 1.6b-core and 2.5r. |
-| 0.6 | **Metric definitions and generic scorer.** Implement fixture-schema validation and pure `score(expected, actual)` for marker recall, value/comparator precision, unit precision and range precision, grouped per lab and aggregate. It accepts supplied predictions and has no dependency on `extract.ts`; Task 2.5b wires the parser into it. | Metric denominator, numeric tolerance and missing/comparator behavior have golden tests, breaking the old scorer↔extract cycle. |
-| 0.7 | **E1 feasibility spike (capable model/human; start with 0.5b).** Compare PP-OCRv5 Greek ONNX against `tesseract.js` `ell+eng` on a small 0.5b sample in Chromium and Safari. For PP-OCR, prove conversion, dictionary wiring, det+rec, confidence and coordinate normalization behind 0.4 headers. Store candidate bytes locally and record exact checksums, first/steady latency and failures in ADR-0003. | Select one `OcrEngine` or update D3/ADR to the fallback **before** Wave 3. No CDN/HF runtime option. This is feasibility evidence, not the E1 release gate. |
+| #    | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Deliverable                                                                                                                                                                                                                                                      |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.0  | **Domain baseline.** Commit root `CONTEXT.md` and accepted ADRs for D1, D1a, D3, D4, D6/D7, D8, D9 and D13, plus ADR-0008 (CSP style-directive scope), ADR-0009 (supersedes ADR-0001; D1's data rule and origin allowlist) and ADR-0010 (D13 display-only positioning), before implementation issues are opened.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Vocabulary and changed binding decisions are reviewable independently of code.                                                                                                                                                                                   |
+| 0.1  | **Scaffold.** Astro 5 static output, one Preact `MedigraphApp` island entry, strict TypeScript, Vitest, Playwright and pnpm. Materialise **[Frontend toolchain](#frontend-toolchain--formatting-linting-and-static-gates)** exactly: Node/pnpm/TypeScript pins, `prettier@3.9.6` with its two plugins, ESLint 10 flat config with every listed language plugin, `eslint-config-prettier` last, husky + lint-staged hooks, and `.github/workflows/ci.yml` with the `lint` job gating `test` and `build`. Do not substitute versions, add `eslint-plugin-prettier`, or reorder ESLint and Prettier. Later score, privacy and bundle gates attach to the same workflow.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Empty static app builds and tests green; `pnpm verify:static` passes on a clean checkout.                                                                                                                                                                        |
+| 0.2  | **Implement provisional contracts.** Create `types.ts` exactly from “Field-level contracts”, plus structural `validateProfile(x: unknown): Profile` and semantic `assertProfileSafe(profile: Profile): void`. Validate finite numbers, coordinate bounds, discriminated ranges, ids, timestamps, uniqueness, cardinality, status/value consistency and free-text policy.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Contract tests reject every malformed boundary. These shapes freeze only after 3.8, not here.                                                                                                                                                                    |
+| 0.3  | **Synthetic/redacted seed fixtures.** Build content-equivalent synthetic PDFs and hand-checked TextItem/expected JSON; do **not** copy the identifying root PDFs. Correct mapping: `MedilabRslt29384Page2.pdf` is the 25-marker **biochemistry** layout; `Page3.pdf` is the multi-region **haematology/CBC** layout. Commit only `fixtures/seed/biochemistry.{pdf,textitems.json,expected.json}` and `haematology.{pdf,textitems.json,expected.json}` with specimen identity and content-based names. Include fragmented and whole-line versions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No real identity substring or document metadata survives. Expected output includes dates, comparators, missing status, retained ranges and SourceRefs. Human/capable-model task.                                                                                 |
+| 0.4  | **Static security foundation—not the final privacy E2E.** Self-host every browser byte under `public/`. There is **no** generated asset manifest and **no** generated CSP hash list: the policy is a committed static string. Commit `_headers` with CSP `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'`. `connect-src` carries D1's origin allowlist and is `'self'` alone in v1; adding an origin edits this one line. Set `build.inlineStylesheets: 'never'` so component `<style>` blocks always emit as external `'self'` stylesheets and no style hash is ever required. Emit no inline `<script>`, so `script-src` needs no hash, nonce, `'unsafe-inline'` or `'unsafe-hashes'`. `style-src-attr 'unsafe-inline'` is the deliberate, scoped exception recorded in [ADR-0008](adr/0008-csp-style-attribute-amendment.md); record which target browsers honour `style-src-attr` and which fall back to `style-src`. Add COOP `same-origin`, COEP `require-corp`, CORP `same-origin`, `Referrer-Policy: no-referrer`, HSTS, `X-Content-Type-Options: nosniff`, and a Permissions Policy allowing only same-origin camera while disabling microphone/geolocation/payment/USB. | A built-app Playwright smoke test boots under the delivered headers and finds no undeclared origin. COOP/COEP cost nothing once every asset is same-origin and give Task 3.3 `crossOriginIsolated` for WASM threads. Full workflow egress testing waits for 5.2. |
+| 0.5a | **Parser corpus.** Collect hand-checked TextItem + expected fixtures from ≥8 Greek labs, covering fragmented and whole-line text, diverse layouts and all date/range cases. Reserve at least one lab as a blind holdout: its labels and expected output may not be used to author aliases or thresholds before the first release score is recorded.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Measures parser/registry behavior without pretending to test OCR. Human/capable-model task.                                                                                                                                                                      |
+| 0.5b | **Real OCR corpus.** From public specimen or wholly synthetic documents, commit source images/scanned PDFs plus expected rows for ≥3 labs, each with a clean scan and at least two phone-photo variants (skew, shadow, perspective or blur). Keep OCR output as a generated test artifact, not the authored input. Include one lab not used to tune preprocessing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Exercises image→preprocess→detection→recognition→parse, including real box geometry. Human/capable-model task.                                                                                                                                                   |
+| 0.5c | **ΚΕΟΚΕΕ marker seed list (capable model/human).** Fetch ΚΕΟΚΕΕ v5 XLSX from the Ministry of Health, verify the recorded sha256, and extract categories 11, 12, 13 and 18 into a committed reviewable TSV under `fixtures/registry-seed/` with columns `grCode, en, abbreviation, el, otherName`. Do **not** emit `MarkerDef`s and do **not** match seed rows to markers automatically — this task produces the _sourced vocabulary_ that alias rule 4(b) requires, nothing more. Record in the issue that ΚΕΟΚΕΕ omits all CBC indices (MCV, MCH, MCHC, RDW, PDW, MPV, WBC, differential) because it is an ordering nomenclature, so `haematology.ts` is corpus-authored.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Pass/fail: the committed TSV has ≥890 rows, every row carries a `grCode` matching `^1[1238](\.\d+){4}$`, and a spot-check of 20 rows against the source file matches byte-for-byte. Feeds 1.6b-core and 2.5r.                                                    |
+| 0.6  | **Metric definitions and generic scorer.** Implement fixture-schema validation and pure `score(expected, actual)` for marker recall, value/comparator precision, unit precision and range precision, grouped per lab and aggregate. It accepts supplied predictions and has no dependency on `extract.ts`; Task 2.5b wires the parser into it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Metric denominator, numeric tolerance and missing/comparator behavior have golden tests, breaking the old scorer↔extract cycle.                                                                                                                                  |
+| 0.7  | **E1 feasibility spike (capable model/human; start with 0.5b).** Compare PP-OCRv5 Greek ONNX against `tesseract.js` `ell+eng` on a small 0.5b sample in Chromium and Safari. For PP-OCR, prove conversion, dictionary wiring, det+rec, confidence and coordinate normalization behind 0.4 headers. Store candidate bytes locally and record exact checksums, first/steady latency and failures in ADR-0003.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Select one `OcrEngine` or update D3/ADR to the fallback **before** Wave 3. No CDN/HF runtime option. This is feasibility evidence, not the E1 release gate.                                                                                                      |
 
 #### Fixture and corpus sourcing rules—non-negotiable
 
 - **Prefer published specimen reports.** Most Greek labs publish a
-  *υπόδειγμα αποτελεσμάτων* / sample report PDF. These are the ideal source: already
+  _υπόδειγμα αποτελεσμάτων_ / sample report PDF. These are the ideal source: already
   synthetic, already public.
 - **Any real-report-derived text must be redacted before commit**—name, AMKA, patient
   id, doctor, address, phone, barcode and accession id. Redact expected JSON and
@@ -1923,18 +2080,18 @@ spec is ambiguous, stop and comment on the issue instead of choosing."*
 
 ### Wave 1 — pure domain (parallel only where dependencies permit)
 
-| # | Task | Depends on |
-|---|---|---|
-| 1.1 | `text.ts` — separate label/abbreviation normalisers (including final sigma), lexical tokens with UTF-16 parent offsets, and no pseudo geometry | 0.2 |
-| 1.2 | `numbers.ts` — comma/dot decimals, separated comparators, shared ambiguous-thousands result, `NUMBER_RE` | 0.2 |
-| 1.3 | `ranges.ts` — parse every range form in the corpus | 0.2 |
-| 1.4 | `units.ts` — normalisation + the enumerated conversion table | 0.2, 1.1 |
-| 1.5 | `dates.ts` — parse, classify and score every candidate; ambiguity/time precision | 0.2, 1.1 |
-| 1.6a | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic | 0.2, 1.1 |
+| #         | Task                                                                                                                                                                                                                      | Depends on          |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1.1       | `text.ts` — separate label/abbreviation normalisers (including final sigma), lexical tokens with UTF-16 parent offsets, and no pseudo geometry                                                                            | 0.2                 |
+| 1.2       | `numbers.ts` — comma/dot decimals, separated comparators, shared ambiguous-thousands result, `NUMBER_RE`                                                                                                                  | 0.2                 |
+| 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2                 |
+| 1.4       | `units.ts` — normalisation + the enumerated conversion table                                                                                                                                                              | 0.2, 1.1            |
+| 1.5       | `dates.ts` — parse, classify and score every candidate; ambiguity/time precision                                                                                                                                          | 0.2, 1.1            |
+| 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic                                                                                                                       | 0.2, 1.1            |
 | 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
-| 1.7 | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks | 0.2, 1.1 |
-| 1.8 | `rows.ts` — vertical clustering (shared by both passes; spec in B1) | 0.2, 0.3 |
-| 1.9 | `review.ts` — immutable marker reassignment, identifier/conflict resolution and `canConfirm`; changing marker keys immediately rebuilds duplicate conflicts | 0.2, 1.6b-core, 1.7 |
+| 1.7       | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks                                                                                                                                           | 0.2, 1.1            |
+| 1.8       | `rows.ts` — vertical clustering (shared by both passes; spec in B1)                                                                                                                                                       | 0.2, 0.3            |
+| 1.9       | `review.ts` — immutable marker reassignment, identifier/conflict resolution and `canConfirm`; changing marker keys immediately rebuilds duplicate conflicts                                                               | 0.2, 1.6b-core, 1.7 |
 
 Every one of these is a pure function with a table-driven test file. Supply each
 builder model with an explicit input→output table in the issue (e.g. for 1.3:
@@ -1946,18 +2103,18 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 
 ### Wave 2 — pipeline
 
-| # | Task | Depends on |
-|---|---|---|
-| 2.1 | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking | 1.1, 1.6a, 1.6b-core, 1.8 |
-| 2.2 | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions and range/value disambiguation | 2.1, 1.2–1.4 |
-| 2.3 | `columns.ts` — **Pass B** column model | 1.8, 0.3 |
-| 2.4 | `grammar.ts` — **Pass B** whole-line/fragmented grammar and nine ordered rules | 1.1–1.4, 2.3 |
-| 2.5a | `extract.ts` core — date/identifier passes, both measurement passes, reconciliation, flags/confidence and `unrecognised[]` | 2.1–2.4, 1.5, 1.7 |
-| 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout | 2.5a, 0.5a, 0.6 |
-| 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel. | 1.6b-core, 0.5a, 2.5b |
-| 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors | 2.5r |
-| 2.6 | `profile.ts` — proposed groups, explicit report construction, mandatory conflict resolution, same-person append and id-based profile merge | 2.5a, 1.6b-core, 1.9 |
-| 2.7 | `series.ts` — ordering, canonical target units, range co-conversion, native preservation, explicit gaps and unit splits | 2.6, 1.4 |
+| #    | Task                                                                                                                                                                                                                                                                                                                            | Depends on                |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                              | 1.1, 1.6a, 1.6b-core, 1.8 |
+| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions and range/value disambiguation                                                                                                                                                                                | 2.1, 1.2–1.4              |
+| 2.3  | `columns.ts` — **Pass B** column model                                                                                                                                                                                                                                                                                          | 1.8, 0.3                  |
+| 2.4  | `grammar.ts` — **Pass B** whole-line/fragmented grammar and nine ordered rules                                                                                                                                                                                                                                                  | 1.1–1.4, 2.3              |
+| 2.5a | `extract.ts` core — date/identifier passes, both measurement passes, reconciliation, flags/confidence and `unrecognised[]`                                                                                                                                                                                                      | 2.1–2.4, 1.5, 1.7         |
+| 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                | 2.5a, 0.5a, 0.6           |
+| 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel. | 1.6b-core, 0.5a, 2.5b     |
+| 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors                                                                                                                                                                                                                           | 2.5r                      |
+| 2.6  | `profile.ts` — proposed groups, explicit report construction, mandatory conflict resolution, same-person append and id-based profile merge                                                                                                                                                                                      | 2.5a, 1.6b-core, 1.9      |
+| 2.7  | `series.ts` — ordering, canonical target units, range co-conversion, native preservation, explicit gaps and unit splits                                                                                                                                                                                                         | 2.6, 1.4                  |
 
 **Acceptance for 2.2 (Pass A alone, no layout analysis):** on
 `fixtures/seed/biochemistry.textitems.json`, all 25 markers with `D-Dimers` as
@@ -1990,18 +2147,18 @@ date/source ordering. No Series contains more than one normalised unit.
 
 ### Wave 3 — I/O adapters
 
-| # | Task | Depends on | Notes |
-|---|---|---|---|
-| 3.1 | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip; self-host the packaged worker under `public/pdf/` | 0.1–0.4 | Test against the synthetic PDFs, including text order and page dimensions. |
-| 3.2 | `pdfRaster.ts` — render one page at a bounded scale to `ImageBitmap`; close each bitmap after that page is recognised | 0.1, 0.3 | Process sequentially to cap memory; never cache or persist pixels. |
-| 3.3 | `OcrEngine` + `ocr.ts` — implement exactly the engine selected by 0.7, emitting line TextItems with confidence and normalised boxes | 0.2, 0.4, 0.7 | Self-host the model, dictionary and WASM bytes under `public/`; no `assetLoader` indirection and no hash manifest. Use SIMD; use threads only when `crossOriginIsolated`, with a tested single-thread fallback. WebGPU may be attempted, but WASM fallback is mandatory. Do not substitute PP-OCRv6 (no Greek). |
-| 3.3b | `preprocess.ts` — EXIF orientation, bounded downscale, perspective/deskew and empirically selected thresholding | 0.5b, 0.7, 3.3 | Capable-model task. Every option is measured on 0.5b; defaults may improve scores but may not lower any held-out metric. Preserve an “original” retry path. |
-| 3.4 | `fileRouter.ts` — route each PDF page independently. A text layer is usable when it has ≥20 letters, ≥2 standalone numeric tokens and either a known anchor or a measurement-shaped row; otherwise raster/OCR that page. If E0 produces zero rows, automatically retry E1; review also exposes “retry this page with OCR”. Images use E1. | 2.5a, 3.1–3.3b | Replaces the undefined `<5 rows` heuristic and handles hybrid PDFs/garbage text layers. Enforce 20 files, 100 total pages, 50 MiB per source and supported MIME/signature checks before decode. Return batch-scoped limit/cancel failures and source-scoped type/size/decode/OCR failures exactly as `RouteFailure`; successful siblings remain in `results`. |
-| 3.5 | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan | 0.2, 2.6 | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI. |
-| 3.6 | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result | 0.1, 0.2 | Store exactly one Profile and no drafts/evidence. `clearAll` removes the database and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps. |
-| 3.7 | `sw.js` — versioned cache of an explicit, committed app/model asset list only; cache-first exact-path lookup after first visit | 0.4, 3.3 | Never cache navigations with user data, blob/data URLs, source files or arbitrary request URLs. No push, background/periodic sync or dynamic `importScripts`. Cross-origin requests only for origins in D1's `connect-src` allowlist (none in v1). Scope to the app; upgrades remove old asset caches. E1 remains usable offline after assets were first fetched. |
-| 3.8 | **E0 and E1 walking slices + contract freeze.** Through the minimal `MedigraphApp` shell, run one synthetic PDF and one corpus image from attach → ExtractionResult → source-aware review → explicit Confirm → Profile/Series → IndexedDB → panel/trend primitive → plaintext export/import. | 2.5c–2.7, 3.1–3.7 | Both slices pass under production CSP and with no test-only adapters. Assert `registryVersion` in every ExtractionResult and fixture. Resolve any contract mismatch in this plan, then mark `types.ts` frozen. Do this before broad UI component work. |
-| 3.9 | **E1 quality gate.** `pnpm ocr:score` runs source images through preprocessing, actual OCR and parser; it never consumes committed OCR TextItems. | 0.5b, 2.5c, 3.3–3.4 | Aggregate recall ≥90%, value precision ≥99%, unit/range precision ≥90%; every OCR lab recall ≥85%, value precision ≥98% and unit/range precision ≥80%, including the untouched OCR holdout. If not, E1 is labelled assisted/beta and the failed dimensions are recorded; do not tune expected data. |
+| #    | Task                                                                                                                                                                                                                                                                                                                                      | Depends on          | Notes                                                                                                                                                                                                                                                                                                                                                             |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.1  | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip; self-host the packaged worker under `public/pdf/`                                                                                                                                                                                                  | 0.1–0.4             | Test against the synthetic PDFs, including text order and page dimensions.                                                                                                                                                                                                                                                                                        |
+| 3.2  | `pdfRaster.ts` — render one page at a bounded scale to `ImageBitmap`; close each bitmap after that page is recognised                                                                                                                                                                                                                     | 0.1, 0.3            | Process sequentially to cap memory; never cache or persist pixels.                                                                                                                                                                                                                                                                                                |
+| 3.3  | `OcrEngine` + `ocr.ts` — implement exactly the engine selected by 0.7, emitting line TextItems with confidence and normalised boxes                                                                                                                                                                                                       | 0.2, 0.4, 0.7       | Self-host the model, dictionary and WASM bytes under `public/`; no `assetLoader` indirection and no hash manifest. Use SIMD; use threads only when `crossOriginIsolated`, with a tested single-thread fallback. WebGPU may be attempted, but WASM fallback is mandatory. Do not substitute PP-OCRv6 (no Greek).                                                   |
+| 3.3b | `preprocess.ts` — EXIF orientation, bounded downscale, perspective/deskew and empirically selected thresholding                                                                                                                                                                                                                           | 0.5b, 0.7, 3.3      | Capable-model task. Every option is measured on 0.5b; defaults may improve scores but may not lower any held-out metric. Preserve an “original” retry path.                                                                                                                                                                                                       |
+| 3.4  | `fileRouter.ts` — route each PDF page independently. A text layer is usable when it has ≥20 letters, ≥2 standalone numeric tokens and either a known anchor or a measurement-shaped row; otherwise raster/OCR that page. If E0 produces zero rows, automatically retry E1; review also exposes “retry this page with OCR”. Images use E1. | 2.5a, 3.1–3.3b      | Replaces the undefined `<5 rows` heuristic and handles hybrid PDFs/garbage text layers. Enforce 20 files, 100 total pages, 50 MiB per source and supported MIME/signature checks before decode. Return batch-scoped limit/cancel failures and source-scoped type/size/decode/OCR failures exactly as `RouteFailure`; successful siblings remain in `results`.     |
+| 3.5  | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan                                                                                                                                                                                                   | 0.2, 2.6            | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI.                                                                                                                         |
+| 3.6  | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result                                                                                                                                                                                  | 0.1, 0.2            | Store exactly one Profile and no drafts/evidence. `clearAll` removes the database and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps.                                                                                                                                                                                |
+| 3.7  | `sw.js` — versioned cache of an explicit, committed app/model asset list only; cache-first exact-path lookup after first visit                                                                                                                                                                                                            | 0.4, 3.3            | Never cache navigations with user data, blob/data URLs, source files or arbitrary request URLs. No push, background/periodic sync or dynamic `importScripts`. Cross-origin requests only for origins in D1's `connect-src` allowlist (none in v1). Scope to the app; upgrades remove old asset caches. E1 remains usable offline after assets were first fetched. |
+| 3.8  | **E0 and E1 walking slices + contract freeze.** Through the minimal `MedigraphApp` shell, run one synthetic PDF and one corpus image from attach → ExtractionResult → source-aware review → explicit Confirm → Profile/Series → IndexedDB → panel/trend primitive → plaintext export/import.                                              | 2.5c–2.7, 3.1–3.7   | Both slices pass under production CSP and with no test-only adapters. Assert `registryVersion` in every ExtractionResult and fixture. Resolve any contract mismatch in this plan, then mark `types.ts` frozen. Do this before broad UI component work.                                                                                                            |
+| 3.9  | **E1 quality gate.** `pnpm ocr:score` runs source images through preprocessing, actual OCR and parser; it never consumes committed OCR TextItems.                                                                                                                                                                                         | 0.5b, 2.5c, 3.3–3.4 | Aggregate recall ≥90%, value precision ≥99%, unit/range precision ≥90%; every OCR lab recall ≥85%, value precision ≥98% and unit/range precision ≥80%, including the untouched OCR holdout. If not, E1 is labelled assisted/beta and the failed dimensions are recorded; do not tune expected data.                                                               |
 
 ### Wave 4 — one mobile-first Preact application island
 
@@ -2016,27 +2173,27 @@ unknown source/page, and direct adapters with `evidenceAvailable:false` show the
 explicit unavailable state. Confirm/Cancel/error/unmount revokes every URL, closes
 every bitmap and clears the map.
 
-| # | Task |
-|---|---|
-| 4.0 | `appState.ts` + MedigraphApp evidence owner — reducer/events, one batch transaction, sourceId-keyed inspection callback and deterministic reference/URL/bitmap release on Confirm/Cancel/error/unmount |
-| 4.1 | `FileDrop` — drag/drop, picker and mobile capture; enforce 3.4 limits; per-file/page progress; render each typed `RouteFailure`. `too-many-files`, `too-many-pages` and `cancelled` are batch errors; `unsupported-type`, `file-too-large`, `decode-failed` and `ocr-failed` identify a source. Source failures do not discard successful siblings. |
-| 4.2 | `ReviewTable` — one session grouped by proposed Report. Preserve an ephemeral `ParsedRow.id`→edited draft mapping until Report construction; it never enters Profile. Every group requires date confirmation and source grouping/splitting; rows support edit/delete and searchable canonical marker reassignment or approved unknown. Reassignment recomputes duplicate conflicts. Conflicts require choose/edit; source page/crop opens beside a row. Low/flagged rows sort first. Identifier panel requires Redact (mask evidence and remove the substring from every derived field), Delete affected row, or False positive for every candidate; unknown labels always appear. Confirm remains disabled until all gates pass, then writes all Reports atomically and disposes evidence. |
+| #    | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4.0  | `appState.ts` + MedigraphApp evidence owner — reducer/events, one batch transaction, sourceId-keyed inspection callback and deterministic reference/URL/bitmap release on Confirm/Cancel/error/unmount                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 4.1  | `FileDrop` — drag/drop, picker and mobile capture; enforce 3.4 limits; per-file/page progress; render each typed `RouteFailure`. `too-many-files`, `too-many-pages` and `cancelled` are batch errors; `unsupported-type`, `file-too-large`, `decode-failed` and `ocr-failed` identify a source. Source failures do not discard successful siblings.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 4.2  | `ReviewTable` — one session grouped by proposed Report. Preserve an ephemeral `ParsedRow.id`→edited draft mapping until Report construction; it never enters Profile. Every group requires date confirmation and source grouping/splitting; rows support edit/delete and searchable canonical marker reassignment or approved unknown. Reassignment recomputes duplicate conflicts. Conflicts require choose/edit; source page/crop opens beside a row. Low/flagged rows sort first. Identifier panel requires Redact (mask evidence and remove the substring from every derived field), Delete affected row, or False positive for every candidate; unknown labels always appear. Confirm remains disabled until all gates pass, then writes all Reports atomically and disposes evidence.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 4.2a | **Review-friction reduction.** A presentation layer over `ReviewTable`: it adds no domain function, weakens no gate and changes no `ReviewSession` shape. (a) **Confidence triage** — a row with `confidence: 'high'` and an empty `flags` array renders collapsed inside a pre-accepted group showing a count and a “review these anyway” disclosure; every other row renders expanded, flagged first, exactly as in 4.2. (b) **Batch confirm** — the primary action accepts all pre-accepted rows at once, with per-row exception still available. It stays disabled until every D6 and D7 gate passes, unchanged from 4.2: triage must never collapse an unresolved identifier candidate, an unconfirmed date, an unresolved conflict or an unapproved unknown marker, and those render expanded regardless of confidence. (c) **Inline correction** — editing a row opens its `SourceRef` crop beside the field rather than in a separate view, reusing the 4.0 `onInspectSource` callback. State in the issue that registry coverage (D5a) is the largest single lever on how many rows need touching, and that this task reduces review effort without reducing review authority. **Pass/fail (Playwright):** a fixture whose rows are all high-confidence and unflagged reaches Confirm in one action; a fixture with one `implausible-value` row and one identifier candidate renders both expanded and holds Confirm disabled until each is resolved. |
-| 4.3 | `PanelView` — Report selector and factual meter list exactly per chart spec; empty/missing/split-unit states included |
-| 4.4 | `TrendView` — single-Series SVG, one-sided/stepped bands, censored and gap behavior, crosshair and fully equivalent table exactly per chart spec |
-| 4.5 | `DataManager` — plaintext export warning; import preview with Cancel/Replace/Merge, same-person gate and same-day time resolution; delete one Report; “Delete everything from this device” unregisters the service worker and clears Profile, caches and live review resources after confirmation; show persistence-denied/eviction education and export nudge. Empty storage always offers Attach and Import. |
-| 4.6 | `app.astro` wires the sole island; zero-hydration `index.astro` and `privacy.astro`. Privacy copy says processing/history are local, runtime assets are first-party, IndexedDB/export are plaintext, browsers may evict data, and device/XSS/shared-file risks remain—no legal absolutes. It explains a Network-tab check without presenting it as proof, and lists the `connect-src` allowlist (empty in v1). **D13 disclaimer:** PanelView and TrendView each carry persistent, always-visible copy — not a dismissible modal and not a one-time gate — stating that Medigraph displays the user's own reported lab values and reference ranges, does not interpret them, and is not medical advice. Copy exists in both `el` and `en` and is bound by D13 like every other string. Initial language follows `navigator.language`; an el/en toggle is stored in non-medical localStorage. Review dates always show ISO alongside localized text. |
+| 4.3  | `PanelView` — Report selector and factual meter list exactly per chart spec; empty/missing/split-unit states included                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 4.4  | `TrendView` — single-Series SVG, one-sided/stepped bands, censored and gap behavior, crosshair and fully equivalent table exactly per chart spec                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 4.5  | `DataManager` — plaintext export warning; import preview with Cancel/Replace/Merge, same-person gate and same-day time resolution; delete one Report; “Delete everything from this device” unregisters the service worker and clears Profile, caches and live review resources after confirmation; show persistence-denied/eviction education and export nudge. Empty storage always offers Attach and Import.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 4.6  | `app.astro` wires the sole island; zero-hydration `index.astro` and `privacy.astro`. Privacy copy says processing/history are local, runtime assets are first-party, IndexedDB/export are plaintext, browsers may evict data, and device/XSS/shared-file risks remain—no legal absolutes. It explains a Network-tab check without presenting it as proof, and lists the `connect-src` allowlist (empty in v1). **D13 disclaimer:** PanelView and TrendView each carry persistent, always-visible copy — not a dismissible modal and not a one-time gate — stating that Medigraph displays the user's own reported lab values and reference ranges, does not interpret them, and is not medical advice. Copy exists in both `el` and `en` and is bound by D13 like every other string. Initial language follows `navigator.language`; an el/en toggle is stored in non-medical localStorage. Review dates always show ISO alongside localized text.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
 ### Wave 5 — hardening
 
-| # | Task |
-|---|---|
-| 5.1 | Happy-path Playwright E2E: attach both synthetic seed PDFs → confirm one proposed group/date → resolve review → one Report with 25+ markers → panel → ferritin trend → plaintext export → clear/reload → import preview → identical Profile |
+| #   | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 5.1 | Happy-path Playwright E2E: attach both synthetic seed PDFs → confirm one proposed group/date → resolve review → one Report with 25+ markers → panel → ferritin trend → plaintext export → clear/reload → import preview → identical Profile                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 5.2 | **D1 egress regression (slim).** Run 5.1 and a real E1 fixture. Assert that every network request targets an origin in the `connect-src` allowlist — `'self'` alone in v1, so any third-party request fails until it is declared — and that every request to a non-`self` origin is a GET or HEAD with no query string, no request body and no app-set header. Instrument `WebSocket`, `EventSource`, `navigator.sendBeacon`, `<a ping>`, form navigation and `RTCPeerConnection` and assert they are never constructed or used; these are unconditional, with no allowlist escape, because none has an inbound-asset use case. Inspect IndexedDB (one Profile, nothing else) and Cache Storage (declared assets only). No canary seeding and no cold/warm/offline matrix. This is regression evidence against accidental egress, not proof against malicious same-origin code. |
-| 5.3 | Bundle budget: initial app route ≤150 KB gzip JS; pdf.js, OCR runtime and model bytes absent from the initial chunk and fetched only on their path. Assert the committed `_headers` CSP is byte-identical to the one the app is served under; there are no generated hashes and no manifest to enforce. |
-| 5.4 | Accessibility: full keyboard review/panel traversal, focus restoration, 44 px targets, visible labels independent of colour, forced-colours, reduced motion, SVG figure naming, meter text alternatives, trend-table parity and axe pass in both themes/languages |
-| 5.5 | **Mobile E1 release gate.** On a named mid-range Android and four-year-old iPhone, measure 0.5b pages on battery: first-fetch separately; steady-state median ≤15 s/page and no page >30 s, no OOM/crash, sequential-page resources released, and ≤512 MiB peak where measurable. If quality (3.9) or either-device gate fails after preprocessing/INT8 work, ship E1 as assisted/beta—not as the default—and keep all data local. |
-| 5.6 | Safety/lifecycle E2E: no-date and ambiguous-date blocks; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states |
+| 5.3 | Bundle budget: initial app route ≤150 KB gzip JS; pdf.js, OCR runtime and model bytes absent from the initial chunk and fetched only on their path. Assert the committed `_headers` CSP is byte-identical to the one the app is served under; there are no generated hashes and no manifest to enforce.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 5.4 | Accessibility: full keyboard review/panel traversal, focus restoration, 44 px targets, visible labels independent of colour, forced-colours, reduced motion, SVG figure naming, meter text alternatives, trend-table parity and axe pass in both themes/languages                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 5.5 | **Mobile E1 release gate.** On a named mid-range Android and four-year-old iPhone, measure 0.5b pages on battery: first-fetch separately; steady-state median ≤15 s/page and no page >30 s, no OOM/crash, sequential-page resources released, and ≤512 MiB peak where measurable. If quality (3.9) or either-device gate fails after preprocessing/INT8 work, ship E1 as assisted/beta—not as the default—and keep all data local.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 5.6 | Safety/lifecycle E2E: no-date and ambiguous-date blocks; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states                                                                                                                                                                                                                                                                                                                                                                 |
 
 ---
 
@@ -2102,13 +2259,13 @@ and the plaintext warning. Record device/browser versions and observations.
 The original version of this appendix asked "which vision model can we self-host for
 Greek lab reports on a €4.54/mo OVH VPS-1?" and answered "none, and we don't need
 one". That conclusion stands. The question was too narrow, though: the real question
-is whether *any* vision model — on-device, on a server we run, or behind a third-party
+is whether _any_ vision model — on-device, on a server we run, or behind a third-party
 API — could be trusted well enough to **delete the mandatory review step (D6)**, which
 is the app's worst user experience. This revision answers that, and prices the server
 option in full rather than dismissing it on cost.
 
 **Two findings up front.** No vision model removes review. And the server option is
-*cheap* — roughly €3/month of real compute, not the €184–569/mo that "a VPS" implies —
+_cheap_ — roughly €3/month of real compute, not the €184–569/mo that "a VPS" implies —
 so cost is not why we reject it. Both matter: the second one means this decision has
 to be defended on its actual grounds, because the next person to propose a server will
 be right about the money.
@@ -2125,17 +2282,17 @@ hardware, and a hosted API equally.
 - **On medical reports specifically**, character-level errors on fine-print numeric
   values and units are a recurring end-to-end VLM failure pattern
   ([MedRepBench, arXiv 2508.16674](https://arxiv.org/abs/2508.16674)).
-- **The failure *shape* is the problem, not the rate.** Our parser fails loudly: it
+- **The failure _shape_ is the problem, not the rate.** Our parser fails loudly: it
   emits `ParseFlag`s (`ambiguous-thousands`, `implausible-value`, `unrecognised-unit`,
   `low-ocr-confidence`) and a `Confidence`, and review sorts on them. A generative
   extractor resolves an ambiguous `1`/`7` silently. A wrong-but-plausible ferritin
   value that never surfaces in review is the worst outcome this product has, and a
-  model that raises average accuracy while removing the signal that says *which rows
-  to distrust* is a net loss for us even at a better headline score.
+  model that raises average accuracy while removing the signal that says _which rows
+  to distrust_ is a net loss for us even at a better headline score.
 - **It would degrade review even where it improved extraction.** A VLM enters the D4
   seam through the `parsedRows` branch with `evidenceAvailable: false`, so review
   shows "source preview unavailable". We would lose crop inspection — the thing that
-  makes review *fast* — and bypass the marker registry that D5a calls the product's
+  makes review _fast_ — and bypass the marker registry that D5a calls the product's
   core asset.
 - **Review is not only a correction step.** The D7 identifier scrub is a hard
   persistence gate, and the D6 date, grouping and same-person questions are user
@@ -2149,7 +2306,7 @@ problem.
 
 ### 2. Would accepting PDFs only remove it?
 
-No, but it is the strongest *available* accuracy lever and it is already the E0 path.
+No, but it is the strongest _available_ accuracy lever and it is already the E0 path.
 The distinction that matters is not PDF-versus-image but **text-layer versus
 raster** — a scanned report wrapped in a PDF still needs OCR, which is why Task 3.4
 routes per page rather than per file.
@@ -2167,38 +2324,38 @@ yields exact character codes, so `low-ocr-confidence` disappears. What survives:
   (`Α`/`A`, `Ρ`/`P`, `Ο`/`O`) that are especially damaging in Greek. Task 3.4 already
   assumes garbage text layers exist and gates on usability.
 - **D6 and D7 are untouched.** A text-layer PDF carries the patient's name and AMKA in
-  *machine-readable* form, so the scrub gate matters at least as much. Collection,
+  _machine-readable_ form, so the scrub gate matters at least as much. Collection,
   report, print and birth dates all appear; `DateCandidate.kind` exists precisely
   because choosing among them is not automatic.
 - **Registry misses and duplicate-marker conflicts** remain review actions by
   construction.
 
 So PDF-only shrinks review's workload substantially without removing it. Whether it
-shrinks it *enough* to feel effortless is measurable rather than arguable: the corpus
+shrinks it _enough_ to feel effortless is measurable rather than arguable: the corpus
 scorer's `valuePrecision`, `unitPrecision` and `rangePrecision` against the Task 3.9
 floors answer it directly, on our own documents. Note the product cost before treating
 it as free — phone photos of paper reports are plausibly the dominant input for older
 Greek results, and "your PDF is the wrong kind of PDF" is a confusing rejection. As a
-*sequencing* decision (ship E0 first, hold E1 to its gates) it is sound and already
+_sequencing_ decision (ship E0 first, hold E1 to its gates) it is sound and already
 what D1a describes; as a claim that review becomes unnecessary, it is not supported.
 
 ### 3. On-device (E2-local): blocked on capability, not on privacy
 
-| Model | Greek | Browser path | Weight budget |
-|---|---|---|---|
-| **PP-OCRv5 `el` mobile** | ✅ dedicated `el_PP-OCRv5_mobile_rec`, 89.28 % | ✅ onnxruntime-web | **~15 MB** (det 4.94 MB + rec ~10 MB) |
-| Tesseract `ell` | ✅ | ✅ mature | ~1.4 MB data |
-| PaddleOCR-VL 0.9B / 1.5 / 1.6 | ✅ edit distance **0.135** ([arXiv 2510.14528](https://arxiv.org/abs/2510.14528)) | ❌ no ONNX export; Paddle-framework | ~500–700 MB at Q4 |
-| SmolVLM | ❌ 6 languages, no Greek | ✅ | — |
-| Granite-Docling-258M | ❌ English + experimental AR/ZH/JA | ✅ | best size fit, no Greek |
-| LFM-2.5VL-1.6B | ❌ not claimed | ✅ shipped WebGPU demo | **~1.5 GB, ~90 s first load** |
-| dots.ocr | ✅ | ❌ | 3B — consumer GPU |
-| PP-OCRv6 tiny/small/medium | ❌ | ✅ (but useless) | 1.5–34.5M |
+| Model                         | Greek                                                                             | Browser path                        | Weight budget                         |
+| ----------------------------- | --------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------- |
+| **PP-OCRv5 `el` mobile**      | ✅ dedicated `el_PP-OCRv5_mobile_rec`, 89.28 %                                    | ✅ onnxruntime-web                  | **~15 MB** (det 4.94 MB + rec ~10 MB) |
+| Tesseract `ell`               | ✅                                                                                | ✅ mature                           | ~1.4 MB data                          |
+| PaddleOCR-VL 0.9B / 1.5 / 1.6 | ✅ edit distance **0.135** ([arXiv 2510.14528](https://arxiv.org/abs/2510.14528)) | ❌ no ONNX export; Paddle-framework | ~500–700 MB at Q4                     |
+| SmolVLM                       | ❌ 6 languages, no Greek                                                          | ✅                                  | —                                     |
+| Granite-Docling-258M          | ❌ English + experimental AR/ZH/JA                                                | ✅                                  | best size fit, no Greek               |
+| LFM-2.5VL-1.6B                | ❌ not claimed                                                                    | ✅ shipped WebGPU demo              | **~1.5 GB, ~90 s first load**         |
+| dots.ocr                      | ✅                                                                                | ❌                                  | 3B — consumer GPU                     |
+| PP-OCRv6 tiny/small/medium    | ❌                                                                                | ✅ (but useless)                    | 1.5–34.5M                             |
 
 Greek is PaddleOCR-VL's second-worst script (0.135 against 0.013 for Latin — roughly
 ten times the error rate) and that is on clean benchmark scans, not phone photos.
 GGUF/llama.cpp support for it landed 2026-03-06 and wllama v3 added WebGPU with
-multimodal, so a browser path is newly *conceivable*; nobody has published one. That
+multimodal, so a browser path is newly _conceivable_; nobody has published one. That
 is a research project, not an integration.
 
 **The device gate settles it regardless of Greek.** A 0.9B model at Q4 is ~500–700 MB
@@ -2223,16 +2380,16 @@ raised dedicated-vCPU CCX prices 113–176 % in June 2026 (CCX63 now €853.49/m
 
 **Flat-rate GPU hosting is the wrong shape for this workload.**
 
-| Option | Price | Notes |
-|---|---|---|
-| Hetzner GEX44 (RTX 4000 SFF Ada, 20 GB) | €184/mo + €79 setup | EU |
-| Scaleway L4 (24 GB) | €0.79/GPU/hr ≈ €569/mo always-on | EU |
-| GPU Mart RTX A4000 (16 GB) | $119/mo | US — triggers Chapter V transfer machinery |
+| Option                                  | Price                            | Notes                                      |
+| --------------------------------------- | -------------------------------- | ------------------------------------------ |
+| Hetzner GEX44 (RTX 4000 SFF Ada, 20 GB) | €184/mo + €79 setup              | EU                                         |
+| Scaleway L4 (24 GB)                     | €0.79/GPU/hr ≈ €569/mo always-on | EU                                         |
+| GPU Mart RTX A4000 (16 GB)              | $119/mo                          | US — triggers Chapter V transfer machinery |
 
 VRAM is a non-issue (~1 GB INT8, ~2 GB FP16). Throughput is ~45 pages/min peak on an
 L40S and roughly half that sustained; a RTX 4000 is a fraction again. That is far more
 capacity than we need, running permanently, for a workload where each user attaches a
-handful of pages a few times a *year*. At 100 active users/month × ~15 pages, a
+handful of pages a few times a _year_. At 100 active users/month × ~15 pages, a
 €184/mo box costs ~€0.12/page while scale providers charge ~$0.0007 — about 170×
 worse, because the box idles more than 99 % of the time.
 
@@ -2250,7 +2407,7 @@ rounding error and "a VPS" was never the right question.
   Art. 28 processor agreement with the host, and Chapter V transfer machinery if the
   hardware sits outside the EEA — which eliminates the cheapest row in the table above.
 - **It contradicts the project's binding constraint.** The constraint is GDPR-shaped:
-  *no sensitive user data on Medigraph's server.* A VPS is Medigraph's server. This
+  _no sensitive user data on Medigraph's server._ A VPS is Medigraph's server. This
   option collides with that constraint more directly than a third-party API does,
   because it puts the data on the one machine the constraint names.
 - **It demolishes the architecture.** It supersedes D1, D1a and D2, voids ADR-0009,
@@ -2274,7 +2431,7 @@ rounding error and "a VPS" was never the right question.
   supersedes D1/D1a, a new threat/legal review, rewritten privacy copy, explicit
   per-use consent and a separate build. This plan neither approves nor implements it.
 - **Do not adopt PP-OCRv6.** It is newer, smaller and faster, and it cannot read
-  Greek — its 50 languages are ZH/EN/JA plus 46 *Latin-script* ones. Greek support
+  Greek — its 50 languages are ZH/EN/JA plus 46 _Latin-script_ ones. Greek support
   exists in v5 and was dropped in v6. Recorded in the D3 ADR so nobody "upgrades" into
   a regression.
 - **Do not swap in Granite-Docling** on size grounds either; it has no Greek.
@@ -2300,7 +2457,7 @@ rounding error and "a VPS" was never the right question.
   review, strict CSP, no raw HTML, safe text rendering and the Task 5.2 regression
   test reduce risk but cannot mathematically prove a compromised app harmless. Treat
   dependency and XSS review as D1 work. Note the D1 origin allowlist is a guard
-  against *accidental* egress, not against deliberate egress by compromised code.
+  against _accidental_ egress, not against deliberate egress by compromised code.
 - **Service workers are privileged, persistent code.** Cache only the explicit
   committed asset list, prohibit dynamic code and user-data caching, test upgrades, and
   unregister/clear it on “Delete everything”. A stale worker must not bypass new CSP

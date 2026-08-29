@@ -8,7 +8,7 @@
 
 Medigraph reads lab reports and plots each marker over time. Under
 [MDCG 2019-11](https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2019_11_guidance_en_0.pdf),
-software that stores, archives and *displays* data is not a medical device, while
+software that stores, archives and _displays_ data is not a medical device, while
 software that **interprets** data for a diagnostic purpose is — and MDR Rule 11 puts
 diagnostic software at Class IIa or above, meaning a notified body, CE marking and a
 QMS. The primary qualification trigger is the **intended purpose the manufacturer
@@ -17,7 +17,7 @@ states**, so product copy weighs at least as heavily as UI behaviour.
 The plan sat on both sides of that line without noticing. The chart specifications
 were already disciplined — Panel view mandates neutral factual language, forbids
 `good`/`warning`/`critical` and severity inference, and frames every status as
-*reported* — but the Trend view carried no equivalent clause despite being the view
+_reported_ — but the Trend view carried no equivalent clause despite being the view
 that produces information no lab ever gave the user. Meanwhile the product pitch
 promised to reveal "whether their ferritin has been sliding for four years", which is
 a claim to deliver clinical insight.

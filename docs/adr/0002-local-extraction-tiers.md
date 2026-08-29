@@ -29,13 +29,13 @@ consent. Merely supplying one's own API key does not make data egress D1-conform
 **Amended 2026-08-29 ([ADR-0011](0011-no-vision-language-model-for-v1.md)):** E2 now
 splits into **E2-local** (on-device inference, D1-conforming, blocked on Greek model
 coverage and device limits rather than on privacy) and **E2-remote** (off-device
-inference of any kind, *including a server we operate ourselves*, barred by the data
+inference of any kind, _including a server we operate ourselves_, barred by the data
 rule). The undifferentiated term invited two errors: treating a vision model as
 inherently privacy-breaking, and treating "self-hosted" as inherently
 privacy-preserving. The test is whether the bytes leave the device.
 
 **Amended 2026-08-29 ([ADR-0009](0009-egress-data-rule-and-origin-allowlist.md)):** D1
-now permits declared third-party *inbound* asset fetches via a `connect-src` allowlist.
+now permits declared third-party _inbound_ asset fetches via a `connect-src` allowlist.
 This does not soften the E2-remote boundary. E2-remote is barred because it transmits
 document content off the device, which the data rule forbids outright — not because it
 contacts a foreign origin. Declaring an origin can never authorise E2-remote, and the
