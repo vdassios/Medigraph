@@ -1,0 +1,10 @@
+# Private reference inputs — contain identifying patient text.
+# Never commit these (docs/plan.md, "Fixture and corpus sourcing rules").
+# Task 0.3 recreates their layouts synthetically under fixtures/seed/.
+MedilabRslt*.pdf
+
+# Node
+node_modules/
+dist/
+.astro/
+*.log
