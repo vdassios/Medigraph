@@ -16,3 +16,6 @@ peerDependencyRules:
 allowBuilds:
   esbuild: true
   sharp: true
+
+minimumReleaseAgeExclude:
+  - zod@4.5.4

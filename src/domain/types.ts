@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Field-level contracts (docs/plan.md, "Field-level contracts") plus the two
  * validators Task 0.2 requires.
@@ -6,7 +8,7 @@
  * before or after freeze updates the plan and every affected fixture in the same
  * change — never add a convenience field locally.
  *
- * Pure TypeScript: zero DOM, zero I/O, no browser or vendor types (D4).
+ * Pure domain code: zero DOM, zero I/O, and no browser or vendor runtime objects (D4).
  */
 
 export type Confidence = 'high' | 'medium' | 'low';
@@ -92,10 +94,7 @@ export interface ParsedNumber {
   ambiguousThousands: boolean;
 }
 
-export type ReferenceRange =
-  | { kind: 'closed'; min: number; max: number }
-  | { kind: 'minOnly'; min: number; comparator: '>' | '>=' }
-  | { kind: 'maxOnly'; max: number; comparator: '<' | '<=' };
+export type ReferenceRange = z.infer<typeof referenceRangeSchema>;
 
 export interface ParsedRow {
   id: string;
@@ -146,34 +145,10 @@ export interface ExtractionResult {
   evidencePages?: TextItem[][]; // transient review evidence only
 }
 
-export interface CollectedAt {
-  date: string; // YYYY-MM-DD, local civil date
-  time: string | null; // required to distinguish two same-day Reports
-  precision: 'day' | 'minute';
-}
-
-export interface Measurement {
-  markerKey: string;
-  label?: string; // allowed only for an approved x:* marker
-  status: ParseStatus;
-  value: number | null; // native lab value
-  comparator: Comparator | null;
-  unit: string | null; // native lab unit
-  referenceRange: ReferenceRange | null; // native lab range
-  sourceOrder: number;
-}
-
-export interface Report {
-  id: string; // UUID created only when review is confirmed
-  collectedAt: CollectedAt;
-  measurements: Measurement[]; // markerKey unique within this array
-}
-
-export interface Profile {
-  schemaVersion: 1;
-  id: string; // opaque UUID, never a patient identifier
-  reports: Report[];
-}
+export type CollectedAt = z.infer<typeof collectedAtSchema>;
+export type Measurement = z.infer<typeof measurementSchema>;
+export type Report = z.infer<typeof reportSchema>;
+export type Profile = z.infer<typeof profileSchema>;
 
 export interface Conflict {
   id: string;
@@ -248,14 +223,13 @@ export interface Series {
 // ---------------------------------------------------------------------------
 // Validation
 //
-// `validateProfile` is the structural + semantic gate: it accepts `unknown` and
-// either returns a `Profile` or throws. `assertProfileSafe` is the separate D7
+// `validateProfile` is the Zod structural + semantic gate: it accepts `unknown`
+// and either returns a `Profile` or throws. `assertProfileSafe` is the separate D7
 // safety validator over the one free-text path into a Profile — an approved
 // unknown-marker label. Both are called on import (Task 3.5) and before persist.
 // ---------------------------------------------------------------------------
 
-/** Bounds from the `.medigraph` file format section. */
-export const PROFILE_LIMITS = {
+const PROFILE_LIMITS = {
   maxReports: 10_000,
   maxMeasurementsPerReport: 1_000,
   maxUnknownLabelLength: 120,
@@ -265,191 +239,189 @@ function fail(path: string, message: string): never {
   throw new Error(`invalid-profile: ${path} ${message}`);
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+const idSchema = z.string().min(1, 'must be a non-empty string');
+const finiteNumberSchema = z.number({ error: 'must be a finite number' });
+const comparatorSchema = z.enum(['<', '<=', '>', '>=']);
 
-/** Non-empty opaque string. Ids are opaque here; UUID shape is a producer concern. */
-function requireId(value: unknown, path: string): string {
-  if (typeof value !== 'string' || value.length === 0) fail(path, 'must be a non-empty string');
-  return value;
-}
-
-function requireFiniteNumber(value: unknown, path: string): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) fail(path, 'must be a finite number');
-  return value;
-}
-
-/** Strict Gregorian YYYY-MM-DD — rejects 2025-02-30 and 2025-13-01. */
-function requireCivilDate(value: unknown, path: string): string {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    fail(path, 'must be a YYYY-MM-DD date');
+const civilDateSchema = z.string().superRefine((date, context) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    context.addIssue({ code: 'custom', message: 'must be a YYYY-MM-DD date' });
+    return;
   }
-  const [y, m, d] = value.split('-').map(Number) as [number, number, number];
-  if (m < 1 || m > 12) fail(path, 'has a month outside 1-12');
-  const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
-  if (d < 1 || d > daysInMonth) fail(path, 'is not a real calendar day');
-  return value;
-}
-
-/** Local civil HH:mm, 00:00-23:59. No timezone conversion (plan: grouping rules). */
-function requireCivilTime(value: unknown, path: string): string {
-  if (typeof value !== 'string' || !/^\d{2}:\d{2}$/.test(value)) {
-    fail(path, 'must be an HH:mm time');
+  const [year, month, day] = date.split('-').map(Number) as [number, number, number];
+  if (month < 1 || month > 12) {
+    context.addIssue({ code: 'custom', message: 'has a month outside 1-12' });
+    return;
   }
-  const [h, min] = value.split(':').map(Number) as [number, number];
-  if (h > 23 || min > 59) fail(path, 'is not a valid time of day');
-  return value;
-}
-
-const COMPARATORS: readonly Comparator[] = ['<', '<=', '>', '>='];
-
-function validateComparator(value: unknown, path: string): Comparator | null {
-  if (value === null) return null;
-  if (typeof value !== 'string' || !COMPARATORS.includes(value as Comparator)) {
-    fail(path, `must be null or one of ${COMPARATORS.join(', ')}`);
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day < 1 || day > daysInMonth) {
+    context.addIssue({ code: 'custom', message: 'is not a real calendar day' });
   }
-  return value as Comparator;
-}
+});
 
-function validateReferenceRange(value: unknown, path: string): ReferenceRange | null {
-  if (value === null) return null;
-  if (!isRecord(value)) fail(path, 'must be null or an object');
-  switch (value.kind) {
-    case 'closed': {
-      const min = requireFiniteNumber(value.min, `${path}.min`);
-      const max = requireFiniteNumber(value.max, `${path}.max`);
-      if (min > max) fail(path, 'has min greater than max');
-      return { kind: 'closed', min, max };
+const civilTimeSchema = z.string().superRefine((time, context) => {
+  if (!/^\d{2}:\d{2}$/.test(time)) {
+    context.addIssue({ code: 'custom', message: 'must be an HH:mm time' });
+    return;
+  }
+  const [hour, minute] = time.split(':').map(Number) as [number, number];
+  if (hour > 23 || minute > 59) {
+    context.addIssue({ code: 'custom', message: 'is not a valid time of day' });
+  }
+});
+
+const referenceRangeSchema = z
+  .discriminatedUnion('kind', [
+    z.object({ kind: z.literal('closed'), min: finiteNumberSchema, max: finiteNumberSchema }),
+    z.object({
+      kind: z.literal('minOnly'),
+      min: finiteNumberSchema,
+      comparator: z.enum(['>', '>=']),
+    }),
+    z.object({
+      kind: z.literal('maxOnly'),
+      max: finiteNumberSchema,
+      comparator: z.enum(['<', '<=']),
+    }),
+  ])
+  .superRefine((range, context) => {
+    if (range.kind === 'closed' && range.min > range.max) {
+      context.addIssue({ code: 'custom', message: 'has min greater than max' });
     }
-    case 'minOnly': {
-      const min = requireFiniteNumber(value.min, `${path}.min`);
-      const comparator = value.comparator;
-      if (comparator !== '>' && comparator !== '>=') {
-        fail(`${path}.comparator`, "must be '>' or '>=' for a minOnly range");
+  });
+
+const collectedAtSchema = z.discriminatedUnion('precision', [
+  z.object({ date: civilDateSchema, time: z.null(), precision: z.literal('day') }),
+  z.object({ date: civilDateSchema, time: civilTimeSchema, precision: z.literal('minute') }),
+]);
+
+const measurementSchema = z
+  .object({
+    markerKey: idSchema,
+    label: z.string().optional(),
+    status: z.enum(['value', 'missing']),
+    value: finiteNumberSchema.nullable(),
+    comparator: comparatorSchema.nullable(),
+    unit: z.string().nullable(),
+    referenceRange: referenceRangeSchema.nullable(),
+    sourceOrder: z.number().int().nonnegative(),
+  })
+  .superRefine((measurement, context) => {
+    if (measurement.label !== undefined && !measurement.markerKey.startsWith('x:')) {
+      context.addIssue({
+        code: 'custom',
+        message: 'is allowed only for a derived x:* marker key',
+        path: ['label'],
+      });
+    }
+    if (measurement.status === 'missing' && measurement.value !== null) {
+      context.addIssue({
+        code: 'custom',
+        message: "must be null when status is 'missing'",
+        path: ['value'],
+      });
+    }
+    if (measurement.status === 'missing' && measurement.comparator !== null) {
+      context.addIssue({
+        code: 'custom',
+        message: "must be null when status is 'missing'",
+        path: ['comparator'],
+      });
+    }
+    if (measurement.status === 'value' && measurement.value === null) {
+      context.addIssue({
+        code: 'custom',
+        message: "must be a finite number when status is 'value'",
+        path: ['value'],
+      });
+    }
+  });
+
+const reportSchema = z
+  .object({
+    id: idSchema,
+    collectedAt: collectedAtSchema,
+    measurements: z
+      .array(measurementSchema)
+      .max(
+        PROFILE_LIMITS.maxMeasurementsPerReport,
+        `exceeds ${String(PROFILE_LIMITS.maxMeasurementsPerReport)} entries`,
+      ),
+  })
+  .superRefine((report, context) => {
+    const markerKeys = new Set<string>();
+    for (const measurement of report.measurements) {
+      if (markerKeys.has(measurement.markerKey)) {
+        context.addIssue({
+          code: 'custom',
+          message: `repeats marker key ${measurement.markerKey}`,
+          path: ['measurements'],
+        });
       }
-      return { kind: 'minOnly', min, comparator };
+      markerKeys.add(measurement.markerKey);
     }
-    case 'maxOnly': {
-      const max = requireFiniteNumber(value.max, `${path}.max`);
-      const comparator = value.comparator;
-      if (comparator !== '<' && comparator !== '<=') {
-        fail(`${path}.comparator`, "must be '<' or '<=' for a maxOnly range");
+  });
+
+const profileSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    id: idSchema,
+    reports: z
+      .array(reportSchema)
+      .max(PROFILE_LIMITS.maxReports, `exceeds ${String(PROFILE_LIMITS.maxReports)} entries`),
+  })
+  .superRefine((profile, context) => {
+    const reportIds = new Set<string>();
+    const reportsByDate = new Map<string, { report: Report; index: number }[]>();
+
+    for (const [index, report] of profile.reports.entries()) {
+      if (reportIds.has(report.id)) {
+        context.addIssue({
+          code: 'custom',
+          message: `repeats report id ${report.id}`,
+          path: ['reports', index, 'id'],
+        });
       }
-      return { kind: 'maxOnly', max, comparator };
+      reportIds.add(report.id);
+
+      const reports = reportsByDate.get(report.collectedAt.date);
+      if (reports) reports.push({ report, index });
+      else reportsByDate.set(report.collectedAt.date, [{ report, index }]);
     }
-    default:
-      fail(`${path}.kind`, "must be 'closed', 'minOnly' or 'maxOnly'");
-  }
-}
 
-function validateCollectedAt(value: unknown, path: string): CollectedAt {
-  if (!isRecord(value)) fail(path, 'must be an object');
-  const date = requireCivilDate(value.date, `${path}.date`);
-  const precision = value.precision;
-  if (precision !== 'day' && precision !== 'minute') {
-    fail(`${path}.precision`, "must be 'day' or 'minute'");
-  }
-  const rawTime = value.time;
-  if (precision === 'day') {
-    if (rawTime !== null) fail(`${path}.time`, "must be null when precision is 'day'");
-    return { date, time: null, precision: 'day' };
-  }
-  return { date, time: requireCivilTime(rawTime, `${path}.time`), precision: 'minute' };
-}
-
-function validateMeasurement(value: unknown, path: string): Measurement {
-  if (!isRecord(value)) fail(path, 'must be an object');
-  const markerKey = requireId(value.markerKey, `${path}.markerKey`);
-
-  const status = value.status;
-  if (status !== 'value' && status !== 'missing') {
-    fail(`${path}.status`, "must be 'value' or 'missing'");
-  }
-
-  const referenceRange = validateReferenceRange(value.referenceRange, `${path}.referenceRange`);
-
-  const rawUnit = value.unit;
-  if (rawUnit !== null && typeof rawUnit !== 'string') {
-    fail(`${path}.unit`, 'must be a string or null');
-  }
-  const unit = rawUnit;
-
-  const sourceOrder = requireFiniteNumber(value.sourceOrder, `${path}.sourceOrder`);
-  if (!Number.isInteger(sourceOrder) || sourceOrder < 0) {
-    fail(`${path}.sourceOrder`, 'must be a non-negative integer');
-  }
-
-  // A `label` is permitted only for a derived (x:*) marker key. Carrying one on a
-  // canonical key is how source text would leak into Profile under a real marker.
-  let label: string | undefined;
-  const rawLabel = value.label;
-  if (rawLabel !== undefined) {
-    if (typeof rawLabel !== 'string') fail(`${path}.label`, 'must be a string when present');
-    if (!markerKey.startsWith('x:')) {
-      fail(`${path}.label`, 'is allowed only for a derived x:* marker key');
+    for (const [date, sameDay] of reportsByDate) {
+      if (sameDay.length < 2) continue;
+      const times = new Set<string>();
+      for (const { report, index } of sameDay) {
+        const { precision, time } = report.collectedAt;
+        if (precision !== 'minute') {
+          context.addIssue({
+            code: 'custom',
+            message: `must be minute-precision because ${date} carries more than one Report`,
+            path: ['reports', index, 'collectedAt'],
+          });
+          continue;
+        }
+        if (times.has(time)) {
+          context.addIssue({
+            code: 'custom',
+            message: `is not unique within ${date}`,
+            path: ['reports', index, 'collectedAt', 'time'],
+          });
+        }
+        times.add(time);
+      }
     }
-    label = rawLabel;
-  }
+  });
 
-  // status/value consistency, and one-sided comparator direction.
-  if (status === 'missing') {
-    if (value.value !== null) fail(`${path}.value`, "must be null when status is 'missing'");
-    if (value.comparator !== null) {
-      fail(`${path}.comparator`, "must be null when status is 'missing'");
-    }
-    const missing: Measurement = {
-      markerKey,
-      status: 'missing',
-      value: null,
-      comparator: null,
-      unit,
-      referenceRange,
-      sourceOrder,
-    };
-    return label === undefined ? missing : { ...missing, label };
-  }
-
-  const numeric = requireFiniteNumber(value.value, `${path}.value`);
-  const measured: Measurement = {
-    markerKey,
-    status: 'value',
-    value: numeric,
-    comparator: validateComparator(value.comparator, `${path}.comparator`),
-    unit,
-    referenceRange,
-    sourceOrder,
-  };
-  return label === undefined ? measured : { ...measured, label };
-}
-
-function validateReport(value: unknown, path: string): Report {
-  if (!isRecord(value)) fail(path, 'must be an object');
-  const id = requireId(value.id, `${path}.id`);
-  const collectedAt = validateCollectedAt(value.collectedAt, `${path}.collectedAt`);
-
-  const rawMeasurements = value.measurements;
-  if (!Array.isArray(rawMeasurements)) fail(`${path}.measurements`, 'must be an array');
-  if (rawMeasurements.length > PROFILE_LIMITS.maxMeasurementsPerReport) {
-    fail(
-      `${path}.measurements`,
-      `exceeds ${String(PROFILE_LIMITS.maxMeasurementsPerReport)} entries`,
-    );
-  }
-
-  const measurements = rawMeasurements.map((entry, i) =>
-    validateMeasurement(entry, `${path}.measurements[${String(i)}]`),
+function formatProfilePath(path: PropertyKey[]): string {
+  return path.reduce<string>(
+    (result, segment) =>
+      typeof segment === 'number'
+        ? `${result}[${String(segment)}]`
+        : `${result}.${String(segment)}`,
+    'profile',
   );
-
-  const seen = new Set<string>();
-  for (const measurement of measurements) {
-    if (seen.has(measurement.markerKey)) {
-      fail(`${path}.measurements`, `repeats marker key ${measurement.markerKey}`);
-    }
-    seen.add(measurement.markerKey);
-  }
-
-  return { id, collectedAt, measurements };
 }
 
 /**
@@ -461,53 +433,12 @@ function validateReport(value: unknown, path: string): Report {
  * same-date minute-precision rule.
  */
 export function validateProfile(value: unknown): Profile {
-  if (!isRecord(value)) fail('profile', 'must be an object');
-  if (value.schemaVersion !== 1) fail('profile.schemaVersion', 'must be 1');
-  const id = requireId(value.id, 'profile.id');
+  const result = profileSchema.safeParse(value);
+  if (result.success) return result.data;
 
-  const rawReports = value.reports;
-  if (!Array.isArray(rawReports)) fail('profile.reports', 'must be an array');
-  if (rawReports.length > PROFILE_LIMITS.maxReports) {
-    fail('profile.reports', `exceeds ${String(PROFILE_LIMITS.maxReports)} entries`);
-  }
-
-  const reports = rawReports.map((entry, i) =>
-    validateReport(entry, `profile.reports[${String(i)}]`),
-  );
-
-  const seenIds = new Set<string>();
-  for (const report of reports) {
-    if (seenIds.has(report.id)) fail('profile.reports', `repeats report id ${report.id}`);
-    seenIds.add(report.id);
-  }
-
-  // Equal dates never imply equal Reports. If a date carries more than one Report,
-  // every Report on that date must be minute-precision with a distinct time.
-  const byDate = new Map<string, Report[]>();
-  for (const report of reports) {
-    const bucket = byDate.get(report.collectedAt.date);
-    if (bucket) bucket.push(report);
-    else byDate.set(report.collectedAt.date, [report]);
-  }
-  for (const [date, sameDay] of byDate) {
-    if (sameDay.length < 2) continue;
-    const times = new Set<string>();
-    for (const report of sameDay) {
-      const { precision, time } = report.collectedAt;
-      if (precision !== 'minute' || time === null) {
-        fail(
-          `profile.reports[${report.id}].collectedAt`,
-          `must be minute-precision because ${date} carries more than one Report`,
-        );
-      }
-      if (times.has(time)) {
-        fail(`profile.reports[${report.id}].collectedAt.time`, `is not unique within ${date}`);
-      }
-      times.add(time);
-    }
-  }
-
-  return { schemaVersion: 1, id, reports };
+  const issue = result.error.issues[0];
+  if (!issue) fail('profile', 'is invalid');
+  fail(formatProfilePath(issue.path), issue.message);
 }
 
 // D7 safety validator. The one path source text can take into a Profile is an
