@@ -10,7 +10,8 @@
 >   Do not re-litigate an entry; if one is genuinely wrong, change it here first,
 >   record the change as an ADR under `docs/adr/`, and only then change code.
 > - **Task issues derive from this file.** Each task in the breakdown becomes one
->   GitHub issue labelled `ready-for-agent`, linking back to its section here.
+>   GitHub issue, routed as `ready-for-agent` or `ready-for-human` by the task rules,
+>   linking back to its section here.
 > - **Ambiguity is a bug in this document.** Builder models must not resolve it by
 >   choosing — they stop and comment on the issue, and the resolution lands here.
 > - **Keep it current.** When implementation diverges from the plan, update the
@@ -647,6 +648,7 @@ export function previewImport(
 export function saveProfile(profile: Profile): Promise<void>;
 export function loadProfile(): Promise<Profile | null>;
 export function replaceProfile(profile: Profile): Promise<void>;
+export function requestStoragePersistence(): Promise<boolean | null>;
 export function clearAll(): Promise<void>;
 
 // appState.ts
@@ -749,6 +751,7 @@ src/
     review.ts            immutable review edits, reassignments + hard gates
     profile.ts           reviewed groups -> Reports; explicit merge/conflict rules
     series.ts            Profile -> Series[]        (alignment, unit reconciliation)
+    scorer.ts            pure corpus metrics; no extract dependency
   io/                 browser-only adapters, thin, integration-tested
     pdfText.ts           pdfjs-dist -> TextItem[]
     pdfRaster.ts         pdfjs-dist -> ImageBitmap
@@ -761,6 +764,9 @@ src/
   ui/                 one MedigraphApp island with child components
     MedigraphApp.tsx     owns the attach→review→confirm transaction
   pages/              Astro routes: index (landing), app, privacy
+scripts/
+  corpus-score.ts      parser-corpus runner and aggregate/per-lab reporting
+  ocr-score.ts         source-image OCR corpus runner
 public/
   ocr/                 selected OCR models/dictionary/WASM (self-hosted, plain paths)
   pdf/                 self-hosted pdf.js worker (ships inside the pinned pdfjs-dist package)
@@ -2047,8 +2053,9 @@ state reach the DOM without a CSP-blocked style attribute.
 
 ## Task breakdown
 
-Each task below becomes one GitHub issue labelled `ready-for-agent`
-(per `docs/agents/issue-tracker.md`), with this document linked as the spec.
+Each task below becomes one GitHub issue with this document linked as the spec.
+Tasks explicitly marked human/capable-model are labelled `ready-for-human`; every
+other task is labelled `ready-for-agent` (per `docs/agents/issue-tracker.md`).
 
 **Every issue body must include, verbatim:** the exact file paths to create, the
 exact exported function signatures, the behaviour rules copied from the relevant
@@ -2071,6 +2078,12 @@ spec is ambiguous, stop and comment on the issue instead of choosing."_
 | 0.6  | **Metric definitions and generic scorer.** Implement fixture-schema validation and pure `score(expected, actual)` for marker recall, value/comparator precision, unit precision and range precision, grouped per lab and aggregate. It accepts supplied predictions and has no dependency on `extract.ts`; Task 2.5b wires the parser into it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Metric denominator, numeric tolerance and missing/comparator behavior have golden tests, breaking the old scorer↔extract cycle.                                                                                                                                  |
 | 0.7  | **E1 feasibility spike (capable model/human; start with 0.5b).** Compare PP-OCRv5 Greek ONNX against `tesseract.js` `ell+eng` on a small 0.5b sample in Chromium and Safari. For PP-OCR, prove conversion, dictionary wiring, det+rec, confidence and coordinate normalization behind 0.4 headers. Store candidate bytes locally and record exact checksums, first/steady latency and failures in ADR-0003.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Select one `OcrEngine` or update D3/ADR to the fallback **before** Wave 3. No CDN/HF runtime option. This is feasibility evidence, not the E1 release gate.                                                                                                      |
 
+Task 0.6 creates `src/domain/scorer.ts` and `src/domain/scorer.test.ts`; its proof is
+`pnpm vitest run src/domain/scorer.test.ts`. Task 2.5b creates
+`scripts/corpus-score.ts` and the `pnpm corpus:score` package script. Task 3.9 creates
+`scripts/ocr-score.ts` and the `pnpm ocr:score` package script. The scripts call the
+pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
+
 #### Fixture and corpus sourcing rules—non-negotiable
 
 - **Prefer published specimen reports.** Most Greek labs publish a
@@ -2092,6 +2105,12 @@ spec is ambiguous, stop and comment on the issue instead of choosing."_
   fixtures only; OCR tuning may not rewrite expected values or consume its held-out
   lab. After the first release score, freeze that holdout as regression data and add
   a new unseen lab before the next tuning cycle.
+- Parser fixtures use
+  `fixtures/parser/{training,holdout}/<lab>/{textitems.json,expected.json}`. OCR
+  fixtures use `fixtures/ocr/{training,holdout}/<lab>/expected.json` plus source
+  images/scanned PDFs under that lab's `sources/` directory. `<lab>` is a stable,
+  content-based slug; each lab is wholly in training or holdout, never split between
+  both. OCR observations are generated during tests and are never committed.
 
 ### Wave 1 — pure domain (parallel only where dependencies permit)
 
@@ -2130,6 +2149,13 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 | 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors                                                                                                                                                                                                                           | 2.5r                      |
 | 2.6  | `profile.ts` — proposed groups, explicit report construction, mandatory conflict resolution, same-person append and id-based profile merge                                                                                                                                                                                      | 2.5a, 1.6b-core, 1.9      |
 | 2.7  | `series.ts` — ordering, canonical target units, range co-conversion, native preservation, explicit gaps and unit splits                                                                                                                                                                                                         | 2.6, 1.4                  |
+
+Task 2.5r expands to one issue for each registry file:
+`haematology.ts`, `biochemistry.ts`, `lipids.ts`, `hormones.ts`, `vitamins.ts`,
+`inflammation.ts`, `coagulation.ts`, `urinalysis.ts` and `index.ts`. Every panel issue
+depends on 1.6b-core, 0.5a and 2.5b. The `index.ts` issue additionally depends on all
+eight panel issues, and 2.5c depends on the `index.ts` issue. Registry curation and
+version coordination are human/capable-model work and use `ready-for-human`.
 
 **Acceptance for 2.2 (Pass A alone, no layout analysis):** on
 `fixtures/seed/biochemistry.textitems.json`, all 25 markers with `D-Dimers` as
@@ -2175,6 +2201,23 @@ date/source ordering. No Series contains more than one normalised unit.
 | 3.8  | **E0 and E1 walking slices + contract freeze.** Through the minimal `MedigraphApp` shell, run one synthetic PDF and one corpus image from attach → ExtractionResult → source-aware review → explicit Confirm → Profile/Series → IndexedDB → panel/trend primitive → plaintext export/import.                                              | 2.5c–2.7, 3.1–3.7   | Both slices pass under production CSP and with no test-only adapters. Assert `registryVersion` in every ExtractionResult and fixture. Resolve any contract mismatch in this plan, then mark `types.ts` frozen. Do this before broad UI component work.                                                                                                            |
 | 3.9  | **E1 quality gate.** `pnpm ocr:score` runs source images through preprocessing, actual OCR and parser; it never consumes committed OCR TextItems.                                                                                                                                                                                         | 0.5b, 2.5c, 3.3–3.4 | Aggregate recall ≥90%, value precision ≥99%, unit/range precision ≥90%; every OCR lab recall ≥85%, value precision ≥98% and unit/range precision ≥80%, including the untouched OCR holdout. If not, E1 is labelled assisted/beta and the failed dimensions are recorded; do not tune expected data.                                                               |
 
+**Pinned Wave 3 browser boundaries.** `rasterisePdfPage` targets 2 CSS pixels per PDF
+point, then scales down as needed so the output is at most 3,000 pixels on its longest
+edge and at most 8,000,000 pixels total. Preprocessing applies the same two caps to
+source images, preserves aspect ratio and never upscales. `fileRouter.ts` accepts only
+`application/pdf`, `image/jpeg`, `image/png` and `image/webp`, and requires the MIME
+type to agree with the corresponding `%PDF-`, JPEG `FF D8 FF`, PNG 8-byte or RIFF/WebP
+signature before decode. `requestStoragePersistence()` is called before the first
+Profile save; it returns `null` when the StorageManager API is unavailable and the
+browser boolean otherwise, and persistence denial never blocks saving.
+
+The service worker's explicit source of truth is the manually reviewed
+`public/app-assets.json`. It lists exact same-origin URL paths for the app shell,
+hashed JS/CSS output, pdf.js worker and selected OCR runtime/model/dictionary bytes.
+Task 3.7 updates it after inspecting a deterministic production build; no build step
+generates or mutates it. Tests fail when a listed path is absent from `dist/`, when a
+required runtime path is missing, or when an unlisted request is added to the cache.
+
 ### Wave 4 — one mobile-first Preact application island
 
 `MedigraphApp` is the only hydrated island. Child components receive state/actions;
@@ -2199,6 +2242,12 @@ every bitmap and clears the map.
 | 4.5  | `DataManager` — plaintext export warning; import preview with Cancel/Replace/Merge, same-person gate and same-day time resolution; delete one Report; “Delete everything from this device” unregisters the service worker and clears Profile, caches and live review resources after confirmation; show persistence-denied/eviction education and export nudge. Empty storage always offers Attach and Import.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 4.6  | `app.astro` wires the sole island; zero-hydration `index.astro` and `privacy.astro`. Privacy copy says processing/history are local, runtime assets are first-party, IndexedDB/export are plaintext, browsers may evict data, and device/XSS/shared-file risks remain—no legal absolutes. It explains a Network-tab check without presenting it as proof, and lists the `connect-src` allowlist (empty in v1). **D13 disclaimer:** PanelView and TrendView each carry persistent, always-visible copy — not a dismissible modal and not a one-time gate — stating that Medigraph displays the user's own reported lab values and reference ranges, does not interpret them, and is not medical advice. Copy exists in both `el` and `en` and is bound by D13 like every other string. Initial language follows `navigator.language`; an el/en toggle is stored in non-medical localStorage. Review dates always show ISO alongside localized text.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
+**Wave 4 dependencies.** Task 4.0 depends on 0.2, 1.9, 2.6, 3.4–3.6 and 3.8. Task
+4.1 depends on 4.0 and 3.4. Task 4.2 depends on 4.0, 1.9, 2.6 and 3.8; 4.2a depends
+on 4.2. Task 4.3 depends on 4.0, 2.7 and 3.8; 4.4 depends on 4.3 and 2.7. Task 4.5
+depends on 4.0, 2.6 and 3.5–3.7. Task 4.6 depends on 0.4 and all Tasks 4.0–4.5,
+including 4.2a and 4.4.
+
 ### Wave 5 — hardening
 
 | #   | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -2209,6 +2258,12 @@ every bitmap and clears the map.
 | 5.4 | Accessibility: full keyboard review/panel traversal, focus restoration, 44 px targets, visible labels independent of colour, forced-colours, reduced motion, SVG figure naming, meter text alternatives, trend-table parity and axe pass in both themes/languages                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | 5.5 | **Mobile E1 release gate.** On a named mid-range Android and four-year-old iPhone, measure 0.5b pages on battery: first-fetch separately; steady-state median ≤15 s/page and no page >30 s, no OOM/crash, sequential-page resources released, and ≤512 MiB peak where measurable. If quality (3.9) or either-device gate fails after preprocessing/INT8 work, ship E1 as assisted/beta—not as the default—and keep all data local.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | 5.6 | Safety/lifecycle E2E: no-date and ambiguous-date blocks; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states                                                                                                                                                                                                                                                                                                                                                                 |
+
+**Wave 5 dependencies.** Task 5.1 depends on 0.3, 3.8 and 4.6. Task 5.2 depends on
+0.4, 0.5b, 3.7, 3.9 and 5.1. Task 5.3 depends on 0.4, 3.3 and 4.6. Task 5.4 depends
+on 4.2, 4.2a, 4.3, 4.4 and 4.6. Task 5.5 depends on 0.5b, 3.3, 3.3b, 3.9 and 4.6;
+it is a human device-lab task and uses `ready-for-human`. Task 5.6 depends on 2.6,
+2.7, 3.5, 3.6, 4.2–4.5 and 5.1.
 
 ---
 
@@ -2231,11 +2286,16 @@ one-to-one by marker key; every emitted row contributes once to value precision,
 an unmatched/duplicate row is incorrect. A matched row is correct only when
 ParseStatus, result comparator and value match; therefore emitting `missing` for an
 expected value lowers value precision. Numeric comparisons use
-`max(1e-9, abs(expected) * 1e-6)` tolerance. Unit precision compares normalised units.
-Range precision requires the same range kind, the same one-sided comparator and every
-bound within tolerance. Missing rows match only `status:'missing'`, `value:null` and
-`comparator:null`; any retained range is scored normally. Scores print integer
-numerator/denominator as well as percentages so small labs cannot hide behind rounding.
+`max(1e-9, abs(expected) * 1e-6)` tolerance. Unit and range precision use field
+opportunities: a matched row contributes when either expected or actual contains that
+field, and an unmatched actual row contributes when it contains that field. Thus an
+omitted expected unit/range and an invented unit/range are both incorrect, while a
+matched pair with the field absent on both sides is excluded. Unit precision compares
+normalised units. Range precision requires the same range kind, the same one-sided
+comparator and every bound within tolerance. Missing rows match only
+`status:'missing'`, `value:null` and `comparator:null`; any retained range is scored
+normally. Scores print integer numerator/denominator as well as percentages so small
+labs cannot hide behind rounding.
 
 **Parser gate.** `pnpm corpus:score` runs the hand-checked TextItem corpus at the
 2.5c aggregate/per-lab floors, with Pass B both enabled and disabled. The first blind
