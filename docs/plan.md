@@ -233,6 +233,38 @@ interface ColumnModel {
   columns: Column[];
 }
 
+type TemplateProvenance = 'seed' | 'learned';
+type TemplateComponent = 'chrome' | 'title' | 'header' | 'bands';
+interface TemplateFingerprint {
+  chromeHashes: string[]; // sorted, deduplicated token hashes
+  titleHashes: string[]; // every section title on the page; may be empty
+  headerHashes: string[];
+  bandStarts: number[]; // quantised x-band starts, ascending
+  bandCount: number;
+}
+interface TemplateZone {
+  rect: Rect; // page-normalised, as TextItem
+  resolution: 'redacted' | 'false-positive';
+}
+interface TemplateProfile {
+  id: string;
+  version: number;
+  provenance: TemplateProvenance;
+  confirmations: number; // seed profiles apply at 0; learned apply at >= 2
+  fingerprint: TemplateFingerprint;
+  columnRoles: Column[]; // pinned roles, one per expected band
+  collectionDateLabelHash: string | null;
+  identifierZones: TemplateZone[];
+  panelHints: string[]; // may hold several panels or none
+}
+interface TemplateMatch {
+  profileId: string;
+  provenance: TemplateProvenance;
+  confirmations: number;
+  page: number;
+  scores: Record<TemplateComponent, number>;
+}
+
 interface ParsedNumber {
   value: number;
   comparator: Comparator | null;
@@ -473,8 +505,35 @@ export interface TextExtractionInput {
   adapterId: string;
   tier: 'E0' | 'E1';
   pages: TextItem[][];
+  templateProfiles?: readonly TemplateProfile[]; // Pass T; absent means Pass T does not run
 }
 export function extract(input: TextExtractionInput): ExtractionResult;
+
+// templates.ts
+export function fingerprintPage(
+  page: number,
+  rows: readonly Row[],
+  models: readonly ColumnModel[],
+): TemplateFingerprint;
+export function matchTemplate(
+  fingerprint: TemplateFingerprint,
+  profiles: readonly TemplateProfile[],
+): TemplateMatch | null;
+export function verifyTemplateMatch(
+  match: TemplateMatch,
+  fingerprint: TemplateFingerprint,
+  profile: TemplateProfile,
+): boolean;
+export function learnTemplateProfile(
+  fingerprint: TemplateFingerprint,
+  applied: TemplateProfile | null,
+  corrections: TemplateCorrections,
+): TemplateProfile;
+export interface TemplateCorrections {
+  columnRoles: Column[] | null;
+  collectionDateLabelHash: string | null;
+  identifierZones: TemplateZone[] | null;
+}
 
 // identifiers.ts / profile.ts / series.ts
 export function findIdentifierCandidates(
@@ -2152,8 +2211,10 @@ which it does not bend:
   values — so nothing readable and real-report-derived is committed. It is still
   real-report-derived and is reviewed under the same redaction discipline as parser
   fixtures.
-- `TEMPLATE_PROFILES_VERSION` is incremented once per merged change set and the corpus
-  template check re-run, mirroring `REGISTRY_VERSION` handling in Task 2.5r.
+- The asset lives at `src/domain/templateSeed.ts`, exporting `SEED_TEMPLATE_PROFILES`
+  and `TEMPLATE_PROFILES_VERSION`. The version is incremented once per merged change
+  set and the corpus template check re-run, mirroring `REGISTRY_VERSION` handling in
+  Task 2.5r.
 
 ---
 
