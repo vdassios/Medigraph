@@ -2322,9 +2322,27 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 
 #### Fixture and corpus sourcing rules—non-negotiable
 
-- **Prefer published specimen reports.** Most Greek labs publish a
-  _υπόδειγμα αποτελεσμάτων_ / sample report PDF. These are the ideal source: already
-  synthetic, already public.
+- **Prefer published specimen reports where they exist — but do not assume they do.**
+  A synthetic, already-public _υπόδειγμα αποτελεσμάτων_ remains the ideal source. The
+  earlier claim that most Greek labs publish one is **not supported**: a search across
+  seven angles on 2026-09-01 — Greek specimen phrasing, the named private chains
+  (Affidea, Euromedica, Bioclinic, BIOanalysis), `filetype:pdf` specimen queries, the
+  LIS vendors' own sites (CCS MediLab, INFOMED sLis, Ilyda Bio-Diagnosis, Gi-Net),
+  ΕΣΥΔ/ISO 15189 quality material, patient-education pages and demo accounts — found
+  none. Greek labs deliver results through patient portals rather than publishing
+  sample PDFs, and vendor sites carry marketing copy with no example output. Treat a
+  published specimen as a lucky find, not a plan.
+- **Do not hunt the open web for real result PDFs.** Queries shaped to match printed
+  report text would surface real people's health data. That is not a permitted fixture
+  source at any redaction level, and looking is itself the wrong act.
+- **The national repository is the realistic route to breadth.** Greek lab results from
+  every public and private facility land in the ΑΗΦΥ digital repository, retrievable by
+  the patient at `myhealth.gov.gr` with Taxisnet, ΑΜΚΑ and an OTP. A user can therefore
+  obtain their own multi-lab history from one place. That makes it both a corpus route
+  — with the same redaction rules, and only ever someone's own records, supplied
+  deliberately — and a product observation worth carrying into E0 work, since a
+  repository-issued PDF may have a national layout worth recognising ahead of any
+  single lab's.
 - **Any real-report-derived text must be redacted before commit**—name, AMKA, patient
   id, doctor, address, phone, barcode and accession id. Redact expected JSON and
   metadata, not just visible pixels.
@@ -2341,8 +2359,21 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
   and `Page3` pair is an equivalent source: that report's three-page layout — urine,
   biochemistry, haematology — is fixed across instances, and only values and identity
   differ.
-- Target lab diversity, not volume: single-column, multi-column, sectioned,
-  units-in-own-column, units-glued, range-absent and whole-line OCR geometry.
+- **Target template diversity, not lab count.** Parser difficulty tracks the report
+  _template_ — column roles, header wording, sectioning, gutters — not the issuer, and
+  one issuer routinely ships several unrelated templates (D14). Cover single-column,
+  multi-column, sectioned, units-in-own-column, units-glued, range-absent and
+  whole-line OCR geometry.
+- **Floor: at least four issuers and at least nine distinct templates**, with one
+  entire issuer sealed as the blind holdout. This is a **reduction** from the original
+  "at least eight Greek labs", made on 2026-09-01 because the specimen-report premise
+  above proved false and no eighth lab is obtainable without new material from a user.
+  It is a floor, not a target: raise it toward eight issuers as ΑΗΦΥ-sourced or
+  specimen material arrives, and re-seal the holdout with a new unseen issuer before
+  each tuning cycle. Note the cost honestly — with four issuers the per-lab floors in
+  Task 2.5c rest on three training issuers, so generalisation evidence is thinner than
+  the original floor intended and the holdout result carries correspondingly more
+  weight.
 - Parser and OCR corpora are separate. Registry authors may inspect parser training
   fixtures only; OCR tuning may not rewrite expected values or consume its held-out
   lab. After the first release score, freeze that holdout as regression data and add
@@ -2840,6 +2871,14 @@ rounding error and "a VPS" was never the right question.
   review-from-scratch, and no template may suppress a flag or promote a confidence.
   None of these is a proof — a template that verifies and is still wrong remains
   possible, which is why the user still confirms.
+- **The corpus is thinner than the plan originally required, and that is a quality
+  risk, not just a schedule one.** The eight-lab floor became four issuers and nine
+  templates because published Greek specimen reports could not be found. Three training
+  issuers is a narrow base from which to claim the Task 2.5c per-lab floors generalise,
+  and the sealed holdout is now the only real evidence of generalisation. Do not treat
+  a passing score on this corpus as evidence the parser handles Greek labs in general;
+  widen the corpus before making that claim, and never widen it by relaxing the
+  redaction rules or by harvesting real reports from the web.
 - **Corpus acquisition is the schedule risk.** Start 0.5a/0.5b with scaffolding and
   0.7. The identifying root PDFs are not fixtures; synthetic seed recreations unblock
   domain work only after Task 0.3 completes.
