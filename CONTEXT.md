@@ -14,23 +14,25 @@ reported; it never interprets it.
 
 ## Ubiquitous language
 
-| Term                 | Meaning                                                                                                                                                                |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Source file**      | A PDF or image attached for one review session. It is transient.                                                                                                       |
-| **TextItem**         | A positioned text observation with a stable id, page-normalised rectangle and optional recognition confidence.                                                         |
-| **Row**              | TextItems clustered by vertical overlap.                                                                                                                               |
-| **ParsedRow**        | An ephemeral measurement candidate with parse status, confidence, flags and optional source evidence.                                                                  |
-| **ExtractionResult** | One source file's ephemeral rows, date candidates, identifier candidates and optional evidence pages.                                                                  |
-| **Review session**   | One attach batch's transactional draft. All gates must resolve before one atomic Confirm.                                                                              |
-| **Marker**           | A biological quantity tracked over time.                                                                                                                               |
-| **Marker key**       | A stable canonical id, or `x:<normalised-label>` for a reviewed unknown marker.                                                                                        |
-| **Marker seed**      | The sourced Greek/English vocabulary extracted from ΚΕΟΚΕΕ (Task 0.5c) that registry aliases may be authored from. It is vocabulary, not a registry.                   |
-| **Report**           | The confirmed measurements from one collection event, identified by an opaque UUID and user-confirmed local civil date/time. Equal dates do not imply the same Report. |
-| **Measurement**      | One confirmed marker result in native lab value, unit and reference range. Marker keys are unique within a Report.                                                     |
-| **Reference range**  | A closed, minimum-only or maximum-only interval printed by the lab for one Measurement. It is not a property of the Marker.                                            |
-| **Series**           | One marker's compatible-unit Measurements across Reports, ordered by collection date/time.                                                                             |
-| **Profile**          | One anonymous person's complete confirmed local dataset. It is the only medical-data object persisted or exported.                                                     |
-| **Conflict**         | Duplicate candidate rows for one marker in a proposed Report; review must choose or edit exactly one Measurement.                                                      |
+| Term                 | Meaning                                                                                                                                                                                                                     |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source file**      | A PDF or image attached for one review session. It is transient.                                                                                                                                                            |
+| **TextItem**         | A positioned text observation with a stable id, page-normalised rectangle and optional recognition confidence.                                                                                                              |
+| **Row**              | TextItems clustered by vertical overlap.                                                                                                                                                                                    |
+| **ParsedRow**        | An ephemeral measurement candidate with parse status, confidence, flags and optional source evidence.                                                                                                                       |
+| **ExtractionResult** | One source file's ephemeral rows, date candidates, identifier candidates and optional evidence pages.                                                                                                                       |
+| **Review session**   | One attach batch's transactional draft. All gates must resolve before one atomic Confirm.                                                                                                                                   |
+| **Marker**           | A biological quantity tracked over time.                                                                                                                                                                                    |
+| **Marker key**       | A stable canonical id, or `x:<normalised-label>` for a reviewed unknown marker.                                                                                                                                             |
+| **Marker seed**      | The sourced Greek/English vocabulary extracted from ΚΕΟΚΕΕ (Task 0.5c) that registry aliases may be authored from. It is vocabulary, not a registry.                                                                        |
+| **Report**           | The confirmed measurements from one collection event, identified by an opaque UUID and user-confirmed local civil date/time. Equal dates do not imply the same Report.                                                      |
+| **Measurement**      | One confirmed marker result in native lab value, unit and reference range. Marker keys are unique within a Report.                                                                                                          |
+| **Reference range**  | A closed, minimum-only or maximum-only interval printed by the lab for one Measurement. It is not a property of the Marker.                                                                                                 |
+| **Series**           | One marker's compatible-unit Measurements across Reports, ordered by collection date/time.                                                                                                                                  |
+| **Profile**          | One anonymous person's complete confirmed local dataset. It is the only medical-data object persisted or exported.                                                                                                          |
+| **Template profile** | A versioned, non-identifying description of one report template: hashed chrome, title and header tokens, a column x-band signature, column roles, the collection-date label, identifier zones and standing false positives. |
+| **Template match**   | The per-page result of fingerprinting a source page and structurally verifying it against a template profile. It pre-resolves review questions; it never confirms them.                                                     |
+| **Conflict**         | Duplicate candidate rows for one marker in a proposed Report; review must choose or edit exactly one Measurement.                                                                                                           |
 
 ## Invariants
 
@@ -51,6 +53,11 @@ reported; it never interprets it.
   disjointness, and always confirmed by the user.
 - Review resolves dates, source grouping, duplicate markers and every identifier
   candidate before Confirm.
+- A template match pins column roles and pre-resolves gates; it never creates, alters
+  or suppresses a value, a flag or a confidence, and never confirms on the user's
+  behalf. Verification fails closed and applies nothing partially. Learned template
+  profiles persist as hashes and geometry in a store separate from Profile, are cleared
+  by "Delete everything", and never enter `.medigraph`.
 - A Report has at most one Measurement per marker key. Equal dates never auto-merge.
 - Values and reference ranges stay native in Profile. Series conversion transforms
   both by the same factor and preserves native fields; incompatible units split.
@@ -73,3 +80,4 @@ reported; it never interprets it.
 - `docs/adr/0009-egress-data-rule-and-origin-allowlist.md` (supersedes 0001)
 - `docs/adr/0010-display-only-positioning.md`
 - `docs/adr/0011-no-vision-language-model-for-v1.md` (amends 0002)
+- `docs/adr/0012-template-recognition-assists-review.md` (amends 0006)
