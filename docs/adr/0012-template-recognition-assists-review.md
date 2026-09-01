@@ -17,12 +17,14 @@ verification entirely for a lab whose results we have parsed before, on the prem
 that a lab's layout is fixed and only the order of tests varies. The reference corpus
 does not support either half of that premise.
 
-**Layout is not fixed per lab.** Four labs produce at least six structurally distinct
+**Layout is not fixed per lab.** Four issuers produce nine structurally distinct
 layouts. Bioiatriki issues a sectioned list with per-marker method sublines and a
 two-panel urine form. Galinos issues a haematology form with a left row-label gutter
 and a flat biochemistry table; the two share a masthead, a generator and a lab, and are
 not reorderings of one another. Iatrokosmos prints units inside the range column;
-Galinos glues them to the value. The stable, matchable unit is the report **template**,
+Galinos glues them to the value. Iatrokosmos is the tightest case of all: its
+haematology and biochemistry forms differ only in column header wording and band
+geometry. The stable, matchable unit is the report **template**,
 per page — which is also the granularity Task 3.4 already routes at.
 
 **Near-perfect is not perfect, and the residue is silent.** Task 2.5c's release floor
