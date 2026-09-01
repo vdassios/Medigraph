@@ -7,8 +7,10 @@ function measurement(overrides: Record<string, unknown> = {}): Record<string, un
     status: 'value',
     value: 245,
     comparator: null,
+    textValue: null,
     unit: 'ng/mL',
     referenceRange: { kind: 'closed', min: 30, max: 400 },
+    categoricalReference: null,
     sourceOrder: 0,
     ...overrides,
   };
@@ -244,5 +246,63 @@ describe('assertProfileSafe', () => {
     expect(() => {
       assertProfileSafe(withLabel(label));
     }).toThrow(expected);
+  });
+});
+
+describe('categorical measurements', () => {
+  function categorical(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+    return measurement({
+      markerKey: 'x:λεύκωμα',
+      label: 'Λεύκωμα (Λεύκωμα)',
+      status: 'categorical',
+      value: null,
+      comparator: null,
+      textValue: 'Αρνητικό',
+      unit: null,
+      referenceRange: null,
+      categoricalReference: 'Αρνητικό(<=10 mg/dl)',
+      ...overrides,
+    });
+  }
+
+  it('accepts a printed string against the printed expected value', () => {
+    const profileValue = profile({ reports: [report({ measurements: [categorical()] })] });
+    expect(validateProfile(profileValue)).toEqual(profileValue);
+  });
+
+  it('accepts a categorical result with no printed expected value', () => {
+    const profileValue = profile({
+      reports: [report({ measurements: [categorical({ categoricalReference: null })] })],
+    });
+    expect(validateProfile(profileValue)).toEqual(profileValue);
+  });
+
+  it.each([
+    ['textValue', { textValue: null }],
+    ['textValue', { textValue: '   ' }],
+  ])('rejects a categorical measurement with a blank %s', (_field, overrides) => {
+    expect(() => {
+      validateProfile(profile({ reports: [report({ measurements: [categorical(overrides)] })] }));
+    }).toThrow(/textValue/);
+  });
+
+  it.each([
+    ['value', { value: 1 }],
+    ['comparator', { comparator: '<' }],
+    ['unit', { unit: 'mg/dl' }],
+    ['referenceRange', { referenceRange: { kind: 'closed', min: 0, max: 1 } }],
+  ])('rejects a categorical measurement carrying a numeric %s', (field, overrides) => {
+    expect(() => {
+      validateProfile(profile({ reports: [report({ measurements: [categorical(overrides)] })] }));
+    }).toThrow(new RegExp(field));
+  });
+
+  it.each([
+    ['textValue', { textValue: 'Αρνητικό' }],
+    ['categoricalReference', { categoricalReference: 'Αρνητικό' }],
+  ])('rejects a numeric measurement carrying %s', (field, overrides) => {
+    expect(() => {
+      validateProfile(profileWithMeasurement(overrides));
+    }).toThrow(new RegExp(field));
   });
 });

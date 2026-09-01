@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 export type Confidence = 'high' | 'medium' | 'low';
 export type Comparator = '<' | '<=' | '>' | '>=';
-export type ParseStatus = 'value' | 'missing';
+export type ParseStatus = 'value' | 'categorical' | 'missing';
 export type ParseSource = 'anchor' | 'layout' | 'adapter';
 export type ParseFlag =
   | 'ambiguous-thousands'
@@ -299,11 +299,15 @@ const measurementSchema = z
   .object({
     markerKey: idSchema,
     label: z.string().optional(),
-    status: z.enum(['value', 'missing']),
+    status: z.enum(['value', 'categorical', 'missing']),
     value: finiteNumberSchema.nullable(),
     comparator: comparatorSchema.nullable(),
+    /** Printed result of a categorical Measurement; null for every other status. */
+    textValue: z.string().nullable().default(null),
     unit: z.string().nullable(),
     referenceRange: referenceRangeSchema.nullable(),
+    /** The string the lab printed as the expected value, verbatim; categorical only. */
+    categoricalReference: z.string().nullable().default(null),
     sourceOrder: z.number().int().nonnegative(),
   })
   .superRefine((measurement, context) => {
@@ -334,6 +338,42 @@ const measurementSchema = z
         message: "must be a finite number when status is 'value'",
         path: ['value'],
       });
+    }
+    // A categorical Measurement is a printed string and nothing else: it has no
+    // number, no comparator, no unit and no numeric range, so it is never converted
+    // and a categorical Series never splits on unit incompatibility (D15).
+    if (measurement.status === 'categorical') {
+      if (measurement.textValue === null || measurement.textValue.trim() === '') {
+        context.addIssue({
+          code: 'custom',
+          message: "must be a non-empty string when status is 'categorical'",
+          path: ['textValue'],
+        });
+      }
+      for (const field of ['value', 'comparator', 'unit', 'referenceRange'] as const) {
+        if (measurement[field] !== null) {
+          context.addIssue({
+            code: 'custom',
+            message: "must be null when status is 'categorical'",
+            path: [field],
+          });
+        }
+      }
+    } else {
+      if (measurement.textValue !== null) {
+        context.addIssue({
+          code: 'custom',
+          message: "is allowed only when status is 'categorical'",
+          path: ['textValue'],
+        });
+      }
+      if (measurement.categoricalReference !== null) {
+        context.addIssue({
+          code: 'custom',
+          message: "is allowed only when status is 'categorical'",
+          path: ['categoricalReference'],
+        });
+      }
     }
   });
 

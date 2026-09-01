@@ -30,30 +30,44 @@ every ferritin result they have ever been given, side by side, with the referenc
 range each lab printed at the time. That data is already in the user's possession —
 it is just trapped in unstructured documents.
 
-**What we're building.** A web app where the user attaches several lab-result files
-(PDF or image), and gets back a per-marker time series: every recorded value for each
+**What we're building.** A web app where the user attaches their ΑΗΦΥ laboratory-result
+documents, and gets back a per-marker time series: every recorded value for each
 biological marker across every test they've supplied, each shown against the reference
 range its own lab printed. Default view is a panel of every
 marker in the most recent report; tapping a marker opens its history over time
 against its reference range. The user can switch the panel to any other report.
 
-**Input shape.** The user attaches PDFs (and photos/scans, which route through E1).
-One source file holds **at most one visit's results** — a file is never split across
-Reports, which is why `regroupSources` takes a partition of source ids rather than a
-finer-grained mapping. The converse is **not** true and is common in practice: one
-visit is frequently emailed as several files, typically one per department
-(haematology, biochemistry, hormones). Merging several sources into one Report is
-therefore a first-class flow, not an edge case, and the grouping proposal must be good
-at it. Reports usually fall roughly one per year because that is how often people test,
-but nothing in the model assumes that: dates are read from the documents and a Profile
-may hold any number of Reports in a year.
+**Input shape — one source class, and nothing else.** Medigraph accepts exactly one
+kind of file: an **ΑΗΦΥ document**, the laboratory-results PDF a patient downloads from
+Greece's national digital repository at `myhealth.gov.gr` (Taxisnet + ΑΜΚΑ + OTP). Loose
+lab PDFs, emailed departmental reports, photographs and scans are **not accepted**. See
+ADR-0013 for why, and the [ΑΗΦΥ document](#the-αηφυ-document) section for what one
+contains.
+
+This collapses most of the input variability the plan was originally built to absorb.
+An ΑΗΦΥ document is generated server-side (ReportLab, signed with pyHanko), always
+carries a text layer, and is one order: **one document = one visit = one issuing
+laboratory = one collection date**, with every department — haematology, biochemistry,
+immunology, hormones, tumour markers, urine — consolidated into that single file. A
+source is therefore never split across Reports _and_ never merged with another, so
+multi-source grouping is not a flow Medigraph has.
+
+What the repository does **not** do is normalise the cell contents. The container is
+fixed; the values inside it are passed through verbatim from each issuing laboratory,
+so marker wording, decimal separator, unit notation and whether the range repeats its
+unit all still vary between labs. Extraction difficulty moved from _layout_ to
+_content_, and the marker registry and unit table matter more than before, not less.
+
+Reports usually fall roughly one per year because that is how often people test, but
+nothing in the model assumes that: dates are read from the document and a Profile may
+hold any number of Reports in a year.
 
 **The hard constraint.** The Medigraph operator never receives or stores medical
 data, and **no medical data leaves the user's device.** That is the invariant. The
 browser does store the confirmed `Profile` locally in plaintext IndexedDB, and an
 exported `.medigraph` file is also plaintext. Those copies belong to the user, not to
 the operator, but they remain sensitive on a shared, lost or compromised device.
-Source documents, raw OCR text and review evidence are transient and are never
+Source documents, extracted text and review evidence are transient and are never
 persisted. All runtime code, models, workers and WASM are self-hosted static assets —
 a cost and compliance choice rather than a mandate — and there is no telemetry and no
 error reporting. Third-party _inbound_ asset fetches are permitted but must be declared
@@ -78,7 +92,7 @@ That step is not a fallback — it is the product's honesty mechanism. The
 vision-model appendix records why no extractor, on-device or off-device, removes it.
 
 **Deliberately left open.** v1 does everything client-side: pdf.js for text-layer
-PDFs, the OCR engine selected by Task 0.7 for images, and a marker-anchored parser
+ΑΗΦΥ documents through the pdf.js text layer, and a marker-anchored parser
 over both. A future _on-device_ document-vision adapter (**E2-local**) remains
 possible behind the extraction seam. An _off-device_ one (**E2-remote**) — whether a
 third-party API or a server we operate ourselves — would replace D1 with a different
@@ -94,24 +108,25 @@ decision. The decisions all live in this document.
 
 ## Decisions already made (do not re-litigate)
 
-| #   | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | **No user-data egress.** No document content, raw or OCR text, crop, identifier, confirmed value or anything derived from them leaves the device — not to Medigraph's own origin, not to any third party. There is no telemetry and no error reporting. Third-party _inbound_ asset fetches are permitted but must be **declared**: `connect-src` carries an explicit origin allowlist (empty in v1, because every runtime asset is self-hosted), and any request to a non-`self` origin must be a GET or HEAD with no query string, no request body and no app-set header. `WebSocket`, `EventSource`, `sendBeacon` and `RTCPeerConnection` are never constructed. Adding an allowlisted origin is an ordinary code-review decision checked against the data rule; transmitting user data requires an ADR superseding this one.                                                                               | The enforceable line is _what leaves the device_, not _which origins are contacted_. Stated as a data rule it stays honest under GDPR — Medigraph is never a controller for health data it never receives — while leaving room to add a third-party asset host without amending this plan. Self-hosting remains the default because it is free on the Cloudflare Pages target and avoids the consent obligation a third-party fetch would trigger (a CDN fetch discloses the visitor's IP; see ADR-0009). The v1 CSP, service-worker policy and the slimmed Task 5.2 regression test enforce the allowlist and the request-shape rule together; none of them is a security proof against already-malicious same-origin code.                                                                                                                                                                                                           |
-| D1a | **Extraction modes (`E0`/`E1`; `E2` splits into `E2-local` and `E2-remote`).** **E0** = pdf.js text layer. **E1** = the Task 0.7-selected in-browser Greek OCR engine. E1 is a shipping default only after the real image→OCR release gate passes; otherwise it ships clearly labelled assisted/beta while E0 remains supported. **E2-local** names a possible future _on-device_ document-VLM adapter: it conforms to D1's data rule, and is blocked today on Greek coverage, on the absence of a browser runtime path, and on the Task 5.5 device gate — not on privacy. **E2-remote** names _off-device_ inference of any kind, **including a server we operate ourselves**; it transmits document content off the device, therefore violates D1's data rule, and requires a new ADR, privacy copy, threat model and separately built consent flow. No E2 code or endpoint of either kind is present in v1. | E0/E1 keep document content on the device, and E2-local would too. The split exists because the undifferentiated `E2` invited two errors: reading "vision model" as inherently privacy-breaking, and reading "self-hosted" as inherently privacy-preserving. Neither holds — the test is whether the bytes leave the device, so our own VPS is barred on exactly the same rule as a third-party API. Note also that D1's origin allowlist does _not_ open a path for E2-remote: it is barred by the data rule, not the origin rule, so declaring an origin can never authorise it. See ADR-0011 and the vision-model appendix.                                                                                                                                                                                                                                                                                                         |
-| D2  | **Astro 5 static output + one Preact application island.** Deployed to Cloudflare Pages as pure static assets. No Workers, adapter or SSR. Marketing/privacy routes hydrate nothing; `MedigraphApp` alone owns interactive state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Static delivery preserves the deployment/privacy shape, while one island gives the attach→review→commit transaction a single owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| D3  | **All v1 extraction is local and deterministic.** `pdfjs-dist` handles E0. Task 0.7 must prove PP-OCRv5 Greek ONNX (`PP-OCRv5_mobile_det` + `el_PP-OCRv5_mobile_rec`) in supported browsers; if it fails, the recorded fallback is `tesseract.js` with `ell+eng`. The selected engine, models, dictionary and WASM are self-hosted under `public/` and loaded lazily.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | PP-OCRv5 has the better model fit but no official Greek ONNX browser path. The spike decides before Wave 3, and the OCR corpus—not vendor accuracy—decides whether E1 is release-ready.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| D4  | **One extraction seam, two observation shapes, one review draft.** An `ExtractionAdapter` emits either positioned `TextItem` observations or direct `ParsedRow` observations. Both converge into an `ExtractionResult` containing rows, date candidates, identifier candidates and source references before review. E0/E1 must provide row/evidence provenance; direct rows may omit it but must still provide date/identifier evidence. `TextItem.confidence` remains optional.                                                                                                                                                                                                                                                                                                                                                                                                                               | This keeps parser fixtures independent of PDF/OCR while preserving the evidence mandatory review needs. Domain-valued provenance enables page/crop inspection without coupling downstream code to an adapter; a future direct adapter can report source-unavailable explicitly.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| D5  | **Marker-anchored parsing is primary; layout parsing is secondary.** We locate known biological markers anywhere on the page, then read outward from each one. Layout/column analysis runs as a _second_ pass, only to discover measurements whose label we don't recognise.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Layouts differ per lab; marker names barely do. Anchoring on the marker makes the parser layout-agnostic by construction. See the pipeline spec.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| D5a | **The marker registry is the product's core asset, not a lookup table.** Its Greek alias coverage determines extraction quality more than any other single factor, and it is versioned, corpus-tested and scored.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Direct consequence of D5: if the parser is marker-driven, registry coverage _is_ parser quality.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| D6  | **Mandatory transactional review.** One attach batch produces one review session. Nothing is charted or persisted until all dates, report groupings, conflicts and identifier candidates are resolved and the user confirms the whole batch. Low-confidence rows sort first; every row can be edited, deleted or reassigned, and every E0/E1 row can be inspected at its source page/crop.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | A silent misparse becomes a wrong health chart. A batch transaction prevents half-reviewed files from leaking into history.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| D7  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. Every identifier candidate must be redacted, have its row deleted, or be explicitly dismissed as a false positive before Confirm enables. Unknown labels are always included in the scrub surface. All references to source files, object URLs, bitmaps, raw text and crops are released on confirm/cancel and never enter IndexedDB, Cache Storage or export.                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Merely displaying PII candidates does not enforce the promise. The residual free-text path is an approved unknown-marker label, so it needs both review and a final safety validator.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| D8  | **Plaintext IndexedDB for one anonymous local Profile.** The app persists only confirmed `Profile` data as medical data. Before appending to a non-empty Profile, the user must confirm that the new reports belong to the same person; no patient identity is stored. **Amended by D14 (ADR-0012):** locally learned template profiles persist in a separate bounded store as hashes and geometry only — no document text, no values, no dates, no identifiers — cleared by `clearAll` and excluded from `.medigraph`. Medical data remains Profile-only.                                                                                                                                                                                                                                                                                                                                                     | This provides useful returning-user history without implying at-rest protection. The privacy page must disclose shared-device, XSS, backup/sync and browser-eviction risks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| D9  | **Plaintext, versioned `.medigraph` JSON; no encryption or decryption.** Export is a transparent JSON envelope around one validated `Profile`, with explicit sensitivity warnings and size limits. Import offers previewed Cancel/Replace/Merge semantics and never silently overwrites local data.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Passphrases and recovery complexity are unnecessary for v1. Plaintext is an intentional usability trade-off, not a security feature; users must be told to store the file as they would the original lab reports.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| D10 | **No LOINC codes in v1.** Canonical marker registry uses our own stable string IDs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | LOINC codes are a hallucination magnet for builder models and buy nothing at this stage.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| D11 | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Only two chart forms are needed, both simple; a library costs more bundle than it saves, and hand-rolled SVG gives us the accessibility and touch behaviour the spec below requires.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| D12 | **No dual-axis charts, ever.** Markers with different units are never overlaid on one y-scale.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Universal data-viz rule; see chart specs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| D13 | **Display only: Medigraph never characterises a value or a trend.** Every status string is traceable to the reference range the lab itself printed. No severity language, no clinical inference, no trend direction, slope, rate of change or delta badge, in any view or in any product copy. Marketing copy states a capability (see your own data over time), never a clinical insight.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Under [MDCG 2019-11](https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2019_11_guidance_en_0.pdf) the manufacturer's stated **intended purpose** is the primary qualification trigger, and interpretive software lands under MDR Rule 11 at Class IIa or above — notified body, CE marking, QMS. Display-only positioning stays outside that regime at almost no cost, because the chart specs were already written this way. This is a design constraint recorded for engineering purposes, not legal advice.                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| D14 | **Template recognition assists review; it never replaces it.** A per-page `TemplateProfile` may pin `ColumnRole` assignments, classify `DateCandidate.kind`, mark identifier zones for automatic redaction and record standing false positives. It may not create, alter or suppress a value, a `ParseFlag` or a `Confidence`, and it never satisfies D6 confirmation, the D7 scrub, D8 same-person confirmation or source grouping on the user's behalf. Profiles are matched per page, verified structurally, and discarded whole on any structural mismatch. Two provenances exist: a versioned shipped seed asset and profiles learned locally from the user's own confirmations. Learned profiles persist as hashes and geometry only — never document text, never values — in a store separate from `Profile`, and are excluded from `.medigraph`.                                                       | Layout varies per report _template_, not per lab: four issuers in `corpus/greek-labs/` produce nine structurally distinct layouts — Galinos three, Bioiatriki three, Iatrokosmos two, the fourth one — and Iatrokosmos prints two forms that share a masthead, a generator and a lab, differing only in column header wording and band geometry. The lab brand is therefore the wrong key. Recognition attacks review's _cost_ — which of three printed dates is the collection date, which column carries the unit, which ΑΜΚΑ belongs to the signing physician — rather than review's _authority_. Task 2.5c's own floor is 99% value precision, which over a 25-marker panel leaves roughly one report in five carrying a wrong value; the same lab also issues reports for different members of one family, which D8's unverifiable same-person gate exists to catch. Both say the confirmation stays with the user. See ADR-0012. |
+| #   | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Rationale                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **No user-data egress.** No document content, raw or OCR text, crop, identifier, confirmed value or anything derived from them leaves the device — not to Medigraph's own origin, not to any third party. There is no telemetry and no error reporting. Third-party _inbound_ asset fetches are permitted but must be **declared**: `connect-src` carries an explicit origin allowlist (empty in v1, because every runtime asset is self-hosted), and any request to a non-`self` origin must be a GET or HEAD with no query string, no request body and no app-set header. `WebSocket`, `EventSource`, `sendBeacon` and `RTCPeerConnection` are never constructed. Adding an allowlisted origin is an ordinary code-review decision checked against the data rule; transmitting user data requires an ADR superseding this one. | The enforceable line is _what leaves the device_, not _which origins are contacted_. Stated as a data rule it stays honest under GDPR — Medigraph is never a controller for health data it never receives — while leaving room to add a third-party asset host without amending this plan. Self-hosting remains the default because it is free on the Cloudflare Pages target and avoids the consent obligation a third-party fetch would trigger (a CDN fetch discloses the visitor's IP; see ADR-0009). The v1 CSP, service-worker policy and the slimmed Task 5.2 regression test enforce the allowlist and the request-shape rule together; none of them is a security proof against already-malicious same-origin code. |
+| D1a | **One extraction mode: E0.** Medigraph accepts exactly one input, the ΑΗΦΥ document (see [The ΑΗΦΥ document](#the-αηφυ-document)), and reads it through the pdf.js text layer. Photographs, scans and loose laboratory PDFs are rejected at attach with an explanatory message. **E1 (in-browser OCR) is deleted, not deferred**: no OCR engine, model, dictionary or WASM ships, and `tesseract.js`/PP-OCRv5 are not dependencies. **E2-local** and **E2-remote** remain unbuilt and unauthorised, E2-remote still barred by D1's data rule.                                                                                                                                                                                                                                                                                    | An ΑΗΦΥ document is server-generated and always carries a text layer, so recognition error is designed out rather than mitigated. Deleting E1 removes the app's largest bundle, its worst accuracy risk, its device-capability gate and an entire corpus-acquisition problem, at the cost of rejecting the paper history a user may still hold — a real loss, accepted knowingly because the repository already holds that history in digital form. See ADR-0013; the OCR appendix is retained as the record of why E1 was once planned.                                                                                                                                                                                     |
+| D2  | **Astro 5 static output + one Preact application island.** Deployed to Cloudflare Pages as pure static assets. No Workers, adapter or SSR. Marketing/privacy routes hydrate nothing; `MedigraphApp` alone owns interactive state.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Static delivery preserves the deployment/privacy shape, while one island gives the attach→review→commit transaction a single owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| D3  | **All extraction is local and deterministic.** `pdfjs-dist` reads the ΑΗΦΥ text layer; there is no recognition step, no model and no probabilistic component anywhere in the pipeline.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | With E1 deleted (D1a) the only remaining extraction input is an exact character stream, so every parse failure is a rule that did not match rather than a character that was misread. That is the failure shape the plan has always preferred, now obtained by construction rather than by mitigation.                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| D4  | **One observation shape, one review draft.** An `ExtractionAdapter` emits positioned `TextItem` observations from the pdf.js text layer, converging into an `ExtractionResult` of rows, identifier candidates, the collection date and source references. The direct-`ParsedRow` branch is **removed**: with a single known source class there is no second adapter to accommodate, and the seam existed to keep one open.                                                                                                                                                                                                                                                                                                                                                                                                       | The seam cost real complexity — optional evidence, `evidenceAvailable`, adapter-supplied date and identifier contracts — to serve adapters that no longer exist. Removing it is only safe because the input class is now closed; reopening it requires reopening ADR-0013.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| D5  | **Marker-anchored parsing is the only pass.** Locate known registry markers in the `Περιγραφή` column and read across the row's fixed columns. **Pass B (layout discovery) is removed**: column roles are given by the template, so there is no table to reconstruct. A `Περιγραφή` value that matches no registry entry is still read — its cells are positionally unambiguous — and surfaces as an unknown marker for review.                                                                                                                                                                                                                                                                                                                                                                                                  | Pass B existed to discover measurements in unknown layouts. The ΑΗΦΥ table has fixed, verified column headings, so every row is readable by position and the discovery problem is gone. Note this inverts the original reasoning: marker anchoring was primary _because_ layouts differed, and it survives because it is also the best way to resolve marker identity, which is now the only hard part.                                                                                                                                                                                                                                                                                                                      |
+| D5a | **The marker registry is the product's core asset, not a lookup table.** Its Greek alias coverage determines extraction quality more than any other single factor, and it is versioned, corpus-tested and scored.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Direct consequence of D5: if the parser is marker-driven, registry coverage _is_ parser quality.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| D6  | **Mandatory transactional review, without grouping.** One attach batch produces one review session. Nothing is charted or persisted until every identifier candidate is resolved, every duplicate-marker conflict is resolved, every unknown marker is approved and the user confirms the batch. **Source grouping is removed**: one document is exactly one Report, so `proposeReportGroups`/`regroupSources` and the grouping gate do not exist. The collection date is read from `Ημερομηνία Λήψης Δείγματος` and is **presented for confirmation**, not disambiguated.                                                                                                                                                                                                                                                       | Grouping existed because one visit arrived as several departmental files. The repository consolidates a visit into one document, so the flow has no referent. Date confirmation is retained deliberately: the parse is near-certain, but confirmation is what keeps the user the author of their own record, and it now costs one tap rather than a disambiguation.                                                                                                                                                                                                                                                                                                                                                          |
+| D7  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. Every identifier candidate must be redacted, have its row deleted, or be explicitly dismissed as a false positive before Confirm enables. Unknown labels are always included in the scrub surface. All references to source files, object URLs, bitmaps, raw text and crops are released on confirm/cancel and never enter IndexedDB, Cache Storage or export.                                                                                                                                                                                                                                                                                                                                                                     | Merely displaying PII candidates does not enforce the promise. The residual free-text path is an approved unknown-marker label, so it needs both review and a final safety validator.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| D8  | **Plaintext IndexedDB for one anonymous local Profile.** The app persists only confirmed `Profile` data as medical data. Before appending to a non-empty Profile, the user must confirm that the new reports belong to the same person; no patient identity is stored. **Amended by D14 (ADR-0012):** locally learned template profiles persist in a separate bounded store as hashes and geometry only — no document text, no values, no dates, no identifiers — cleared by `clearAll` and excluded from `.medigraph`. Medical data remains Profile-only.                                                                                                                                                                                                                                                                       | This provides useful returning-user history without implying at-rest protection. The privacy page must disclose shared-device, XSS, backup/sync and browser-eviction risks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| D9  | **Plaintext, versioned `.medigraph` JSON; no encryption or decryption.** Export is a transparent JSON envelope around one validated `Profile`, with explicit sensitivity warnings and size limits. Import offers previewed Cancel/Replace/Merge semantics and never silently overwrites local data.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Passphrases and recovery complexity are unnecessary for v1. Plaintext is an intentional usability trade-off, not a security feature; users must be told to store the file as they would the original lab reports.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| D10 | **No LOINC codes in v1.** Canonical marker registry uses our own stable string IDs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | LOINC codes are a hallucination magnet for builder models and buy nothing at this stage.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| D11 | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Only two chart forms are needed, both simple; a library costs more bundle than it saves, and hand-rolled SVG gives us the accessibility and touch behaviour the spec below requires.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| D12 | **No dual-axis charts, ever.** Markers with different units are never overlaid on one y-scale.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Universal data-viz rule; see chart specs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| D13 | **Display only: Medigraph never characterises a value or a trend.** Every status string is traceable to the reference range the lab itself printed. No severity language, no clinical inference, no trend direction, slope, rate of change or delta badge, in any view or in any product copy. Marketing copy states a capability (see your own data over time), never a clinical insight.                                                                                                                                                                                                                                                                                                                                                                                                                                       | Under [MDCG 2019-11](https://health.ec.europa.eu/system/files/2020-09/md_mdcg_2019_11_guidance_en_0.pdf) the manufacturer's stated **intended purpose** is the primary qualification trigger, and interpretive software lands under MDR Rule 11 at Class IIa or above — notified body, CE marking, QMS. Display-only positioning stays outside that regime at almost no cost, because the chart specs were already written this way. This is a design constraint recorded for engineering purposes, not legal advice.                                                                                                                                                                                                        |
+| D14 | **Document validation, not template recognition.** `ahfyDocument.ts` verifies that a source is an ΑΗΦΥ document — title, the twelve metadata labels, the five-column table header — and rejects anything else at attach. On success it supplies fixed column roles, the collection-date field and the six identifier positions. It may not create, alter or suppress a value, a `ParseFlag` or a `Confidence`, and it never satisfies D6 confirmation, the D7 scrub or D8 same-person confirmation. There is no fingerprint, no similarity score, no learned or shipped profile store, and no persisted template object.                                                                                                                                                                                                         | Recognising _which_ of many templates a document uses is not a problem Medigraph has any more: it accepts one. What survives from ADR-0012 is the part that was always the real prize — a known layout pre-resolving review's questions — and the machinery built to identify templates among many is deleted with it. D8's amendment for a template store is withdrawn; IndexedDB holds one `Profile` and nothing else.                                                                                                                                                                                                                                                                                                     |
+| D15 | **Measurements are numeric or categorical.** A `Measurement` carries either a number with an optional comparator and unit, or a trimmed string result. Both may carry a reference: numeric ranges as today, categorical as the expected string the lab printed. A cell holding both — `6.0 Όξινη` — is numeric and the trailing word is discarded. Categorical Series are ordered like numeric ones and rendered as a step sequence of printed values; they are never scored, ranked or converted, and no ordering is implied between two distinct strings.                                                                                                                                                                                                                                                                      | The urine panel is a normal part of an ΑΗΦΥ document and is entirely non-numeric. Modelling it as `status: 'missing'` would silently discard a whole panel the user attached, which is exactly the failure the plan most wants to avoid. Charting a printed value over time is display, not interpretation, so D13 holds: Medigraph shows `Αρνητικό` beside the lab's own `Αρνητικό`, and says nothing about what either means.                                                                                                                                                                                                                                                                                              |
 
 The accepted ADRs for D1, D1a, D3, D4, D6/D7, D8, D9 and D13 live under `docs/adr/`,
 along with ADR-0008, which scopes the CSP style directives. **ADR-0009 supersedes
@@ -132,7 +147,7 @@ authorise it.
 
 | Term                 | Meaning                                                                                                                                                                                                                                                                     |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Source file**      | A PDF or image the user attaches.                                                                                                                                                                                                                                           |
+| **Source file**      | One ΑΗΦΥ document the user attaches. It is transient and is never split or merged.                                                                                                                                                                                          |
 | **TextItem**         | One positioned text observation with stable `id`, text, rectangle and optional adapter confidence. Coordinates are page-normalised: top-left origin, y increasing downward, all values in `[0,1]`.                                                                          |
 | **Row**              | TextItems clustered by vertical overlap.                                                                                                                                                                                                                                    |
 | **ParsedRow**        | One ephemeral measurement candidate with a complete parse status, confidence, flags and optional source reference. It is not a persisted Measurement.                                                                                                                       |
@@ -151,15 +166,15 @@ authorise it.
 ### Field-level contracts
 
 These are the authoritative shapes for Task 0.2. They remain **provisional until the
-E0 and E1 walking slices in Task 3.8 pass**; after that task they are frozen. A field
+E0 walking slice in Task 3.8 passes**; after that task they are frozen. A field
 change before or after freeze updates this section and all affected fixtures in the
 same change—builders never add convenience fields locally.
 
 ```ts
 type Confidence = 'high' | 'medium' | 'low';
 type Comparator = '<' | '<=' | '>' | '>=';
-type ParseStatus = 'value' | 'missing';
-type ParseSource = 'anchor' | 'layout' | 'adapter';
+type ParseStatus = 'value' | 'categorical' | 'missing';
+type ParseSource = 'anchor';
 type ParseFlag =
   | 'ambiguous-thousands'
   | 'ambiguous-role'
@@ -283,8 +298,10 @@ interface ParsedRow {
   status: ParseStatus;
   value: number | null;
   comparator: Comparator | null;
+  textValue: string | null; // status 'categorical' only
   unit: string | null;
   referenceRange: ReferenceRange | null;
+  categoricalReference: string | null; // status 'categorical' only
   confidence: Confidence;
   source: ParseSource;
   section: string | null;
@@ -315,7 +332,7 @@ interface IdentifierCandidate {
 interface ExtractionResult {
   sourceId: string;
   adapterId: string;
-  tier: 'E0' | 'E1' | 'E2';
+  tier: 'E0';
   registryVersion: number;
   rows: ParsedRow[];
   dateCandidates: DateCandidate[];
@@ -412,7 +429,9 @@ interface SeriesPoint {
   status: ParseStatus;
   value: number | null; // converted to Series.unit when possible
   comparator: Comparator | null;
+  textValue: string | null; // status 'categorical' only; never converted
   referenceRange: ReferenceRange | null; // converted by the same factor
+  categoricalReference: string | null; // status 'categorical' only
   nativeValue: number | null;
   nativeUnit: string | null;
   nativeReferenceRange: ReferenceRange | null;
@@ -436,7 +455,7 @@ while custom refinements own the cross-field, uniqueness and same-day rules belo
 
 All ids are non-empty opaque strings; production Report/Profile ids are UUIDs.
 Observation/review validation enforces finite coordinates, `0 ≤ x,y,w,h ≤ 1`,
-`x+w ≤ 1`, `y+h ≤ 1`, and confidence in `[0,1]` when present. E0/E1
+`x+w ≤ 1`, `y+h ≤ 1`, and confidence in `[0,1]` when present. The E0 adapter
 ExtractionResults require `registryVersion === REGISTRY_VERSION`,
 `evidenceAvailable:true`, `evidencePages`, a SourceRef on every row/candidate, and
 SourceRef item ids/ranges that exist on the referenced 1-based page. `validateProfile`
@@ -503,7 +522,7 @@ export function parseLayoutRow(row: Row, model: ColumnModel | null): ParsedRow |
 export interface TextExtractionInput {
   sourceId: string;
   adapterId: string;
-  tier: 'E0' | 'E1';
+  tier: 'E0';
   pages: TextItem[][];
   templateProfiles?: readonly TemplateProfile[]; // Pass T; absent means Pass T does not run
 }
@@ -631,7 +650,7 @@ export function score(
 // adapter.ts / pdfText.ts / pdfRaster.ts / preprocess.ts / ocr.ts
 export interface ExtractionAdapter {
   readonly id: string;
-  readonly tier: 'E0' | 'E1' | 'E2';
+  readonly tier: 'E0';
   supports(file: File): boolean;
   extract(file: File, sourceId: string, signal: AbortSignal): Promise<AdapterOutput>;
 }
@@ -806,10 +825,9 @@ src/
     markerKey.ts         label -> marker key
     anchors.ts           TextItem[] -> Anchor[]     (PASS A: marker detection)
     readout.ts           Anchor -> ParsedRow        (PASS A: spatial read-outward)
-    rows.ts              TextItem[] -> Row[]        (shared: vertical clustering, used by BOTH passes)
-    columns.ts           Row[] -> ColumnModel       (PASS B: x-clustering + headers)
-    grammar.ts           Row + ColumnModel -> ParsedRow  (PASS B)
-    extract.ts           runs both passes, reconciles -> ExtractionResult
+    rows.ts              TextItem[] -> Row[]        (vertical clustering, wrapped labels)
+    ahfyDocument.ts      TextItem[] -> AhfyDocument (PASS V: validate, bind columns)
+    extract.ts           runs PASS V then PASS A -> ExtractionResult
     identifiers.ts       PII candidate detection
     review.ts            immutable review edits, reassignments + hard gates
     profile.ts           reviewed groups -> Reports; explicit merge/conflict rules
@@ -818,8 +836,6 @@ src/
   io/                 browser-only adapters, thin, integration-tested
     pdfText.ts           pdfjs-dist -> TextItem[]
     pdfRaster.ts         pdfjs-dist -> ImageBitmap
-    preprocess.ts        E1 input cleanup: EXIF orientation, downscale, deskew (Task 3.3b)
-    ocr.ts               selected local OCR engine -> TextItem[] with confidence
     adapter.ts           ExtractionAdapter interface (D4) — the vision-model seam
     fileRouter.ts        File -> ExtractionAdapter output (picks the right adapter)
     fileFormat.ts        plaintext .medigraph serialise/parse/migrate
@@ -829,9 +845,7 @@ src/
   pages/              Astro routes: index (landing), app, privacy
 scripts/
   corpus-score.ts      parser-corpus runner and aggregate/per-lab reporting
-  ocr-score.ts         source-image OCR corpus runner
 public/
-  ocr/                 selected OCR models/dictionary/WASM (self-hosted, plain paths)
   pdf/                 self-hosted pdf.js worker (ships inside the pinned pdfjs-dist package)
   sw.js                static-asset-only app/model cache (Task 3.7)
 ```
@@ -845,12 +859,12 @@ inside the review session and all references are released on Confirm, Cancel or
 navigation.
 
 **The seam (D4, D1a).** Everything downstream of `ExtractionResult` is
-extraction-agnostic. Swapping an E0/E1 adapter changes `io/`, not review or domain:
+extraction-agnostic. Replacing the E0 adapter changes `io/`, not review or domain:
 
 ```ts
 interface ExtractionAdapter {
   readonly id: string; // 'pdf-text' | 'ppocr-v5-el' | 'vlm-*' | …
-  readonly tier: 'E0' | 'E1' | 'E2';
+  readonly tier: 'E0';
   supports(file: File): boolean;
   extract(file: File, sourceId: string, signal: AbortSignal): Promise<AdapterOutput>;
 }
@@ -866,7 +880,7 @@ type AdapterOutput =
 ```
 
 **Rules that keep the option open** (state these in every `io/` and `domain/` issue):
-no module outside `io/` may import `pdfjs-dist` or the selected OCR runtime; no module outside
+no module outside `io/` may import `pdfjs-dist`; no module outside
 `io/` may assume an `ExtractionResult` came from text items; `ParsedRow` must be
 constructible without TextItem provenance, while `sourceRef` remains optional for
 review. A direct-row adapter must supply date and identifier candidates and declare
@@ -878,8 +892,7 @@ cannot appear behind this seam; it needs an ADR superseding D1/D1a first (ADR-00
 
 **Dependencies (pin exact versions).** Baseline: `astro@5`, `@astrojs/preact@4`,
 `preact@10`, `zod@4.5.4`, `pdfjs-dist@5`, `idb@8`, `vitest`, `@playwright/test`. Task 0.7 adds
-exactly one OCR stack: `onnxruntime-web` (with a proved wrapper only if needed) for
-PP-OCRv5, **or** `tesseract.js` for the fallback—not both in the production bundle.
+exactly one PDF stack: `pdfjs-dist`. No OCR runtime, model or dictionary ships.
 Packages may be downloaded at build/install time, and all browser runtime bytes are
 built or copied under `public/` and served first-party. Astro's own build hashing
 applies; there is no separate content-hash manifest (D1, ADR-0009). `Profile` validation on import
@@ -917,7 +930,7 @@ export sharing.
   same-origin code executes. Dependency review, no raw HTML, text-only rendering,
   CSP and service-worker integrity are therefore preventative parts of D1. The
   Playwright guard demonstrates exercised behavior only.
-- Availability is best-effort: IndexedDB can be evicted and offline OCR needs one
+- Availability is best-effort: IndexedDB can be evicted and offline use needs one
   successful asset fetch. Export is the user-controlled recovery path.
 
 ---
@@ -1458,6 +1471,73 @@ the prose in this document and the ADRs exactly as wrapped.
 
 ---
 
+## The ΑΗΦΥ document
+
+The single accepted input. Everything the pipeline assumes about structure is stated
+here; anything not stated here is lab-controlled and must be treated as variable.
+
+**Provenance.** Generated server-side by the national repository and downloaded by the
+patient from `myhealth.gov.gr`. `Producer` reads
+`ReportLab PDF Library - www.reportlab.com; pyHanko 0.25.3`, page size is A4, and the
+file is digitally signed. A text layer is always present, so there is no raster path
+(ADR-0013). Every page carries a `Κωδικός: <opaque id>` header, the repository's
+verification code.
+
+**Fixed by the repository — the parser may rely on these.**
+
+- A first-page metadata block with these exact labels, in this order: `Αρ. Υπόθεσης`,
+  `ΑΜΚΑ`, `Επώνυμο`, `Όνομα`, `Αριθμός Παραγγελίας`, `Ημερομηνία Λήψης Δείγματος`,
+  `Ημερομηνία Αποτελέσματος`, `Επώνυμο Ιατρού`, `Όνομα Ιατρού`, `ΑΜΚΑ Ιατρού`,
+  `Ειδικότητα Ιατρού`, `Επωνυμία Εργαστηρίου`. Verified identical across three
+  documents from three different issuing laboratories.
+- The document title `Αποτελέσματα Εργαστηριακών Εξετάσεων`.
+- A five-column results table, header repeated per section, with these exact headings:
+  **`Περιγραφή` | `Αποτέλεσμα` | `Μονάδα Μέτρησης` | `Φυσιολογικές Τιμές` |
+  `Παρατηρήσεις`**. Column roles are therefore known and are never inferred.
+- **One document = one order = one issuing laboratory = one collection date**, with
+  every department consolidated into that file. `Ημερομηνία Λήψης Δείγματος` is the
+  collection date; no date disambiguation pass is required.
+- Identifier positions are known: patient `ΑΜΚΑ`, `Επώνυμο`, `Όνομα`, and the referring
+  doctor's `Επώνυμο Ιατρού`, `Όνομα Ιατρού`, `ΑΜΚΑ Ιατρού`.
+
+**Lab-controlled — the parser may rely on none of it.** The repository is a container,
+not a normaliser. Across three documents from three laboratories, every one of these
+varied:
+
+| Varies                      | Observed                                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Marker wording              | `Λευκά Αιμοσφαίρια (WBC) (WBC)`, `Λευκά αιμοσφαίρια (WBC) (WBC)`, and bare `WBC (WBC)` with no Greek name at all    |
+| Decimal separator           | one lab 41 periods / 0 commas, another 23 commas / 5 periods — both inside the same template                        |
+| Unit notation               | `x10^3 / μL`, `k/ml` and `k/μl` for one quantity; `k/μL` and `k/μl` within a single document                        |
+| Range format                | `4 - 10.5`, `4,0 - 10,0 k/μl` (unit repeated inside the range) and `4,0-11,0` (no spaces)                           |
+| Section and sub-header rows | `ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ (LABEL RBC)`, `(LABELWBC TYPE)` — table rows that are not measurements, present in some labs |
+
+**Mixed-script text is normal, not corruption.** Confirmed by codepoint:
+`Μέσος Όγκος Ερυθρών (ΜCV)` opens with U+039C GREEK CAPITAL MU where the row's second
+parenthetical uses Latin `MCV`; the unit `Μ/μl` is Greek-Mu + Greek-mu + Latin-l; the
+issuing lab `ΑΙΜΑΤΟΛΟΓΙΚO` is eleven Greek letters and a Latin `O`; and doctor names
+carry accented Greek capitals (`ΚΑΡΑΓΚΟΎΝΗΣ`, `ΜΙΚΡΟΒΙΟΛΌΓΟΣ`). Homoglyph folding in
+`text.ts` is therefore load-bearing for both label matching and unit normalisation, not
+a defensive nicety.
+
+**Non-numeric results are ordinary.** The urine panel reports `Χροιά: Ωχροκίτρινη`
+against a reference of `Κίτρινη`, and `Λεύκωμα: Αρνητικό` against `Αρνητικό(<=10 mg/dl)`.
+Some cells mix both — `Αντίδραση PH: 6.0 Όξινη` — and must yield the number. These are
+categorical Measurements (D15), not parse failures.
+
+**Categorical contract.** A `Measurement` with `status: 'categorical'` carries a trimmed
+non-empty `textValue` and a nullable `categoricalReference` — the string the lab printed
+in `Φυσιολογικές Τιμές`, verbatim, including forms like `Αρνητικό(<=10 mg/dl)`. Its
+`value`, `comparator`, `unit` and `referenceRange` are all null: a categorical result has
+no unit and is never converted, so `units.ts` never sees one and a categorical Series
+never splits. Equality is exact on the normalised string; no ordering is defined between
+two distinct strings, and none may be invented — `Αρνητικό` is not "better" than
+`Θετικό`, and D13 forbids saying so. A cell holding both a number and a word
+(`6.0 Όξινη`) is `status: 'value'` with the word discarded, because the number is the
+measurement and the word is the lab's gloss on it.
+
+---
+
 ## Extraction pipeline spec
 
 This is the part that must be specified to the token, because it is where builder
@@ -1470,129 +1550,70 @@ ferritin prints a token normalising to `φερριτινη`, and every lab that 
 cell count prints `(RBC)` somewhere on that line. So we anchor on the marker and read
 outward, instead of reconstructing the table and hoping the marker is in column one.
 
-What _does_ repeat is the **report template**: one lab's haematology form is stable
-across years even though the same lab's biochemistry form shares nothing with it but a
-masthead. Pass T below exploits that where it can, supplying layout priors and
-pre-resolved review questions. It is strictly a prior. Pass A remains
-layout-independent and authoritative, and must pass its acceptance criteria with Pass T
-absent, exactly as it must with Pass B disabled.
+That reasoning is **why the parser is marker-anchored, and it now cuts differently.**
+The ΑΗΦΥ template fixes the layout, so the marker is always in `Περιγραφή` and the
+value always in `Αποτέλεσμα`. Marker anchoring survives not because layouts vary but
+because _marker identity_ is the remaining hard problem: the same quantity appears as
+`Λευκά Αιμοσφαίρια (WBC) (WBC)`, `Λευκά αιμοσφαίρια (WBC) (WBC)` or bare `WBC (WBC)`
+depending on the issuing laboratory.
 
-The pipeline therefore runs **two passes over the same `TextItem[]`** and reconciles:
+The pipeline therefore runs **one gate and one pass**:
 
-- **Pass A — marker-anchored (primary).** Find every registry marker mention on the
-  page. For each, search a spatial neighbourhood for its value, unit and range.
-  Layout-independent. Produces high-confidence rows.
-- **Pass B — layout (discovery only).** Rows → columns → grammar, as a table reader.
-  Its job is _not_ to parse the document; it is to surface measurement-shaped lines
-  that Pass A didn't claim, so unknown markers still get charted and so registry gaps
-  become visible.
+- **Pass V — document validation.** Accept or reject the source, and on acceptance bind
+  the five column roles, the collection date and the identifier positions.
+- **Pass A — marker-anchored parsing.** For each row, resolve the `Περιγραφή` cell to a
+  marker key through the registry, and read the row's remaining cells by column role.
+  A label the registry does not know still yields a row, flagged as an unknown marker.
 
-**Two geometry modes—never invent glyph coordinates.** pdf.js commonly emits small
-fragments for which spatial read-out is reliable. OCR commonly emits one box for an
-entire printed line, such as `Σάκχαρο ορού 71 mg/dL 70 - 110`. Splitting that box and
-interpolating x-coordinates by character count is forbidden: proportional fonts make
-the fabricated geometry unsafe. `text.ts` instead produces lexical tokens carrying
-their parent `TextItem.id` and character offsets:
+**Never invent glyph coordinates.** pdf.js emits fragments whose boxes are real;
+splitting a fragment and interpolating x-coordinates by character count is forbidden,
+because proportional fonts make the fabricated geometry unsafe. `text.ts` produces
+lexical tokens carrying their parent `TextItem.id` and character offsets, and only
+parent boxes participate in page geometry. The whole-line geometry mode is gone with
+E1: an ΑΗΦΥ text layer is always fragmented.
 
-- **fragmented mode:** a Row contains several parent TextItems; Pass A uses the
-  spatial rules below;
-- **line mode:** a parent TextItem contains both a marker and numeric content; marker
-  matching and read-out use token order inside that string, and only the parent box
-  participates in page geometry;
-- Pass B likewise uses line-local grammar for a single line box and column geometry
-  only for genuinely separate fragments.
-
-Parser fixtures exercise both modes. Real OCR tests begin from images, not from
-hand-positioned TextItems, so detection, recognition and geometry are all measured.
+A cell's content may still need token-level work — `6.0 Όξινη` is one fragment holding a
+number and a word — and that is lexical, not geometric.
 
 ---
 
-### PASS T — Template recognition (prior; optional)
+### PASS V — Document validation (`ahfyDocument.ts`)
 
-Pass T runs **before** Pass A, once per page, and supervises neither parse. It answers
-"have we seen this exact report form before?", and if so it pins column roles and
-pre-resolves review questions that are otherwise the user's work. Its governing
-constraint is absolute and is repeated in D14:
+Runs once per source, before anything is parsed, and is a **gate**: a source that fails
+validation produces no rows and is reported to the user as "not an ΑΗΦΥ document",
+with the accepted source class named. There is no partial acceptance and no fallback
+parse.
 
-> A template match may pin roles and pre-resolve gates. It may never create, alter or
-> suppress a value, a `ParseFlag` or a `Confidence`.
+**V1. Accept.** Require, on page one, the title `Αποτελέσματα Εργαστηριακών Εξετάσεων`
+and the twelve metadata labels listed in [The ΑΗΦΥ document](#the-αηφυ-document); and,
+on any page, at least one results table whose header row reads `Περιγραφή`,
+`Αποτέλεσμα`, `Μονάδα Μέτρησης`, `Φυσιολογικές Τιμές`, `Παρατηρήσεις`. Compare after
+`text.ts` normalisation, so homoglyphs and accented capitals do not fail a valid
+document. `Producer` and the `Κωδικός` header are corroborating only — never sufficient,
+never required, since a re-saved PDF loses its metadata while remaining a valid
+document.
 
-A page with no match, or with a match that fails verification, proceeds exactly as if
-Pass T did not exist. Matching is per **page**, not per file — Task 3.4 already routes
-per page, one six-page Bioiatriki file carries haematology, biochemistry, immunology
-and hormone panels with section titles spanning page breaks, and one Galinos visit
-arrives as three single-page files carrying two different forms.
+**V2. Supply.** On acceptance, and only then, the validator yields:
 
-#### T1. Fingerprint (`templates.ts`)
+| Yields               | Effect                                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Column roles         | The five columns are bound by header position: label, value, unit, range, notes. Never inferred, never scored.                        |
+| Collection date      | `Ημερομηνία Λήψης Δείγματος`, parsed as `dd-mm-yyyy`, presented to the user for confirmation.                                         |
+| Identifier positions | Patient `ΑΜΚΑ`, `Επώνυμο`, `Όνομα` and the doctor's `Επώνυμο Ιατρού`, `Όνομα Ιατρού`, `ΑΜΚΑ Ιατρού`, each pre-resolved as `redacted`. |
+| Issuing laboratory   | `Επωνυμία Εργαστηρίου`, retained as the Report's lab label. It is not an identifier and is not redacted.                              |
+| Section titles       | The panel headings between tables, used as `sectionHint` for T4 tie resolution.                                                       |
 
-Computed from that page's `TextItem[]` before any parsing, from document _chrome_ only
-— never from patient content, never from measured values. Four components:
+**V3. What it never does.** It creates, alters and suppresses nothing: no value, no
+`ParseFlag`, no `Confidence`. It does not confirm the date, does not discharge the D7
+scrub — pre-applied redactions are resolutions the user must still see and may reverse —
+and does not answer D8. Row text is read through `text.ts` exactly as it would be
+without the validator; only the column _roles_ come from the template.
 
-1. `chromeTokens` — normalised tokens from the top and bottom bands of the page:
-   masthead, address, footer boilerplate. Normalisation is the existing `text.ts`
-   pipeline, so accent and case folding are shared with marker matching.
-2. `titleTokens` — normalised tokens of **every** section title on the page, as a set.
-   This is the component that makes per-template keying work where per-lab keying
-   fails: `ΓΕΝΙΚΗ ΕΞΕΤΑΣΗ ΑΙΜΑΤΟΣ` and `ΕΡΓΑΣΤΗΡΙΑΚΕΣ ΕΞΕΤΑΣΕΙΣ` separate the two
-   Galinos templates, which are identical in `chromeTokens`. The set may hold several
-   titles or none: a Bioiatriki page commonly carries the tail of one panel and the
-   head of the next, and the first and last pages of a multi-page report carry no
-   section title at all. An empty `titleTokens` is a legitimate value, not a match
-   failure — it throws the decision onto `headerTokens` and `bandSignature`, which is
-   why those are required components rather than tie-breakers. Continuation pages of
-   one form share a fingerprint by design.
-3. `headerTokens` — normalised tokens of the column header row (`Εξέταση`,
-   `Αποτέλεσμα`, `Αποτέλεσμα - Μονάδες`, `Τιμές Αναφοράς`, `Φυσιολογικές Τιμές`,
-   `Φυσ. τιμές`, `Μονάδες`).
-4. `bandSignature` — the quantised x-band starts of the `columns.ts` column model, plus
-   the band count.
-
-Every token is stored as a stable hash, never as readable text, so similarity is
-computable without persisting document text — the rule that keeps learned profiles
-compatible with D7 (see [Storage](#template-profile-storage-d8-amendment)). Scoring is
-per-component Jaccard similarity against each candidate profile; **all four components
-must clear their thresholds**, with `titleTokens` and `headerTokens` weighted highest.
-If two profiles both clear, the result is a non-match, not the higher score.
-
-PDF `Creator`/`Producer` metadata (FastReport, wkhtmltopdf, PDFTron, Bullzip across the
-current corpus) is recorded as a **weak corroborating signal only**. It cannot separate
-two templates from one lab, it is absent on the E1 path, and it is trivially rewritten
-by any tool that touches the file — it may never be sufficient for a match on its own.
-
-#### T2. Structural verification — fail closed
-
-A match is a hypothesis and is verified before any role is applied: band count equal to
-the profile's, header tokens present at their expected bands, the collection-date label
-present, and identifier zones non-empty wherever the profile records them as populated.
-
-**Any failure discards the match whole.** There is no partial application and no
-degraded mode. A lab that re-versions its report therefore falls back to today's
-behaviour rather than to a confidently wrong parse, which is the failure this pass must
-never introduce. A verified match must never reduce the review surface below what the
-same page would present unmatched.
-
-#### T3. What a verified match applies
-
-| Applies                  | Effect                                                                                                                                                                                                                  |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `columnRoles`            | Pins `ColumnRole` for `columns.ts`. Covers units-inside-the-range-column (Iatrokosmos prints `19.0 - 44.0 mg/dL`) and units glued to values (Galinos prints `5,37 Μ/μl`) without inference.                             |
-| `collectionDateLabel`    | Sets `DateCandidate.kind: 'collection'` directly. Other printed dates keep their scored kinds.                                                                                                                          |
-| `identifierZones`        | Candidates falling in these zones arrive with resolution `'redacted'` already applied. Redaction, never dismissal, is the automatic default.                                                                            |
-| `standingFalsePositives` | Zones authored as structurally non-patient arrive resolved `'false-positive'` with the profile recorded as the reason — the signing physician's ΑΜΚΑ in a report footer is the motivating case.                         |
-| `panelHint`              | The page's panel set, as an additional signal for the marker-set-disjointness test in `profile.ts`, improving the one-visit-several-departmental-files grouping proposal. A page may contribute several panels or none. |
-
-Nothing else. Specifically: no value substitution, no flag suppression, no confidence
-promotion, no marker-key assignment. Marker identity belongs to the registry (D5a);
-templates own geometry.
-
-#### T4. What a verified match never touches
-
-D6 date confirmation, D6 grouping confirmation, `Conflict` resolution, unknown-marker
-approval, and D8 same-person confirmation. A pre-applied identifier resolution _is_ a
-resolution and so counts toward `canConfirm`, but review must display every one and
-every one must be individually reversible (Task 4.2b). Rows whose roles came from a
-template enter Task 4.2a's pre-accepted collapsed group only if they independently hold
-`confidence: 'high'` and an empty `flags` array; the template substitutes for neither.
+**V4. Rows the table contains but a measurement is not.** Some laboratories emit
+structural rows inside the table — `ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ (LABEL RBC)`,
+`(LABELWBC TYPE)`, `Φυσικά χαρακτηριστικά (Φυσικά χαρακτηρ)`. A row whose value, unit
+and range cells are all empty is a section marker: record it as the current
+`sectionHint` and emit no `ParsedRow`. Never infer a measurement from a label alone.
 
 ---
 
@@ -1697,88 +1718,19 @@ one tied marker's hint matches the nearest heading; all remaining ties are rejec
 
 ---
 
-### PASS B — Layout (discovery)
+### Rows (`rows.ts`)
 
-Runs only to find measurement-shaped rows **not covered by any Pass-A anchor**.
-Output is always capped at `confidence: 'low'` and always surfaces in the review
-screen for confirmation, because by definition we did not recognise the marker.
+Cluster TextItems into rows by vertical overlap, shared by validation and Pass A. A
+label may wrap across lines while its value sits on the second line
+(`Πολυμορφοπύρηνα (NEUT%)` / `(NEUT%)  48,1  %  40,0 - 75,0 %`), so a row is the set of
+items overlapping the _value_ band, and a label is the concatenation of the label-column
+items that overlap it. This is the one place the ΑΗΦΥ table is not naively rectangular.
 
-#### B1. Rows (`rows.ts`) — shared infrastructure
-
-Although specified here, `rows.ts` is used by **both** passes (Pass A's "within a
-row" in A1/A2 is this clustering) and is built in Wave 1 as Task 1.8.
-Cluster `TextItem[]` into `Row[]`: two items are in the same row if their vertical
-centres differ by less than 0.6 × the smaller item's height. Sort rows by `y`
-ascending, items within a row by `x` ascending. Preserve original items on the row.
-
-#### B2. Column model (`columns.ts`)
-
-1. Scan rows for a **header row**: any row containing a token matching a header
-   keyword. Keywords (case/accent-insensitive): `Αποτέλεσμα`, `Τιμές Αναφοράς`,
-   `Τιμή Αναφοράς`, `Εξέταση`, `Μονάδες`, `Result`, `Value`, `Reference`,
-   `Reference Range`, `Normal Range`, `Test`, `Units`, `Flag`.
-2. A header row defines column x-boundaries for all rows below it, until the next
-   header row. A page may contain several header regions (the samples do).
-3. Where no header row exists, cluster item x-starts across all rows; a cluster with
-   ≥ 60 % of rows participating becomes a column boundary. If fewer than 2 boundaries
-   are found, emit `ColumnModel = null` and grammar falls back to positional parsing.
-4. Classify each column as `label` / `value` / `unit` / `range` by the header keyword
-   when present; otherwise by content: the column where ≥ 70 % of cells match
-   `RANGE_RE` is `range`; the leftmost column where ≥ 70 % of cells match `NUMBER_RE`
-   is `value`; the leftmost remaining column is `label`.
-
-#### B3. Grammar (`grammar.ts`)
-
-Regexes, exactly:
-
-```regex
-NUMBER_RE   = /^[<>≤≥]?\s*[+-]?\d{1,6}(?:[.,]\d+)?$/          // standalone token only
-RANGE_RE    = /^(?:[<>≤≥]\s*[+-]?\d+(?:[.,]\d+)?|[+-]?\d+(?:[.,]\d+)?\s*[-–—]\s*[+-]?\d+(?:[.,]\d+)?)$/
-UNIT_RE     = /^[\p{L}%/^\d.·]+$/u                           // normalise first, then validate
-```
-
-`RANGE_RE` deliberately **never matches a bare number**: a range is either two-sided
-(`70 - 110`) or comparator-prefixed (`< 75`). A lone `530` is a value, full stop.
-In addition to `RANGE_RE`, `ranges.ts` accepts the textual Greek forms labs print —
-`Έως n` / `έως n` / `ΕΩΣ n` / `μέχρι n` (matched post-normalisation) — all meaning
-`{kind:'maxOnly', comparator:'<=', max:n}`. Symbolic `<`, `≤`, `>` and `≥` are stored
-as `<`, `<=`, `>` and `>=` on the one-sided ReferenceRange. Ranges split across
-adjacent tokens (`70`, `-`, `110`) are assembled before matching.
-
-Rules, applied in order:
-
-1. **A number token must be standalone.** `Β12`, `D3`, `1η`, `-25-(OH)` are
-   alphanumeric and are therefore _label_ tokens, never values. This rule alone
-   handles `Βιταμίνη Β12  530  pg/mL  200-900` correctly.
-2. **Split glued units.** A token like `5%` or `46,2%` splits into value `5` and
-   unit `%`. For separate text such as `4,83 Κ/μl`, normalise `Κ/μl` before testing
-   it against the unit allowlist; raw Greek `Μ` and `Κ` are valid inputs.
-3. **When a `ColumnModel` exists, column assignment wins.** A row whose only numeric
-   content sits in the `range` column has **no value** — emit
-   `value: null, status: 'missing'`. This is what correctly reads
-   `Δικτυοερυθροκύτταρα (ΔΕΚ%)   0,5 - 2,5` (range only, no result) and
-   `Βασεόφιλα %   ␣   0,2 - 1,0` (blank result cell) instead of inventing a value.
-4. **Fallback grammar** (no column model), left to right: label = leading run of
-   non-NUMBER tokens; value = first NUMBER token; unit = following tokens accepted by
-   `units.ts`; range = remaining tokens matching `RANGE_RE`.
-5. **Comparator values are preserved, never coerced.** `< 0,10` yields
-   `{ value: 0.10, comparator: '<' }`. Never store `0.10` alone, never store `0`.
-6. **Label cleanup**: trim, collapse whitespace, strip trailing `:`. Keep
-   parentheticals — `Αριθμός ερυθρών (RBC)` keeps `(RBC)`, which the registry uses.
-7. **Large integers are suspect in Pass B.** A 4+ digit integer with no decimal part
-   found by Pass B demotes the row to `low`—years, phone numbers and accession
-   numbers are the usual cause. A Pass-A value such as `Βιταμίνη Β12 1120` is not
-   demoted merely for having four digits, but `plausibleRange` still applies.
-8. **Thousands separators are ambiguous in every pass, never guessed.** Every token
-   matching `^[+-]?\d{1,3}[.,]\d{3}$` (for example `250.000` or `1.250`) is ambiguous:
-   it may be a grouped integer or a decimal. A count-style unit such as `/μL` explains
-   the warning but is not required to trigger it. Parse as a decimal, add
-   `ambiguous-thousands`, demote to `low` and flag for review—a silent 1000× error is
-   the worst outcome this parser can produce.
-9. **Ambiguous comparator role is retained for review.** Apply the same unit/context
-   rule as Pass A; if unresolved, keep it as the value with `ambiguous-role` and low
-   confidence. Layout discovery never silently turns a detection-limit result into a
-   lab reference bound or vice versa.
+**Pass B (layout discovery) is removed** — see D5. `columns.ts` and `grammar.ts` are not
+built: column roles come from the validated header, so there is no column model to infer
+and no line grammar to apply. What Pass B existed to catch — a measurement whose label
+the registry does not know — is handled by reading the row positionally and surfacing it
+as an unknown marker.
 
 ---
 
@@ -1799,111 +1751,87 @@ Demotion always takes the worse of current and target (`high` → `medium` → `
 no rule can promote a `low` row to `medium`:
 
 - Demote to `low` if: the value is `missing`; the read-out hit a stop condition
-  before finding a unit _and_ a range; the value-bearing OCR box confidence is below
-  0.85; the row mean OCR confidence is below 0.75; a shared number parse is
+  before finding a unit _and_ a range; a shared number parse is
   `ambiguous-thousands`; or the value is outside the MarkerDef's `plausibleRange`.
 - Demote to `medium` if: the reference range failed to parse; the unit is
   unrecognised; the value carries a comparator; two anchors competed for the same
   read-out neighbourhood.
 
 An implausible value is **retained**, tagged `implausible-value`, sorted to the top of
-review and never silently dropped or clamped. Missing OCR confidence does not itself
-demote a row; the E1 adapter records it whenever the selected engine exposes it.
+review and never silently dropped or clamped. A missing optional confidence does not itself
+demote a row. The E0 adapter never sets it, since a text layer has no recognition confidence; the field is retained only so a future adapter need not change the contract.
 Each trigger adds its matching flag: failed candidate range → `unparsed-range`, raw
 unit rejected → `unrecognised-unit`, anchor overlap → `competing-anchor`, and either
-OCR threshold → `low-ocr-confidence`. Thousands and plausible checks add the flags
+Thousands and plausible checks add the flags
 named in their rules; unresolved numeric role adds `ambiguous-role`. A missing value
 needs no extra flag because status is explicit.
 
 Confidence never gets promoted. The review screen sorts `low` first and pre-focuses
 the first `low` row.
 
-### Date candidate pass (`dates.ts`, before measurement parsing)
+### Collection date (`dates.ts`)
 
-Scan every source page in reading order. Accept `d/m/yyyy`, `d-m-yyyy`, `d.m.yyyy`,
-`yyyy-mm-dd`, and `d <MonthName> yyyy`, plus optional `HH:mm`, with Greek and English
-month names (nominative and genitive). Emit **every** candidate with its SourceRef;
-never discard alternatives. When a line matches several keyword classes, classification
-precedence is `birth` → `print` → `collection` → `report` → `unknown`, preventing
-generic `Date` inside `Date of birth` from winning. Scores are:
+An ΑΗΦΥ document states its dates under fixed labels, so there is no candidate pass and
+no scoring. Read `Ημερομηνία Λήψης Δείγματος` as the collection date in `dd-mm-yyyy`;
+read `Ημερομηνία Αποτελέσματος` only to display alongside it. Day-first is unambiguous
+here because the field is a repository-formatted date, not printed prose, so the
+`ambiguous` flag does not arise.
 
-1. `collection`: `λήψη`, `δειγματοληψία`, `collection`, `collected` (+40 score);
-2. `report`: `ημερομηνία εξέτασης`, `ημ/νία`, `date`, `result date` (+25);
-3. `print`: `εκτύπωση`, `printed`, `issued` (-20);
-4. `birth`: `γέννηση`, `ημ. γεν.`, `DOB`, `birth` (-100 and never preferred);
-5. `unknown` (0).
+Review still **requires an explicit confirmation** of the resulting ISO date (D6). It is
+one tap on a pre-filled value rather than a choice among candidates, and the user may
+correct it. A document whose date field is missing or unparseable fails validation
+rather than reaching review with no date.
 
-Add 10 for the first page and 5 for the top third of a page. Highest non-birth score
-is the proposed collection date; equal top scores remain multiple proposals. If day
-and month are both ≤12 **in a day-first numeric form**, emit day-first with
-`ambiguous:true`; ISO `yyyy-mm-dd` is never ambiguous. Review displays the raw text
-and requires an explicit ISO-date choice. Review must also explicitly confirm an
-unambiguous proposal. No candidate or multiple plausible candidates blocks Confirm
-until the user enters/selects one. Direct-row adapters must provide equivalent
-DateCandidates rather than inventing a Report date downstream.
+The candidate-scoring machinery this section previously specified — keyword classes,
+`birth → print → collection → report` precedence, first-page and top-third bonuses,
+multiple surviving proposals — is **removed**, along with `DateCandidate.kind`. It
+existed to choose among the several dates a lab prints in prose; the repository labels
+them.
 
-A verified Pass T match supplies `kind` directly for the label its profile names, and
-the keyword scores above become the fallback path for every other candidate on the page
-and for every unmatched page. The precedence rule is unchanged. This is the single
-largest review saving available on the current corpus: Bioiatriki prints a report
-datetime, a birth date and `Λήψη δείγματος` on page one, and Iatrokosmos prints
-`Ημ/νία-Ώρα επίσκεψης`, `Ημ/νία-Ώρα άφιξ. δείγμ.` and `Έκδοση`. The template says which
-one counts; the user still confirms it.
+### Report identity and conflicts (`profile.ts`)
 
-### Report grouping, identity and conflicts (`profile.ts`)
-
-- **One source belongs to exactly one Report; several sources may share one.** A
-  source file holds at most one visit's results, so it is never split — hence
-  `regroupSources`' partition rule. The reverse is common: one visit is often emailed
-  as several files, one per department. Multi-source Reports are the normal case, not
-  an edge case.
-- Equal dates **never merge automatically**. Within one attach batch, review may
-  propose that files belong to one collection event, but the user must confirm or split
-  every proposed group. The two synthetic fixture PDFs are accepted as one Report only
-  after this grouping confirmation.
-- **Grouping proposal uses two signals, not one.** Same best date is necessary but not
-  sufficient. Add **marker-set disjointness**: sources sharing a date whose marker keys
-  barely overlap are probably one visit split by department, and are proposed as one
-  group; sources sharing a date whose marker keys substantially overlap are probably
-  distinct collections (a retest, or two labs) and are proposed separately. Overlap is
-  computed on canonical marker keys only, ignoring `x:*` rows, and the proposal is a
-  default the user confirms — never an inference that bypasses the gate. A Pass T
-  `panelHint` is an **additional** signal on top of these two, never a replacement for
-  either, and never a bypass of the grouping confirmation.
-- A confirmed group creates one Report UUID. A later attach is a new Report even on
-  the same date unless the user explicitly selects “add to existing report”; that
-  selection stores `targetReportId` and rebuilds conflicts against its Measurements.
-- Two distinct Reports may share a date only when **all** Reports on that date have
-  distinct minute-precision times. Review stages any needed time update to an existing
-  Report in `existingReportDateUpdates`; that update and the new addition commit in
-  one ProfileChange. Times are local civil values—no timezone conversion.
-- Within a proposed Report, duplicate marker keys produce a `Conflict`. Review must
-  choose one candidate or edit one replacement Measurement. “Keep both” is not a v1
-  resolution. Confirm requires exactly one Measurement per marker key.
-- Appending any Report to a non-empty Profile requires a same-person confirmation.
-  This is a transient boundary check; no identity answer is persisted.
-- Profile merge/import uses Report IDs, never date equality. An identical ID and
+- **One document is exactly one Report.** A source is never split and never merged, so
+  `proposeReportGroups`, `regroupSources`, `confirmGrouping` and `groupingConfirmed` do
+  not exist. Attaching three documents proposes three Reports.
+- A confirmed Report gets a UUID and stores the issuing laboratory from
+  `Επωνυμία Εργαστηρίου` as a display label. That is a property of the Report, not of
+  the person, and carries no identity.
+- **Equal dates never auto-merge.** Two documents sharing a collection date are two
+  Reports; if the user genuinely re-tested that day, both stand. Two distinct Reports
+  may share a date only when all Reports on that date have distinct minute-precision
+  times, and review stages any needed time update in `existingReportDateUpdates`. Times
+  are local civil values — no timezone conversion.
+- A later attach is a new Report even on the same date unless the user explicitly
+  selects "add to existing report"; that selection stores `targetReportId` and rebuilds
+  conflicts against its Measurements.
+- Within one document, duplicate marker keys produce a `Conflict`. Review must choose
+  one candidate or edit one replacement Measurement. "Keep both" is not a v1 resolution.
+  Confirm requires exactly one Measurement per marker key. This survives the pivot: a
+  panel can report the same quantity twice, as `NEUT%` and `Πολυμορφοπύρηνα (NEUT%)` in
+  different sections of one document.
+- Appending any Report to a non-empty Profile requires a same-person confirmation. The
+  document carries the patient's ΑΜΚΑ, and Medigraph deliberately does **not** use it to
+  answer this: ΑΜΚΑ is redacted at the D7 gate and never compared. The gate stays an
+  explicit, unverified question, because never processing a national id is worth more
+  than a verified answer (D8, ADR-0013).
+- Profile merge/import uses Report IDs, never date equality. An identical ID with
   structurally identical validated content is a duplicate; identical ID with different
-  content blocks Merge (the user may Cancel or Replace). Distinct incoming/existing
-  Reports sharing a date create a resolvable precision conflict whenever **either**
-  is day-precision: the user supplies a distinct valid time for every Report on that
-  date, and all existing updates plus incoming additions commit atomically.
+  content blocks Merge. Distinct Reports sharing a date create a resolvable precision
+  conflict whenever either is day-precision.
 
-`regroupSources` accepts a complete partition of successful source ids (each exactly
-once), rebuilds report drafts/conflicts and resets `groupingConfirmed`/date confirmation
-for affected groups. `setReportDate` sets the local civil value and marks it confirmed;
-later editing resets confirmation. A current `x:*` row is persistence-eligible only
-when its id is in `approvedUnknownRowIds`; reassignment to a canonical key or deletion
-removes stale approval and rebuilds conflicts.
+`setReportDate` sets the local civil value and marks it confirmed; later editing resets
+confirmation. A current `x:*` row is persistence-eligible only when its id is in
+`approvedUnknownRowIds`; reassignment to a canonical key or deletion removes stale
+approval and rebuilds conflicts.
 
-`canConfirm` returns true only when every successful source is in one confirmed group,
-every group has a confirmed valid date, every current conflict has one choose/edit
-resolution, every IdentifierCandidate has a resolution, every surviving `x:*` row is
-explicitly approved, same-person confirmation is true when the Profile is non-empty,
-all `targetReportId`s exist, and the proposed Profile satisfies same-day precision.
-`buildProfileChange` then creates UUIDs only for additions and emits complete existing
-Report replacements in `updates`; `applyProfileChange` validates and applies both
-arrays in the one IndexedDB transaction owned by `MedigraphApp`.
+`canConfirm` returns true only when every successful source has a confirmed valid date,
+every current conflict has one choose/edit resolution, every `IdentifierCandidate` has a
+resolution, every surviving `x:*` row is explicitly approved, same-person confirmation
+is true when the Profile is non-empty, all `targetReportId`s exist, and the proposed
+Profile satisfies same-day precision. `buildProfileChange` then creates UUIDs only for
+additions and emits complete existing Report replacements in `updates`;
+`applyProfileChange` validates and applies both arrays in the one IndexedDB transaction
+owned by `MedigraphApp`.
 
 ---
 
@@ -2183,57 +2111,6 @@ state reach the DOM without a CSP-blocked style attribute.
 
 ---
 
-## Template profile storage (D8 amendment)
-
-D8 and Task 3.6 otherwise describe IndexedDB as holding exactly one `Profile` and no
-drafts or evidence. Locally learned template profiles are a **second persisted object
-class**, and this plan states that explicitly rather than letting it arrive as an
-implementation detail. ADR-0012 records the amendment.
-
-- **Separate object store**, bounded in both record count and byte size, holding only:
-  the component hash sets, the band signature, column roles, zone rectangles, a
-  confirmation count and a profile version. **No raw document text, no values, no
-  dates, no identifiers, no marker keys.**
-- **Hashes, not tokens.** Storing hashed tokens rather than readable ones is what keeps
-  D7's "raw text never enters IndexedDB" rule intact while still allowing Jaccard
-  matching. A template profile must not be reversible into the sentences printed on
-  someone's lab report.
-- **`clearAll` removes this store too**, alongside the Profile database and Medigraph
-  Cache Storage entries.
-- **Excluded from `.medigraph`.** Which labs a person attends is health-adjacent
-  metadata, and the export envelope is a plaintext file we actively encourage users to
-  move around and back up. It stays out; `validateProfile` and the Task 3.5 bounds are
-  unchanged, which is the point. Import never carries template profiles either, so a
-  shared or restored file cannot teach one device about another's labs.
-- **Learning rule.** On Confirm, for each source page, if the user corrected no column
-  role, no date kind and no identifier zone, record or increment that page's profile.
-  A profile is applied only at **two or more** confirmations: the first sighting
-  teaches, the second acts. Any user correction to a role or a zone resets that
-  profile's count and rewrites it from the corrected state, so a lab's redesign is
-  absorbed rather than fought.
-- **No update channel.** A shipped profile that stops verifying in the field is simply
-  a non-match. Fetching profile updates, or reporting match failures, would be egress
-  and is barred by D1.
-
-### Shipped seed profiles
-
-The shipped half of D14's two provenances is a versioned asset authored under the
-existing [fixture and corpus sourcing rules](#fixture-and-corpus-sourcing-rulesnon-negotiable),
-which it does not bend:
-
-- Authored **only** from Task 0.5a training labs. Never inspect the sealed holdout to
-  author or tune a profile, exactly as with registry aliases.
-- The committed asset carries hashes, geometry and role maps — no document text and no
-  values — so nothing readable and real-report-derived is committed. It is still
-  real-report-derived and is reviewed under the same redaction discipline as parser
-  fixtures.
-- The asset lives at `src/domain/templateSeed.ts`, exporting `SEED_TEMPLATE_PROFILES`
-  and `TEMPLATE_PROFILES_VERSION`. The version is incremented once per merged change
-  set and the corpus template check re-run, mirroring `REGISTRY_VERSION` handling in
-  Task 2.5r.
-
----
-
 ## The `.medigraph` file format
 
 ```json
@@ -2308,11 +2185,9 @@ spec is ambiguous, stop and comment on the issue instead of choosing."_
 | 0.2  | **Implement provisional contracts.** Create `types.ts` exactly from “Field-level contracts”. Define Zod schemas for the persisted `ReferenceRange`, `CollectedAt`, `Measurement`, `Report` and `Profile` graph, derive those exported TypeScript types with `z.infer`, and expose structural/semantic `validateProfile(x: unknown): Profile` plus the separate D7 `assertProfileSafe(profile: Profile): void`. Validate finite numbers, coordinate bounds, discriminated ranges, ids, timestamps, uniqueness, cardinality, status/value consistency and free-text policy.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Contract tests cover Medigraph-specific refinements and representative schema boundaries without retesting Zod’s built-in primitive checks. These shapes freeze only after 3.8, not here.                                                                        |
 | 0.3  | **Synthetic/redacted seed fixtures.** Build content-equivalent synthetic PDFs and hand-checked TextItem/expected JSON; do **not** copy the identifying root PDFs. Correct mapping: `MedilabRslt29384Page2.pdf` is the 25-marker **biochemistry** layout; `Page3.pdf` is the multi-region **haematology/CBC** layout. Commit only `fixtures/seed/biochemistry.{pdf,textitems.json,expected.json}` and `haematology.{pdf,textitems.json,expected.json}` with specimen identity and content-based names. Include fragmented and whole-line versions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | No real identity substring or document metadata survives. Expected output includes dates, comparators, missing status, retained ranges and SourceRefs. Human/capable-model task.                                                                                 |
 | 0.4  | **Static security foundation—not the final privacy E2E.** Self-host every browser byte under `public/`. There is **no** generated asset manifest and **no** generated CSP hash list: the policy is a committed static string. Commit `_headers` with CSP `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'`. `connect-src` carries D1's origin allowlist and is `'self'` alone in v1; adding an origin edits this one line. Set `build.inlineStylesheets: 'never'` so component `<style>` blocks always emit as external `'self'` stylesheets and no style hash is ever required. Emit no inline `<script>`, so `script-src` needs no hash, nonce, `'unsafe-inline'` or `'unsafe-hashes'`. `style-src-attr 'unsafe-inline'` is the deliberate, scoped exception recorded in [ADR-0008](adr/0008-csp-style-attribute-amendment.md); record which target browsers honour `style-src-attr` and which fall back to `style-src`. Add COOP `same-origin`, COEP `require-corp`, CORP `same-origin`, `Referrer-Policy: no-referrer`, HSTS, `X-Content-Type-Options: nosniff`, and a Permissions Policy allowing only same-origin camera while disabling microphone/geolocation/payment/USB. | A built-app Playwright smoke test boots under the delivered headers and finds no undeclared origin. COOP/COEP cost nothing once every asset is same-origin and give Task 3.3 `crossOriginIsolated` for WASM threads. Full workflow egress testing waits for 5.2. |
-| 0.5a | **Parser corpus.** Collect hand-checked TextItem + expected fixtures from ≥8 Greek labs, covering fragmented and whole-line text, diverse layouts and all date/range cases. Reserve at least one lab as a blind holdout: its labels and expected output may not be used to author aliases or thresholds before the first release score is recorded.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Measures parser/registry behavior without pretending to test OCR. Human/capable-model task.                                                                                                                                                                      |
-| 0.5b | **Real OCR corpus.** From public specimen or wholly synthetic documents, commit source images/scanned PDFs plus expected rows for ≥3 labs, each with a clean scan and at least two phone-photo variants (skew, shadow, perspective or blur). Keep OCR output as a generated test artifact, not the authored input. Include one lab not used to tune preprocessing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Exercises image→preprocess→detection→recognition→parse, including real box geometry. Human/capable-model task.                                                                                                                                                   |
+| 0.5a | **ΑΗΦΥ corpus.** Hand-checked TextItem + expected fixtures from every ΑΗΦΥ document supplied, one directory per issuing laboratory. Cover the observed content dialects: Greek-name labels, bare Latin-code labels, comma and period decimals, unit-inside-range, `(LABEL …)` structural rows and the qualitative urine panel. Redacted TextItems only; never commit a source document. Hold one entire issuing laboratory blind.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Measures parser/registry behavior without pretending to test OCR. Human/capable-model task.                                                                                                                                                                      |
 | 0.5c | **ΚΕΟΚΕΕ marker seed list (capable model/human).** Fetch ΚΕΟΚΕΕ v5 XLSX from the Ministry of Health, verify the recorded sha256, and extract categories 11, 12, 13 and 18 into a committed reviewable TSV under `fixtures/registry-seed/` with columns `grCode, en, abbreviation, el, otherName`. Do **not** emit `MarkerDef`s and do **not** match seed rows to markers automatically — this task produces the _sourced vocabulary_ that alias rule 4(b) requires, nothing more. Record in the issue that ΚΕΟΚΕΕ omits all CBC indices (MCV, MCH, MCHC, RDW, PDW, MPV, WBC, differential) because it is an ordering nomenclature, so `haematology.ts` is corpus-authored.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Pass/fail: the committed TSV has ≥890 rows, every row carries a `grCode` matching `^1[1238](\.\d+){4}$`, and a spot-check of 20 rows against the source file matches byte-for-byte. Feeds 1.6b-core and 2.5r.                                                    |
 | 0.6  | **Metric definitions and generic scorer.** Implement fixture-schema validation and pure `score(expected, actual)` for marker recall, value/comparator precision, unit precision and range precision, grouped per lab and aggregate. It accepts supplied predictions and has no dependency on `extract.ts`; Task 2.5b wires the parser into it.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Metric denominator, numeric tolerance and missing/comparator behavior have golden tests, breaking the old scorer↔extract cycle.                                                                                                                                  |
-| 0.7  | **E1 feasibility spike (capable model/human; start with 0.5b).** Compare PP-OCRv5 Greek ONNX against `tesseract.js` `ell+eng` on a small 0.5b sample in Chromium and Safari. For PP-OCR, prove conversion, dictionary wiring, det+rec, confidence and coordinate normalization behind 0.4 headers. Store candidate bytes locally and record exact checksums, first/steady latency and failures in ADR-0003.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Select one `OcrEngine` or update D3/ADR to the fallback **before** Wave 3. No CDN/HF runtime option. This is feasibility evidence, not the E1 release gate.                                                                                                      |
 
 Task 0.6 creates `src/domain/scorer.ts` and `src/domain/scorer.test.ts`; its proof is
 `pnpm vitest run src/domain/scorer.test.ts`. Task 2.5b creates
@@ -2322,68 +2197,32 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 
 #### Fixture and corpus sourcing rules—non-negotiable
 
-- **Prefer published specimen reports where they exist — but do not assume they do.**
-  A synthetic, already-public _υπόδειγμα αποτελεσμάτων_ remains the ideal source. The
-  earlier claim that most Greek labs publish one is **not supported**: a search across
-  seven angles on 2026-09-01 — Greek specimen phrasing, the named private chains
-  (Affidea, Euromedica, Bioclinic, BIOanalysis), `filetype:pdf` specimen queries, the
-  LIS vendors' own sites (CCS MediLab, INFOMED sLis, Ilyda Bio-Diagnosis, Gi-Net),
-  ΕΣΥΔ/ISO 15189 quality material, patient-education pages and demo accounts — found
-  none. Greek labs deliver results through patient portals rather than publishing
-  sample PDFs, and vendor sites carry marketing copy with no example output. Treat a
-  published specimen as a lucky find, not a plan.
-- **Do not hunt the open web for real result PDFs.** Queries shaped to match printed
-  report text would surface real people's health data. That is not a permitted fixture
-  source at any redaction level, and looking is itself the wrong act.
-- **The national repository is the realistic route to breadth.** Greek lab results from
-  every public and private facility land in the ΑΗΦΥ digital repository, retrievable by
-  the patient at `myhealth.gov.gr` with Taxisnet, ΑΜΚΑ and an OTP. A user can therefore
-  obtain their own multi-lab history from one place. That makes it both a corpus route
-  — with the same redaction rules, and only ever someone's own records, supplied
-  deliberately — and a product observation worth carrying into E0 work, since a
-  repository-issued PDF may have a national layout worth recognising ahead of any
-  single lab's.
-- **Any real-report-derived text must be redacted before commit**—name, AMKA, patient
-  id, doctor, address, phone, barcode and accession id. Redact expected JSON and
-  metadata, not just visible pixels.
-- **Never commit a real patient's PDF to this repository.** For real-report-derived
-  parser fixtures, commit only redacted TextItems. OCR source images/PDFs must be
-  public specimens or generated synthetic documents, never redacted real reports
-  whose underlying text layer/metadata may still identify someone.
-- The `corpus/greek-labs/` inputs contain identifying text — patient names, ΑΜΚΑ, birth
-  dates and order ids. They are private reference inputs only and the directory is
-  gitignored: do not commit, copy, publish or use them directly in tests. Task 0.3
-  recreates the useful layouts with synthetic identity and values, working from
-  `MedilabRslt9760Page2.pdf` (the 25-marker biochemistry layout) and
-  `MedilabRslt9760Page3.pdf` (multi-region haematology/CBC). Any `MedilabRslt<N>Page2`
-  and `Page3` pair is an equivalent source: that report's three-page layout — urine,
-  biochemistry, haematology — is fixed across instances, and only values and identity
-  differ.
-- **Target template diversity, not lab count.** Parser difficulty tracks the report
-  _template_ — column roles, header wording, sectioning, gutters — not the issuer, and
-  one issuer routinely ships several unrelated templates (D14). Cover single-column,
-  multi-column, sectioned, units-in-own-column, units-glued, range-absent and
-  whole-line OCR geometry.
-- **Floor: at least four issuers and at least nine distinct templates**, with one
-  entire issuer sealed as the blind holdout. This is a **reduction** from the original
-  "at least eight Greek labs", made on 2026-09-01 because the specimen-report premise
-  above proved false and no eighth lab is obtainable without new material from a user.
-  It is a floor, not a target: raise it toward eight issuers as ΑΗΦΥ-sourced or
-  specimen material arrives, and re-seal the holdout with a new unseen issuer before
-  each tuning cycle. Note the cost honestly — with four issuers the per-lab floors in
-  Task 2.5c rest on three training issuers, so generalisation evidence is thinner than
-  the original floor intended and the holdout result carries correspondingly more
-  weight.
-- Parser and OCR corpora are separate. Registry authors may inspect parser training
-  fixtures only; OCR tuning may not rewrite expected values or consume its held-out
-  lab. After the first release score, freeze that holdout as regression data and add
-  a new unseen lab before the next tuning cycle.
+- **The corpus is ΑΗΦΥ documents, supplied by their own subject.** There is no lab
+  sourcing problem any more: a user retrieves their own history from `myhealth.gov.gr`
+  and supplies it deliberately. Never harvest lab documents from the web — such
+  material is other people's health data, and looking for it is itself the wrong act.
+- **Never commit a source document.** ΑΗΦΥ documents contain ΑΜΚΑ, patient and doctor
+  names and order ids. They are private reference inputs, `corpus/` is gitignored, and
+  only **redacted TextItems** are committed as fixtures. Redact expected JSON and
+  metadata, not just visible text.
+- **Diversity now means issuing laboratories, not layouts.** The template is constant;
+  what varies is each laboratory's cell content. Target coverage of the observed
+  dialects — Greek-name labels, bare Latin-code labels, comma and period decimals,
+  units inside the range column, `(LABEL …)` structural rows, and the qualitative urine
+  panel — rather than a count of documents.
+- **Floor: at least three issuing laboratories**, with one held out blind. This is what
+  the supplied documents currently provide. It is a floor, not a target: every further
+  laboratory is a new content dialect and raises registry and unit coverage, which is
+  now the only axis on which extraction quality varies. Raise it as documents arrive.
+- Registry authors may inspect training fixtures only. After the first release score,
+  freeze the holdout as regression data and add a new unseen laboratory before the next
+  tuning cycle.
 - Parser fixtures use
-  `fixtures/parser/{training,holdout}/<lab>/{textitems.json,expected.json}`. OCR
-  fixtures use `fixtures/ocr/{training,holdout}/<lab>/expected.json` plus source
-  images/scanned PDFs under that lab's `sources/` directory. `<lab>` is a stable,
-  content-based slug; each lab is wholly in training or holdout, never split between
-  both. OCR observations are generated during tests and are never committed.
+  `fixtures/parser/{training,holdout}/<lab>/{textitems.json,expected.json}`, where
+  `<lab>` is a stable content-based slug of the issuing laboratory. Each laboratory is
+  wholly in training or holdout, never split between both.
+- Task 0.3 recreates synthetic ΑΗΦΥ documents — correct template, synthetic identity and
+  values — for the end-to-end tests, since no real document may be committed.
 
 ### Wave 1 — pure domain (parallel only where dependencies permit)
 
@@ -2410,21 +2249,17 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 
 ### Wave 2 — pipeline
 
-| #    | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Depends on                |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                                                                                                                                                                                                                                                                         | 1.1, 1.6a, 1.6b-core, 1.8 |
-| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions and range/value disambiguation                                                                                                                                                                                                                                                                                                                                                                                                                           | 2.1, 1.2–1.4              |
-| 2.3  | `columns.ts` — **Pass B** column model                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 1.8, 0.3                  |
-| 2.4  | `grammar.ts` — **Pass B** whole-line/fragmented grammar and nine ordered rules                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 1.1–1.4, 2.3              |
-| 2.5a | `extract.ts` core — date/identifier passes, both measurement passes, reconciliation, flags/confidence and `unrecognised[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 2.1–2.4, 1.5, 1.7         |
-| 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                                                                                                                                                                                                                                                           | 2.5a, 0.5a, 0.6           |
-| 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel.                                                                                                                                                                                                                                            | 1.6b-core, 0.5a, 2.5b     |
-| 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | 2.5r                      |
-| 2.6  | `profile.ts` — proposed groups, explicit report construction, mandatory conflict resolution, same-person append, id-based profile merge, and `panelHint` as an additional grouping signal                                                                                                                                                                                                                                                                                                                                                                                  | 2.5a, 1.6b-core, 1.9      |
-| 2.7  | `series.ts` — ordering, canonical target units, range co-conversion, native preservation, explicit gaps and unit splits                                                                                                                                                                                                                                                                                                                                                                                                                                                    | 2.6, 1.4                  |
-| 2.8  | `templates.ts` — **Pass T**. Fingerprint components, hashed token sets, per-component Jaccard matching and thresholds, tie-is-a-non-match, fail-closed T2 structural verification, and T3 application of column roles, date kind, identifier zones and standing false positives. Unit tests must include a mismatch fixture proving a failed verification applies nothing at all.                                                                                                                                                                                          | 2.3, 2.5a, 1.8            |
-| 2.8b | `pnpm corpus:templates` — fingerprint every page of the corpus and assert the separation claim: at least nine distinct profiles across the four issuers, and **zero** cross-template matches. Two same-lab pairs are named cases: Iatrokosmos haematology against Iatrokosmos biochemistry, which differ only in header wording (`Τιμές Αναφοράς` against `Φυσιολογικές Τιμές`) and band geometry, and Galinos biochemistry against Galinos haematology. **This task can falsify the feature**: if the fingerprint cannot separate them cleanly, 2.9 and 4.2b do not ship. | 2.8, 0.5a                 |
-| 2.9  | Author the shipped seed template profile asset from Task 0.5a training labs only; hashes, geometry and role maps, no document text and no values; `TEMPLATE_PROFILES_VERSION` incremented once per merged change set. Curation is human/capable-model work and uses `ready-for-human`.                                                                                                                                                                                                                                                                                     | 2.8b, 0.5a                |
+| #    | Task                                                                                                                                                                                                                                                                                                                                | Depends on                |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                                  | 1.1, 1.6a, 1.6b-core, 1.8 |
+| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions and range/value disambiguation                                                                                                                                                                                    | 2.1, 1.2–1.4              |
+| 2.5a | `extract.ts` core — date/identifier passes, both measurement passes, reconciliation, flags/confidence and `unrecognised[]`                                                                                                                                                                                                          | 2.1, 1.5, 1.7             |
+| 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                    | 2.5a, 0.5a, 0.6           |
+| 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel.     | 1.6b-core, 0.5a, 2.5b     |
+| 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors                                                                                                                                                                                                                               | 2.5r                      |
+| 2.6  | `profile.ts` — proposed groups, explicit report construction, mandatory conflict resolution, same-person append, id-based profile merge, and `panelHint` as an additional grouping signal                                                                                                                                           | 2.5a, 1.6b-core, 1.9      |
+| 2.7  | `series.ts` — ordering, canonical target units, range co-conversion, native preservation, explicit gaps and unit splits                                                                                                                                                                                                             | 2.6, 1.4                  |
+| 2.8  | `ahfyDocument.ts` — **Pass V**. Validate title, the twelve metadata labels and the five-column header after `text.ts` normalisation; reject non-ΑΗΦΥ sources with a clear reason; bind column roles, collection date, identifier positions, issuing laboratory and section titles; classify all-empty-cell rows as section markers. | 2.5a, 1.8                 |
 
 Task 2.5r expands to one issue for each registry file:
 `haematology.ts`, `biochemistry.ts`, `lipids.ts`, `hormones.ts`, `vitamins.ts`,
@@ -2433,8 +2268,8 @@ depends on 1.6b-core, 0.5a and 2.5b. The `index.ts` issue additionally depends o
 eight panel issues, and 2.5c depends on the `index.ts` issue. Registry curation and
 version coordination are human/capable-model work and use `ready-for-human`.
 
-Tasks 2.8, 2.8b and 2.9 are the Pass T chain and are independent of the 2.5r registry
-chain; 2.8b gates 2.9, and a failure there ends the chain rather than downgrading it.
+Task 2.8 (Pass V) gates every parsing task, because no row may be read from a source
+that has not been validated. It is independent of the 2.5r registry chain.
 
 **Acceptance for 2.2 (Pass A alone, no layout analysis):** on
 `fixtures/seed/biochemistry.textitems.json`, all 25 markers with `D-Dimers` as
@@ -2467,19 +2302,14 @@ date/source ordering. No Series contains more than one normalised unit.
 
 ### Wave 3 — I/O adapters
 
-| #    | Task                                                                                                                                                                                                                                                                                                                                      | Depends on          | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 3.1  | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip; self-host the packaged worker under `public/pdf/`                                                                                                                                                                                                  | 0.1–0.4             | Test against the synthetic PDFs, including text order and page dimensions.                                                                                                                                                                                                                                                                                                                                                           |
-| 3.2  | `pdfRaster.ts` — render one page at a bounded scale to `ImageBitmap`; close each bitmap after that page is recognised                                                                                                                                                                                                                     | 0.1, 0.3            | Process sequentially to cap memory; never cache or persist pixels.                                                                                                                                                                                                                                                                                                                                                                   |
-| 3.3  | `OcrEngine` + `ocr.ts` — implement exactly the engine selected by 0.7, emitting line TextItems with confidence and normalised boxes                                                                                                                                                                                                       | 0.2, 0.4, 0.7       | Self-host the model, dictionary and WASM bytes under `public/`; no `assetLoader` indirection and no hash manifest. Use SIMD; use threads only when `crossOriginIsolated`, with a tested single-thread fallback. WebGPU may be attempted, but WASM fallback is mandatory. Do not substitute PP-OCRv6 (no Greek).                                                                                                                      |
-| 3.3b | `preprocess.ts` — EXIF orientation, bounded downscale, perspective/deskew and empirically selected thresholding                                                                                                                                                                                                                           | 0.5b, 0.7, 3.3      | Capable-model task. Every option is measured on 0.5b; defaults may improve scores but may not lower any held-out metric. Preserve an “original” retry path.                                                                                                                                                                                                                                                                          |
-| 3.4  | `fileRouter.ts` — route each PDF page independently. A text layer is usable when it has ≥20 letters, ≥2 standalone numeric tokens and either a known anchor or a measurement-shaped row; otherwise raster/OCR that page. If E0 produces zero rows, automatically retry E1; review also exposes “retry this page with OCR”. Images use E1. | 2.5a, 3.1–3.3b      | Replaces the undefined `<5 rows` heuristic and handles hybrid PDFs/garbage text layers. Enforce 20 files, 100 total pages, 50 MiB per source and supported MIME/signature checks before decode. Return batch-scoped limit/cancel failures and source-scoped type/size/decode/OCR failures exactly as `RouteFailure`; successful siblings remain in `results`. Attach the Pass T template match, or its absence, to each routed page. |
-| 3.5  | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan                                                                                                                                                                                                   | 0.2, 2.6            | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI. Template profiles are excluded from the envelope on both export and import; a test asserts a round-trip carries none.                                                                      |
-| 3.6  | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result                                                                                                                                                                                  | 0.1, 0.2            | Store exactly one Profile and no drafts/evidence, plus the separate template profile store of Task 3.6a and nothing else. `clearAll` removes the database — template profile store included — and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps.                                                                                                                                       |
-| 3.6a | Template profile store — bounded record count and byte size, hashes and geometry only, the two-confirmations-before-applied learning rule, correction-resets-count, and `clearAll` coverage                                                                                                                                               | 3.6, 2.8            | Amends D8 per ADR-0012. A test asserts no readable document text, no value, no date and no identifier can reach this store, and that a stored profile is not reversible into report text.                                                                                                                                                                                                                                            |
-| 3.7  | `sw.js` — versioned cache of an explicit, committed app/model asset list only; cache-first exact-path lookup after first visit                                                                                                                                                                                                            | 0.4, 3.3            | Never cache navigations with user data, blob/data URLs, source files or arbitrary request URLs. No push, background/periodic sync or dynamic `importScripts`. Cross-origin requests only for origins in D1's `connect-src` allowlist (none in v1). Scope to the app; upgrades remove old asset caches. E1 remains usable offline after assets were first fetched.                                                                    |
-| 3.8  | **E0 and E1 walking slices + contract freeze.** Through the minimal `MedigraphApp` shell, run one synthetic PDF and one corpus image from attach → ExtractionResult → source-aware review → explicit Confirm → Profile/Series → IndexedDB → panel/trend primitive → plaintext export/import.                                              | 2.5c–2.7, 3.1–3.7   | Both slices pass under production CSP and with no test-only adapters. Assert `registryVersion` in every ExtractionResult and fixture. Resolve any contract mismatch in this plan, then mark `types.ts` frozen. Do this before broad UI component work.                                                                                                                                                                               |
-| 3.9  | **E1 quality gate.** `pnpm ocr:score` runs source images through preprocessing, actual OCR and parser; it never consumes committed OCR TextItems.                                                                                                                                                                                         | 0.5b, 2.5c, 3.3–3.4 | Aggregate recall ≥90%, value precision ≥99%, unit/range precision ≥90%; every OCR lab recall ≥85%, value precision ≥98% and unit/range precision ≥80%, including the untouched OCR holdout. If not, E1 is labelled assisted/beta and the failed dimensions are recorded; do not tune expected data.                                                                                                                                  |
+| #   | Task                                                                                                                                                                                                                                                                                                         | Depends on        | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 3.1 | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip; self-host the packaged worker under `public/pdf/`                                                                                                                                                                     | 0.1–0.4           | Test against the synthetic PDFs, including text order and page dimensions.                                                                                                                                                                                                                                                                                                                                                           |
+| 3.4 | `fileRouter.ts` — accept PDFs only, enforce 20 files, 100 total pages and 50 MiB per source with MIME/signature checks before decode, then run Pass V per source. A source failing validation is a source-scoped `RouteFailure` naming the accepted document class; successful siblings remain in `results`. | 2.5a, 3.1         | Replaces the undefined `<5 rows` heuristic and handles hybrid PDFs/garbage text layers. Enforce 20 files, 100 total pages, 50 MiB per source and supported MIME/signature checks before decode. Return batch-scoped limit/cancel failures and source-scoped type/size/decode/OCR failures exactly as `RouteFailure`; successful siblings remain in `results`. Attach the Pass T template match, or its absence, to each routed page. |
+| 3.5 | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan                                                                                                                                                                      | 0.2, 2.6          | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI. Template profiles are excluded from the envelope on both export and import; a test asserts a round-trip carries none.                                                                      |
+| 3.6 | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result                                                                                                                                                     | 0.1, 0.2          | Store exactly one Profile and no drafts/evidence, plus the separate template profile store of Task 3.6a and nothing else. `clearAll` removes the database — template profile store included — and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps.                                                                                                                                       |
+| 3.7 | `sw.js` — versioned cache of an explicit, committed app asset list only; cache-first exact-path lookup after first visit                                                                                                                                                                                     | 0.4               | Never cache navigations with user data, blob/data URLs, source files or arbitrary request URLs. No push, background/periodic sync or dynamic `importScripts`. Cross-origin requests only for origins in D1's `connect-src` allowlist (none in v1). Scope to the app; upgrades remove old asset caches. E1 remains usable offline after assets were first fetched.                                                                    |
+| 3.8 | **E0 walking slice + contract freeze.** Through the minimal `MedigraphApp` shell, run one synthetic ΑΗΦΥ document and one rejected non-ΑΗΦΥ PDF from attach → ExtractionResult → source-aware review → explicit Confirm → Profile/Series → IndexedDB → panel/trend primitive → plaintext export/import.      | 2.5c–2.7, 3.1–3.7 | Both slices pass under production CSP and with no test-only adapters. Assert `registryVersion` in every ExtractionResult and fixture. Resolve any contract mismatch in this plan, then mark `types.ts` frozen. Do this before broad UI component work.                                                                                                                                                                               |
 
 **Pinned Wave 3 browser boundaries.** `rasterisePdfPage` targets 2 CSS pixels per PDF
 point, then scales down as needed so the output is at most 3,000 pixels on its longest
@@ -2493,7 +2323,7 @@ browser boolean otherwise, and persistence denial never blocks saving.
 
 The service worker's explicit source of truth is the manually reviewed
 `public/app-assets.json`. It lists exact same-origin URL paths for the app shell,
-hashed JS/CSS output, pdf.js worker and selected OCR runtime/model/dictionary bytes.
+hashed JS/CSS output and the pdf.js worker bytes.
 Task 3.7 updates it after inspecting a deterministic production build; no build step
 generates or mutates it. Tests fail when a listed path is absent from `dist/`, when a
 required runtime path is missing, or when an unlisted request is added to the cache.
@@ -2525,25 +2355,23 @@ every bitmap and clears the map.
 
 **Wave 4 dependencies.** Task 4.0 depends on 0.2, 1.9, 2.6, 3.4–3.6 and 3.8. Task
 4.1 depends on 4.0 and 3.4. Task 4.2 depends on 4.0, 1.9, 2.6 and 3.8; 4.2a depends
-on 4.2, and 4.2b depends on 4.2a, 2.8 and 3.6a. Task 4.3 depends on 4.0, 2.7 and 3.8; 4.4 depends on 4.3 and 2.7. Task 4.5
+on 4.2, and 4.2b depends on 4.2a and 2.8. Task 4.3 depends on 4.0, 2.7 and 3.8; 4.4 depends on 4.3 and 2.7. Task 4.5
 depends on 4.0, 2.6 and 3.5–3.7. Task 4.6 depends on 0.4 and all Tasks 4.0–4.5,
 including 4.2a, 4.2b and 4.4.
 
 ### Wave 5 — hardening
 
-| #   | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 5.1 | Happy-path Playwright E2E: attach both synthetic seed PDFs → confirm one proposed group/date → resolve review → one Report with 25+ markers → panel → ferritin trend → plaintext export → clear/reload → import preview → identical Profile                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 5.2 | **D1 egress regression (slim).** Run 5.1 and a real E1 fixture. Assert that every network request targets an origin in the `connect-src` allowlist — `'self'` alone in v1, so any third-party request fails until it is declared — and that every request to a non-`self` origin is a GET or HEAD with no query string, no request body and no app-set header. Instrument `WebSocket`, `EventSource`, `navigator.sendBeacon`, `<a ping>`, form navigation and `RTCPeerConnection` and assert they are never constructed or used; these are unconditional, with no allowlist escape, because none has an inbound-asset use case. Inspect IndexedDB (one Profile, nothing else) and Cache Storage (declared assets only). No canary seeding and no cold/warm/offline matrix. This is regression evidence against accidental egress, not proof against malicious same-origin code. |
-| 5.3 | Bundle budget: initial app route ≤150 KB gzip JS; pdf.js, OCR runtime and model bytes absent from the initial chunk and fetched only on their path. Assert the committed `_headers` CSP is byte-identical to the one the app is served under; there are no generated hashes and no manifest to enforce.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 5.4 | Accessibility: full keyboard review/panel traversal, focus restoration, 44 px targets, visible labels independent of colour, forced-colours, reduced motion, SVG figure naming, meter text alternatives, trend-table parity, the 4.2b provenance banner and its collapsed identifier disclosure, and axe pass in both themes/languages                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| 5.5 | **Mobile E1 release gate.** On a named mid-range Android and four-year-old iPhone, measure 0.5b pages on battery: first-fetch separately; steady-state median ≤15 s/page and no page >30 s, no OOM/crash, sequential-page resources released, and ≤512 MiB peak where measurable. If quality (3.9) or either-device gate fails after preprocessing/INT8 work, ship E1 as assisted/beta—not as the default—and keep all data local.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 5.6 | Safety/lifecycle E2E: no-date and ambiguous-date blocks; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states                                                                                                                                                                                                                                                                                                                                                                 |
+| #   | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 5.1 | Happy-path Playwright E2E: attach both synthetic seed PDFs → confirm one proposed group/date → resolve review → one Report with 25+ markers → panel → ferritin trend → plaintext export → clear/reload → import preview → identical Profile                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 5.2 | **D1 egress regression (slim).** Run 5.1 and a rejected non-ΑΗΦΥ source. Assert that every network request targets an origin in the `connect-src` allowlist — `'self'` alone in v1, so any third-party request fails until it is declared — and that every request to a non-`self` origin is a GET or HEAD with no query string, no request body and no app-set header. Instrument `WebSocket`, `EventSource`, `navigator.sendBeacon`, `<a ping>`, form navigation and `RTCPeerConnection` and assert they are never constructed or used; these are unconditional, with no allowlist escape, because none has an inbound-asset use case. Inspect IndexedDB (one Profile, nothing else) and Cache Storage (declared assets only). No canary seeding and no cold/warm/offline matrix. This is regression evidence against accidental egress, not proof against malicious same-origin code. |
+| 5.3 | Bundle budget: initial app route ≤150 KB gzip JS; pdf.js bytes absent from the initial chunk and fetched only on their path. Assert the committed `_headers` CSP is byte-identical to the one the app is served under; there are no generated hashes and no manifest to enforce.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 5.4 | Accessibility: full keyboard review/panel traversal, focus restoration, 44 px targets, visible labels independent of colour, forced-colours, reduced motion, SVG figure naming, meter text alternatives, trend-table parity, the 4.2b provenance banner and its collapsed identifier disclosure, and axe pass in both themes/languages                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 5.6 | Safety/lifecycle E2E: no-date and ambiguous-date blocks; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states                                                                                                                                                                                                                                                                                                                                                                          |
 
 **Wave 5 dependencies.** Task 5.1 depends on 0.3, 3.8 and 4.6. Task 5.2 depends on
-0.4, 0.5b, 3.7, 3.9 and 5.1. Task 5.3 depends on 0.4, 3.3 and 4.6. Task 5.4 depends
-on 4.2, 4.2a, 4.2b, 4.3, 4.4 and 4.6. Task 5.5 depends on 0.5b, 3.3, 3.3b, 3.9 and 4.6;
-it is a human device-lab task and uses `ready-for-human`. Task 5.6 depends on 2.6,
+0.4, 3.7 and 5.1. Task 5.3 depends on 0.4 and 4.6. Task 5.4 depends
+on 4.2, 4.2a, 4.2b, 4.3, 4.4 and 4.6. Task 5.6 depends on 2.6,
 2.7, 3.5, 3.6, 4.2–4.5 and 5.1.
 
 ---
@@ -2559,8 +2387,7 @@ formatting or lint failure stops the pipeline before Vitest and Playwright run.
 
 **Unit/integration.** `pnpm vitest run` covers every pure domain table, profile
 validator/safety boundary, merge transaction and file-format negative path. Seed and
-parser-corpus tests consume TextItems. OCR tests never do: they begin with committed
-images/scanned PDFs and generate observations during the run.
+parser-corpus tests consume committed redacted TextItems.
 
 **Metric semantics.** An expected marker contributes once to recall. Match rows
 one-to-one by marker key; every emitted row contributes once to value precision, and
@@ -2578,30 +2405,19 @@ comparator and every bound within tolerance. Missing rows match only
 normally. Scores print integer numerator/denominator as well as percentages so small
 labs cannot hide behind rounding.
 
-**Parser gate.** `pnpm corpus:score` runs the hand-checked TextItem corpus at the
-2.5c aggregate/per-lab floors, with Pass B both enabled and disabled. The first blind
-holdout result is recorded before anyone examines misses or adds aliases. If Pass A
-falls below its floor, improve registry/anchoring rather than making layout parsing
-primary. CI subsequently prevents regression below the committed floors.
+**Parser gate.** `pnpm corpus:score` runs the hand-checked TextItem corpus at the 2.5c
+aggregate and per-laboratory floors. The first blind holdout result is recorded before
+anyone examines misses or adds aliases. Per-laboratory scoring is now the load-bearing
+axis: the template is constant, so a score that varies between laboratories is telling
+you about registry and unit coverage, which is exactly what needs improving. CI
+subsequently prevents regression below the committed floors.
 
-**Template gate.** `pnpm corpus:templates` fingerprints every corpus page and asserts
-the separation claim Pass T rests on: at least nine distinct profiles across the four
-issuers, and zero cross-template matches. Two same-lab pairs are named, both identical
-in masthead, generator and lab: Iatrokosmos haematology against Iatrokosmos
-biochemistry, which differ only in header wording and band geometry and are the tightest
-pair available, and Galinos biochemistry against Galinos haematology. A
-cross-template false match is a release blocker rather than a tuning target, because
-its product consequence is a report parsed under the wrong column roles. The check also
-asserts that no fingerprint component contains readable document text. Pass T is
-excluded from `pnpm corpus:score`: the parser floors are measured with template priors
-absent, so Pass A's scores stay honest and Pass T can never flatter them.
-
-**OCR gate.** `pnpm ocr:score` separately runs 0.5b from source pixels through the
-selected engine and parser at the 3.9 floors. Report detection/recognition failures,
-parser failures and registry misses separately. Tune preprocessing/recognition only
-on training labs, then run the untouched OCR holdout once. Failing quality or Task
-5.5 device limits changes the E1 product label to assisted/beta; it does not justify
-a hidden upload path.
+**Validation gate.** Every ΑΗΦΥ document in the corpus must pass Pass V, and a set of
+negative fixtures must fail it: a non-ΑΗΦΥ lab PDF, a document missing one metadata
+label, and one whose table header wording differs. Acceptance of a non-ΑΗΦΥ source is a
+release blocker, because its consequence is a document parsed under column roles it does
+not have. Validation runs inside `pnpm corpus:score`, since it is a gate rather than a
+prior and no score is meaningful without it.
 
 **End-to-end.** `pnpm playwright test` runs 5.1, 5.2 and 5.6 against the exact static
 build under production headers. Tests inspect the actual `.medigraph` download and
@@ -2609,7 +2425,7 @@ browser stores, not an in-memory substitute.
 
 **Privacy evidence and its limit.** Task 5.2 checks that every request targets a
 declared `connect-src` origin, that non-`self` requests carry no query, body or
-app-set header, and that the banned outbound APIs are never used, across E0 and E1.
+app-set header, and that the banned outbound APIs are never used.
 Any mismatch blocks release. This demonstrates the built app's exercised behavior; it
 cannot prove that malicious same-origin code with memory access is safe. Pinned
 dependencies, lockfile review, CSP and XSS prevention are therefore part of the same
@@ -2623,6 +2439,13 @@ and the plaintext warning. Record device/browser versions and observations.
 ---
 
 ## Appendix — OCR / vision-model research (rev. Aug 2026)
+
+> **Historical.** This appendix is retained as the record of why an OCR tier was once
+> planned and why no vision model was ever accepted. It no longer describes the build:
+> ADR-0013 restricted input to ΑΗΦΥ documents, which always carry a text layer, and
+> deleted E1 outright. Its conclusions about generative extraction still hold and still
+> bar E2 in either form; its comparisons of OCR engines are moot. Do not implement from
+> it.
 
 The original version of this appendix asked "which vision model can we self-host for
 Greek lab reports on a €4.54/mo OVH VPS-1?" and answered "none, and we don't need
@@ -2815,11 +2638,19 @@ rounding error and "a VPS" was never the right question.
 
 ## Known risks
 
-- **OCR quality and latency on photos remain the weakest product path.** Published
-  character accuracy is not report-level value precision. Skew, shadows and dense
-  tables can defeat either candidate. The image corpus, pleasant source-aware review,
-  explicit E1 label and supported-phone gates are mandatory; model branding is not
-  evidence.
+- **Everything now rests on one source class, and we do not control it.** The
+  repository can change its template, its field labels or its table headings without
+  notice, and a change breaks Pass V for every user at once with no fallback path —
+  E1 is deleted, so there is no second way to read a document. Validation fails closed
+  and says so, which is the right failure, but the product is unusable until the
+  template is updated and shipped. Keep Pass V's expectations in one place, keep the
+  rejection message honest about what happened, and treat a repository redesign as a
+  release-blocking incident rather than a bug.
+- **A user's paper history is now out of reach.** Deleting E1 means photographs and
+  scans are refused. For results predating the repository, or held only on paper, the
+  answer is "Medigraph cannot read this" — a real loss of scope, accepted knowingly.
+  The attach-time rejection must say what is accepted and where to get it, never imply
+  the document is defective.
 - **Same-origin software is the privacy trust boundary.** A malicious bundled script
   that can read memory can attempt many egress channels. Self-hosting, lockfile
   review, strict CSP, no raw HTML, safe text rendering and the Task 5.2 regression
@@ -2853,32 +2684,24 @@ rounding error and "a VPS" was never the right question.
 - **Anonymous single-Profile storage can still mix people.** The same-person gate is
   explicit but cannot be verified without storing identity. Never auto-append/import;
   make Replace/Merge and report counts visible, and preserve cancellation.
-- **Guard the D4 seam even though no E2 tier is implemented.** Optional source evidence
-  must not become a required pdf.js/OCR object, and direct-row adapters must still
-  satisfy date and identifier review contracts.
-- **Marker alignment across labs will occasionally be wrong.** v1 mitigation is
-  canonical-marker reassignment in review. A post-confirm “merge series” flow remains
-  a possible v2 feature; it may not be simulated through unsafe aliases.
+- **Marker identity is now the whole extraction problem.** The same quantity arrives as
+  `Λευκά Αιμοσφαίρια (WBC) (WBC)`, `Λευκά αιμοσφαίρια (WBC) (WBC)` or bare `WBC (WBC)`,
+  and mixed-script labels are normal rather than corrupt. v1 mitigation is
+  canonical-marker reassignment in review; a post-confirm "merge series" flow remains a
+  possible v2 feature and may not be simulated through unsafe aliases.
+- **Unit notation varies more than the plan assumed.** One quantity appears as
+  `x10^3 / μL`, `k/ml` and `k/μl` across laboratories, and `k/μL` against `k/μl` within a
+  single document. `units.ts` folding and its explicit allowlist are load-bearing; an
+  unrecognised unit must flag rather than guess.
 - **A bad alias is worse than a missing one.** Keep sourced aliases, sectionHint-only
   T4 tie resolution, implausible flags and human registry review. Never tune aliases
   from the sealed holdout before its score is recorded.
-- **A falsely matched or stale template fails silently, which is the shape we most
-  dislike.** A wrong column-role pin produces well-formed rows with no flag raised, and
-  a lab that redesigns its form without changing its masthead is the realistic trigger.
-  The mitigations are structural: verification fails closed and applies nothing
-  partially, ties across profiles are non-matches, the corpus check treats a
-  cross-template match as a release blocker, review always shows the match and offers
-  review-from-scratch, and no template may suppress a flag or promote a confidence.
-  None of these is a proof — a template that verifies and is still wrong remains
-  possible, which is why the user still confirms.
-- **The corpus is thinner than the plan originally required, and that is a quality
-  risk, not just a schedule one.** The eight-lab floor became four issuers and nine
-  templates because published Greek specimen reports could not be found. Three training
-  issuers is a narrow base from which to claim the Task 2.5c per-lab floors generalise,
-  and the sealed holdout is now the only real evidence of generalisation. Do not treat
-  a passing score on this corpus as evidence the parser handles Greek labs in general;
-  widen the corpus before making that claim, and never widen it by relaxing the
-  redaction rules or by harvesting real reports from the web.
-- **Corpus acquisition is the schedule risk.** Start 0.5a/0.5b with scaffolding and
-  0.7. The identifying root PDFs are not fixtures; synthetic seed recreations unblock
-  domain work only after Task 0.3 completes.
+- **Three issuing laboratories is a narrow base.** The template is constant, so
+  layout generalisation is no longer a question; content generalisation is, and each new
+  laboratory is a new dialect of labels, decimal separators and unit notation. A passing
+  score on three laboratories is not evidence the parser handles the next one. Widen the
+  corpus as documents arrive, and never widen it by harvesting.
+- **Corpus acquisition still gates the schedule, but its shape changed.** Documents come
+  from users retrieving their own history, so the constraint is people supplying files
+  rather than labs publishing them. Start 0.5a with whatever documents exist and add
+  laboratories as they arrive.
