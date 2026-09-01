@@ -19,3 +19,7 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
+
+# pnpm 11 no longer reads save-exact from .npmrc; an empty save prefix is the
+# equivalent and keeps every dependency exactly pinned (see "Version pinning is exact").
+savePrefix: ""

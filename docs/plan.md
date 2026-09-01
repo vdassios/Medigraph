@@ -931,15 +931,30 @@ here is genuinely wrong, change this section first, then the code.
 
 ### Runtime and package manager baseline
 
-| Thing      | Pin                                                      | Declared in                                      | Why this value                                                                                                                                                                                                                                                                                                                 |
-| ---------- | -------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Node       | `24.20.0` in `.nvmrc`, `>=24.20.0 <25` in `engines.node` | `.nvmrc`, `engines.node`, CI `node-version-file` | The lowest line satisfying every tool below: `eslint-plugin-astro@3` needs `^22.22.3 \|\| ^24.16.0 \|\| >=26.3.0`, `lint-staged@17` needs `>=22.22.1`, `@eslint/json` and `@eslint/markdown` need `>=24`. Node 26 is `latest`, not LTS, until Oct 2026.                                                                        |
-| pnpm       | `11.24.0`                                                | `packageManager`, enabled via Corepack           | The project installs with **pnpm** (`engines.node >=22.13`, already satisfied). `pnpm-lock.yaml` is the single lockfile authority and is committed; `pnpm install --frozen-lockfile` is used everywhere non-interactive, so a lockfile that disagrees with `package.json` fails the build instead of being silently rewritten. |
-| TypeScript | `6.0.3`                                                  | `devDependencies`                                | `typescript-eslint@8.68.0` peer-supports `>=4.8.4 <6.1.0`. TypeScript 7 is `latest` on the registry but is **not** yet supported by typescript-eslint, so it is out of scope until that peer range moves.                                                                                                                      |
+| Thing         | Pin                                                      | Declared in                                      | Why this value                                                                                                                                                                                                                                                                                                                 |
+| ------------- | -------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node          | `24.20.0` in `.nvmrc`, `>=24.20.0 <25` in `engines.node` | `.nvmrc`, `engines.node`, CI `node-version-file` | The lowest line satisfying every tool below: `eslint-plugin-astro@3` needs `^22.22.3 \|\| ^24.16.0 \|\| >=26.3.0`, `lint-staged@17` needs `>=22.22.1`, `@eslint/json` and `@eslint/markdown` need `>=24`. Node 26 is `latest`, not LTS, until Oct 2026.                                                                        |
+| pnpm          | `11.24.0`                                                | `packageManager`, enabled via Corepack           | The project installs with **pnpm** (`engines.node >=22.13`, already satisfied). `pnpm-lock.yaml` is the single lockfile authority and is committed; `pnpm install --frozen-lockfile` is used everywhere non-interactive, so a lockfile that disagrees with `package.json` fails the build instead of being silently rewritten. |
+| `@types/node` | `24.13.3`                                                | `devDependencies`                                | Node type definitions for fixture tests that read committed data files. Tracks the **24.x** line to match the `>=24.20.0 <25` engine range and `.nvmrc`; `@types/node@26` is `latest` and would type-check APIs the pinned runtime does not have.                                                                              |
+| TypeScript    | `6.0.3`                                                  | `devDependencies`                                | `typescript-eslint@8.68.0` peer-supports `>=4.8.4 <6.1.0`. TypeScript 7 is `latest` on the registry but is **not** yet supported by typescript-eslint, so it is out of scope until that peer range moves.                                                                                                                      |
+
+**Adding dependencies needs no per-case approval.** Add what the work needs, subject to
+the constraints that follow — they are engineering rules, not an approval queue, and
+none of them is waived by this standing authorisation. A new dependency is pinned
+exactly, declared in the right list (`dependencies` only if it ships to the browser),
+self-hosted if it is a runtime asset (D1), counted against the Task 5.3 bundle budget,
+and reviewed as supply-chain surface: the Known Risks entry that calls same-origin
+software the privacy trust boundary applies to every package added under this rule.
+Anything that would introduce network egress, a build-time code fetch or a runtime
+third-party origin is still an ADR-level decision, not a dependency choice.
 
 **Version pinning is exact.** Every `devDependencies` entry is written without `^` or
-`~`, matching the existing "pin exact versions" rule in Architecture. Set
-`save-exact=true` in `.npmrc` (pnpm reads it) so this survives the next `pnpm add -D`. The formatter is
+`~`, matching the existing "pin exact versions" rule in Architecture. Enforce it with
+`savePrefix: ""` in `pnpm-workspace.yaml`. **`save-exact=true` in `.npmrc` does not work
+under pnpm 11** — `pnpm config get save-exact` returns `undefined` and `pnpm add -D`
+writes a caret regardless, the same migration that moved the `pnpm` package.json field
+into the workspace file. The `.npmrc` key is retained only for npm/yarn; keep the two in
+step. The formatter is
 the strictest case: an unpinned Prettier minor rewrites files across the whole tree,
 so a routine bump lands as an unreviewable diff and CI's `--check` stops agreeing
 with the developer's pre-commit hook. Bumps are deliberate commits that carry their
@@ -1992,7 +2007,8 @@ the only machine-readable release. Its columns map almost directly onto `MarkerD
 It holds 2,403 tests across 8 categories. Only four are quantitative markers a report
 plots over time — **11** Clinical chemistry (131 leaves), **12** Immunochemistry (328),
 **13** Haematology (270) and **18** Immunology (167): 896 tests, 435 carrying an
-abbreviation and 74 an alternative name. Categories 14–17 (cultures, infection
+abbreviation and 73 an alternative name (74 cells are non-empty, but
+`12.03.90.90.900` holds a single space; extraction trims, so whitespace-only is absent). Categories 14–17 (cultures, infection
 serology, genetics, cytology) are largely non-numeric and out of scope.
 
 **Two limits that decide how it may be used.**

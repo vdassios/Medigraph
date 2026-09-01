@@ -1,0 +1,897 @@
+grCode	en	abbreviation	el	otherName
+11.01.01.01.001	5'-Nucleotidase	NTP	5-ΝΟΥΚΛΕΟΤΙΔΑΣΗ	
+11.01.01.02.001	Acid Phosphatase	ACP	ΟΞΙΝΗ ΦΩΣΦΑΤΑΣΗ	
+11.01.01.03.001	Alanine Amino-Transferase	ALT/SGPT	ΑΜΙΝΟΤΡΑΝΣΦΕΡΑΣΗ ΑΛΑΝΙΝΗΣ	
+11.01.01.04.001	Aldolase	ALS	ΑΛΔΟΛΑΣΗ	
+11.01.01.05.001	Alkaline Phosphatase - Total	ALP/AP	ΑΛΚΑΛΙΚΗ ΦΩΣΦΑΤΑΣΗ	
+11.01.01.06.001	Alkaline Phosphatase Isoenzymes	iso-AP	ΙΣΟΕΝΖΥΜΑ ΑΛΚΑΛΙΚΗΣ ΦΩΣΦΑΤΑΣΗΣ	
+11.01.01.07.001	Amylase - Total	AMS/AMY	α-ΑΜΥΛΑΣΗ	ΟΛΙΚΗ ΑΜΥΛΑΣΗ (ΟΡΟΥ ΟΥΡΩΝ)
+11.01.01.08.001	Amylase Isoenzyme	iso-AMS	ΠΑΓΚΡΕΑΤΙΚΗ ΑΜΥΛΑΣΗ (ΙΣΟΕΝΖΥΜΟ)	
+11.01.01.10.001	Aspartate Amino-Transferase	AST/SGOT	ΑΣΠΑΡΤΙΚΗ ΑΜΙΝΟΤΡΑΝΣΦΕΡΑΣΗ	
+11.01.01.11.001	Cholinesterase	CHE	ΨΕΥΔΟΧΟΛΙΝΕΣΤΕΡΑΣΗ	
+11.01.01.12.001	Chymotrypsin		ΧΥΜΟΘΡΥΨΙΝΗ	
+11.01.01.13.001	Creatine Kinase - Total	CK	ΚΡΕΑΤΙΝΙΚΗ ΚΙΝΑΣΗ	CPK
+11.01.01.14.001	Creatine Kinase - MB Activity	CK-MB	ΚΡΕΑΤΙΝΙΚΗ ΚΙΝΑΣΗ-ΜΒ (ΕΝΕΡΓΟΤΗΤΑ)	CPK-MB
+11.01.01.15.001	Creatine Kinase Isoenzymes	iso-CK	ΙΣΟΕΝΖΥΜΑ ΚΡΕΑΤΙΝΙΚΗΣ ΚΙΝΑΣΗΣ	
+11.01.01.16.001	Gamma Glutamyltransferase	γ-GT	γ-ΓΛΟΥΤΑΜΥΛΟΤΡΑΝΣΦΕΡΑΣΗ	
+11.01.01.17.001	Glutamate Dehydrogenase	GLDH	ΓΛΟΥΤΑΜΙΝΙΚΗ ΑΦΥΔΡΟΓΟΝΑΣΗ	
+11.01.01.18.001	Hydroxybutyrate Dehydrogenase	HBDH	Α-ΥΔΡΟΞΥΒΟΥΤΥΡΙΚΗ ΑΦΥΔΡΟΓΟΝΑΣΗ	
+11.01.01.19.001	Lactate Dehydrogenase	LDH	ΓΑΛΑΚΤΙΚΗ ΑΦΥΔΡΟΓΟΝΑΣΗ	
+11.01.01.21.001	Lactate Dehydrogenase Isoenzymes	iso-LDH	ΙΣΟΕΝΖΥΜΑ ΓΑΛΑΚΤΙΚΗΣ ΑΦΥΔΡΟΓΟΝΑΣΗΣ	
+11.01.01.22.001	Leucine Aminopeptidase	LAP	ΑΜΙΝΟΠΕΠΤΙΔΑΣΗ ΤΗΣ ΛΕΥΚΙΝΗΣ	
+11.01.01.23.001	Lipase	LPS	ΛΙΠΑΣΗ	
+11.01.01.24.001	Lysozyme		ΛΥΣΟΖΥΜΗ	
+11.01.01.25.001	Malate Dehydrogenase	MDH	ΑΦΥΔΡΟΓΟΝΑΣΗ ΤΟΥ ΜΗΛΙΚΟΥ ΟΞΕΟΣ	
+11.01.01.26.001	N-acetyl-b,D-Glucosaminidase	b-NAG	Ν-ΑΚΕΤΥΛΟ-Β,D-ΓΛΥΚΟΣΑΜΙΝΙΔΑΣΗ	
+11.01.01.30.001	Acid-beta-glucosidase		ΟΞΙΝΗ Β-ΓΛΥΚΟΣΙΔΑΣΗ	ΓΛΥΚΟΣΕΡΕΒΡΟΣΙΔΑΣΗ
+11.01.01.31.001	Acid Sphingomyelinase		ΟΞΙΝΗ ΣΦΥΓΓΟΜΥΕΛΙΝΑΣΗ	
+11.01.01.32.001	Chitotriosidase		ΧΙΤΟΤΡΙΟΣΙΔΑΣΗ	
+11.01.01.90.900	Other enzymes		ΑΛΛΑ ΕΝΖΥΜΑ	
+11.02.01.01.001	Albumin		ΑΛΒΟΥΜΙΝΗ	
+11.02.01.02.001	Bile acids		ΧΟΛΙΚΑ ΑΛΑΤΑ	
+11.02.01.03.001	Bilirubin Total	TBIL	ΟΛΙΚΗ ΧΟΛΕΡΥΘΡΙΝΗ	
+11.02.01.03.002	Bilirubin Direct	DBIL	ΑΜΕΣΗ ΧΟΛΕΡΥΘΡΙΝΗ	
+11.02.01.03.003	Bilirubin Indirect		ΕΜΜΕΣΗ ΧΟΛΕΡΥΘΡΙΝΗ	
+11.02.01.04.001	Urea/Blood Urea Nitrogen	UREA	ΟΥΡΙΑ	ΠΑΛΑΙΟΤΕΡΗ ΟΝΟΜΑΣΙΑ: BUN
+11.02.01.04.002	Urea crearance		ΚΑΘΑΡΣΗ ΟΥΡΙΑΣ	
+11.02.01.05.001	Cholesterol	CHOL	ΧΟΛΗΣΤΕΡΟΛΗ	ΟΛΙΚΗ ΧΟΛΗΣΤΕΡΟΛΗ
+11.02.01.06.001	Copper	Cu	ΧΑΛΚΟΣ	
+11.02.01.07.001	Creatinine	CREAT	ΚΡΕΑΤΙΝΙΝΗ	
+11.02.01.07.002	Creatinine clearance		ΚΑΘΑΡΣΗ ΚΡΕΑΤΙΝΙΝΗΣ	
+11.02.01.08.001	D-Xylose		D-ΞΥΛΟΖΗ	
+11.02.01.10.001	Fructosamine		ΦΡΟΥΚΤΟΖΑΜΙΝΗ	
+11.02.01.11.001	Fructose		ΦΡΟΥΚΤΟΖΗ	
+11.02.01.12.001	Galactose		ΓΑΛΑΚΤΟΖΗ	
+11.02.01.13.001	Glucose	GLU	ΓΛΥΚΟΖΗ	ΣΑΚΧΑΡΟ
+11.02.01.14.001	Glycosylated/Glycated Haemoglobin	HbA1c	ΓΛΥΚΟΖΥΛΙΩΜΕΝΗ ΑΙΜΟΣΦΑΙΡΙΝΗ	ΓΛΥΚΙΩΜΕΝΗ ΑΙΜΟΣΦΑΙΡΙΝΗ
+11.02.01.15.001	High Density Lipoprotein Cholesterol	HDL	HDL-ΧΟΛΗΣΤΕΡΟΛΗ	ΛΙΠΟΠΡΩΤΕΙΝΗ ΥΨΗΛΗΣ ΠΥΚΝΟΤΗΤΑΣ
+11.02.01.15.002	Atherogenic index		ΑΘΗΡΩΜΑΤΙΚΟΣ ΔΕΙΚΤΗΣ	
+11.02.01.16.001	Iron	Fe	ΣΙΔΗΡΟΣ	
+11.02.01.17.001	Iron Binding Capacity - Total	TIBC	ΟΛΙΚΗ ΣΙΔΗΡΟΔΕΣΜΕΥΤΙΚΗ ΙΚΑΝΟΤΗΤΑ	
+11.02.01.17.002	Iron Binding Capacity - unsaturated	UIBC	ΑΚΟΡΕΣΤΗ ΣΙΔΗΡΟΔΕΣΜΕΥΤΙΚΗ ΙΚΑΝΟΤΗΤΑ	
+11.02.01.18.001	Lactate		ΓΑΛΑΚΤΚΟ ΟΞΥ	
+11.02.01.19.001	Lecithin		ΛΕΚΙΘΙΝΗ	
+11.02.01.21.001	Low Density Lipoprotein Cholesterol	LDL	LDL-ΧΟΛΗΣΤΕΡΟΛΗ	ΛΙΠΟΠΡΩΤΕΙΝΗ ΧΑΜΗΛΗΣ ΠΥΚΝΟΤΗΤΑΣ
+11.02.01.21.002	Low Density Lipoprotein Cholesterol (Calculated)	LDL (Calc)	LDL-ΧΟΛΗΣΤΕΡΟΛΗ (ΥΠΟΛΟΓΙΣΤΙΚΑ)	
+11.02.01.21.003	Very Low Density Lipoprotein Cholesterol	VLDL	VLDL-ΧΟΛΗΣΤΕΡΟΛΗ	
+11.02.01.22.001	Non Esterified Fatty Acids	NEFA	ΜΗ ΕΣΤΕΡΟΠΟΙΗΜΕΝΑ ΛΙΠΑΡΑ ΟΞΕΑ	
+11.02.01.23.001	Oxalate		ΟΞΑΛΙΚΟ ΟΞΥ	
+11.02.01.24.001	Phospholipids		ΦΩΣΦΟΛΙΠΙΔΙΑ	
+11.02.01.25.001	Porphobilinogen		ΠΟΡΦΟΧΟΛΕΡΥΘΡΙΝΟΓΟΝΟ	
+11.02.01.26.001	Pyruvate		ΠΥΡΟΣΤΑΦΥΛΙΚΟ ΟΞΥ	
+11.02.01.27.001	Thymol		ΘΥΜΟΛΗ	
+11.02.01.28.001	Total Lipids		ΟΛΙΚΑ ΛΙΠΙΔΙΑ	
+11.02.01.29.001	Total Porphyrine		ΟΛΙΚΕΣ ΠΟΡΦΥΡΙΝΕΣ	
+11.02.01.30.001	Total Protein		ΟΛΙΚΑ ΛΕΥΚΩΜΑΤΑ	
+11.02.01.30.002	Serum Globulins		ΣΦΑΙΡΙΝΕΣ ΟΡΟΥ	
+11.02.01.30.003	Albumin/Globulins ratio	A/G ratio	ΛΟΓΟΣ ΑΛΒΟΥΜΙΝΗΣ/ΣΦΑΙΡΙΝΩΝ	ΛΕΥΚΩΜΑΤΙΚΟ ΠΗΛΙΚΟ
+11.02.01.31.001	Triglycerides		ΤΡΙΓΛΥΚΕΡΙΔΙΑ	
+11.02.01.32.001	Uric Acid		ΟΥΡΙΚΟ ΟΞΥ	
+11.02.01.33.001	Zinc		ΨΕΥΔΑΡΓΥΡΟΣ	
+11.02.01.34.001	Lipoprotein Electroporesis		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΛΙΠΟΠΡΩΤΕΙΝΩΝ	
+11.02.01.35.001	Protein Electroporesis		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΛΕΥΚΩΜΑΤΩΝ	
+11.02.01.36.001	Serum osmolality		ΩΣΜΩΤΙΚΟΤΗΤΑ ΟΡΟΥ	
+11.02.01.90.900	Other Substrates		ΑΛΛΑ ΥΠΟΣΤΡΩΜΑΤΑ	
+11.03.01.01.001	Ammonia	NH3	ΑΜΜΩΝΙΑ	
+11.03.01.03.001	Calcium	Ca	ΑΣΒΕΣΤΙΟ	
+11.03.01.07.001	Magnesium	Mg	ΜΑΓΝΗΣΙΟ	
+11.03.01.08.001	Phosphate inorganic / Phosphorus	P	ΑΝΟΡΓΑΝΟΣ ΦΩΣΦΟΡΟΣ	
+11.03.01.90.900	Other Electrolytes tests (excluding Electrodes)		ΑΛΛΟΙ ΗΛΕΚΤΡΟΛΥΤΕΣ (ΧΩΡΙΣ ΗΛΕΚΤΡΟΔΙΑ)	
+11.04.01.02.001	Calcium - Electrodes	Ca (electrode)	ΑΣΒΕΣΤΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.02.002	Calcium ionized - Electrodes	Ca++	ΙΟΝΙΣΜΕΝΟ ΑΣΒΕΣΤΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	iCa
+11.04.01.03.001	Chloride - Electrodes	Cl	ΧΛΩΡΙΟΥΧΑ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.04.001	Lithium - Electrodes	Li	ΛΙΘΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.05.001	Magnesium - Electrodes	Mg (electrode)	ΜΑΓΝΗΣΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.05.002	Magnesium - Electrodes	Mg++	ΙΟΝΙΣΜΕΝΟ ΜΑΓΝΗΣΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.06.001	Potassium - Electrodes	K	ΚΑΛΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.07.001	Sodium - Electrodes	Na	ΝΑΤΡΙΟ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.08.001	Carbon Dioxide (Bicarbonate) - Electrodes	HCO3	ΔΙΤΤΑΝΘΡΑΚΙΚΑ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.01.90.900	Other Electrolyte Electrodes		ΑΛΛΟΙ ΗΛΕΚΤΡΟΛΥΤΕΣ (ΜΕ ΗΛΕΚΤΡΟΔΙΑ)	
+11.04.03.01.001	Creatinine - Electrodes	CREAT (electrode)	ΚΡΕΑΤΙΝΙΝΗ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.03.02.001	Glucose - Electrodes	GLU (electrode)	ΓΛΥΚΟΖΗ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.03.04.001	Lactate - Electrodes		ΓΑΛΑΚΤΙΚΟ ΟΞΥ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.03.05.001	Urea - Electrodes	UREA (electrode)	ΟΥΡΙΑ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.03.06.001	Bilirubin - Electrodes	TBIL (electrode)	ΟΛΙΚΗ ΧΟΛΕΡΥΘΡΙΝΗ (ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΗΛΕΚΤΡΟΔΙΟ)	
+11.04.03.90.900	Other Substrate Electrodes / Biosensors		ΑΛΛΑ ΥΠΟΣΤΡΩΜΑΤΑ (ΜΕ ΗΛΕΚΤΡΟΔΙΑ Η ΒΙΟΑΙΣΘΗΤΗΡΕΣ)	
+11.05.01.01.001	Aluminium	Al	ΑΡΓΙΛΙΟ	
+11.05.01.02.001	Arsenate	As	ΑΡΣΕΝΙΚΟ	
+11.05.01.03.001	Kadmium	Cd	ΚΑΔΜΙΟ	
+11.05.01.04.001	MANGANESE	Mn	ΜΑΓΓΑΝΙΟ	
+11.05.01.05.001	LEAD	Pb	ΜΟΛΥΒΔΟΣ	
+11.05.01.06.001	NICKEL	Ni	ΝΙΚΕΛΙΟ	
+11.05.01.07.001	SELENIUM	Se	ΣΕΛΙΝΙΟ	
+11.05.01.08.001	MERCURY	Hg	ΥΔΡΑΡΓΥΡΟΣ	
+11.05.01.09.001	CHROMIUM	Cr	ΧΡΩΜΙΟ	
+11.05.01.90.900	Other Trace elements		ΑΛΛΑ ΙΧΝΟΣΤΟΙΧΕΙΑ	
+11.70.01.01.001	Glucose Test Strips		ΓΛΥΚΟΖΗ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	ΣΑΚΧΑΡΟ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)
+11.70.01.02.001	Cholesterol Test Strips		ΧΟΛΗΣΤΕΡΟΛΗ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.03.001	HDL Test Strips		HDL (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.04.001	Lactate Test Strips		ΓΑΛΑΚΤΙΚΟ ΟΞΥ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.05.001	Triglyceride Test Strips		ΤΡΙΓΛΥΚΕΡΙΔΙΑ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.06.001	Urea Test Strips		ΟΥΡΙΑ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.07.001	HbA1c Test Strips		ΓΛΥΚΟΖΥΛΙΩΜΕΝΗ/ΓΛΥΚΙΩΜΕΝΗ ΑΙΜΟΣΦΑΙΡΙΝΗ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.08.001	Ketone Test Strips		ΚΕΤΟΝΕΣ (ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ)	
+11.70.01.90.900	Other Blood Test Strips		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΑΙΜΑΤΟΣ ΜΕ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ	
+11.70.02.01.001	Urine Single Test Strips (incl. tablets)		ΕΞΕΤΑΣΗ ΟΥΡΩΝ ΜΕ ΤΑΙΝΙΕΣ ΜΙΑΣ ΠΑΡΑΜΕΤΡΟΥ (ΣΑΚΧΑΡΟ, ΚΕΤΟΝΕΣ, ΛΕΥΚΩΜΑ)	
+11.70.02.02.001	Urine Multi-constituent Test Strips (manual)		ΕΞΕΤΑΣΗ ΟΥΡΩΝ ΜΕ ΠΟΛΥΠΑΡΑΜΕΤΡΙΚΕΣ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ (ΜΗ ΑΥΤΟΜΑΤΕΣ ΜΕΘΟΔΟΙ)	
+11.70.02.03.001	Urine Multi-constituent Test Strips (automated)		ΕΞΕΤΑΣΗ ΟΥΡΩΝ ΜΕ ΠΟΛΥΠΑΡΑΜΕΤΡΙΚΕΣ ΤΑΧΥΔΙΑΓΝΩΣΤΙΚΕΣ ΤΑΙΝΙΕΣ (ΑΥΤΟΜΑΤΕΣ ΜΕΘΟΔΟΙ)	
+11.70.02.10.001	Urine SedimentTest Kit (manual)		ΑΝΑΛΥΣΗ ΙΖΗΜΑΤΟΣ ΟΥΡΩΝ (ΜΗ ΑΥΤΟΜΑΤΕΣ ΜΕΘΟΔΟΙ)	
+11.70.02.11.001	Urine Sediment Test Kit (automated)		ΑΝΑΛΥΣΗ ΙΖΗΜΑΤΟΣ ΟΥΡΩΝ (ΑΥΤΟΜΑΤΕΣ ΜΕΘΟΔΟΙ)	
+11.70.02.20.001	Urinary stone analysis		ΑΝΑΛΥΣΗ ΟΥΡΟΛΙΘΩΝ	
+11.70.02.21.001	Urine osmolality		ΩΣΜΩΤΙΚΟΤΗΤΑ ΟΥΡΩΝ	
+11.70.02.90.900	Other Urine Testing		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΟΥΡΩΝ	
+11.70.03.01.001	Faecal Occult Blood	FOB	ΑΝΙΧΝΕΥΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ ΣΤΑ ΚΟΠΡΑΝΑ	MAYER ΚΟΠΡΑΝΩΝ
+11.70.03.02.001	Albumin in stool (Meconium)		ΑΝΙΧΝΕΥΣΗ ΑΛΒΟΥΜΙΝΗΣ ΣΤΑ ΚΟΠΡΑΝΑ	
+11.70.03.90.900	Other Faeces Tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΚΟΠΡΑΝΩΝ	
+11.70.31.01.001	Carbon Dioxide - Electrodes	pCO2	ΔΙΟΞΕΙΔΙΟ ΤΟΥ ΑΝΘΡΑΚΑ (ΜΕΡΙΚΗ ΠΙΕΣΗ)	
+11.70.31.02.001	pH - Electrodes	pH	PH (ΟΛΙΚΟΥ ΑΙΜΑΤΟΣ)	
+11.70.31.03.001	Oxygen - Electrodes	pO2	ΟΞΥΓΟΝΟ (ΜΕΡΙΚΗ ΠΙΕΣΗ)	
+11.70.31.04.001	Lactate - Electrodes		ΓΑΛΑΚΤΙΚΟ ΟΞΥ (ΠΑΡΑ ΤΗΝ ΚΛΙΝΗ, POCT)	
+11.70.31.05.001	Urea - Electrodes		ΟΥΡΙΑ (ΠΑΡΑ ΤΗΝ ΚΛΙΝΗ, POCT)	
+11.70.31.90.900	Other Point of Care Testing (POCT)		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΠΑΡΑ ΤΗΝ ΚΛΙΝΗ (POCT)	
+11.90.90.90.900	Other Other Clinical Chemistry tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΚΛΙΝΙΚΗΣ ΧΗΜΕΙΑΣ-ΒΙΟΧΗΜΕΙΑΣ ΠΟΥ ΔΕΝ ΑΝΑΦΕΡΟΝΤΑΙ ΑΛΛΟΥ	
+12.01.03.01.001	uAlbumin		ΑΛΒΟΥΜΙΝΗ ΟΥΡΩΝ	ΛΕΥΚΩΜΑΤΙΝΗ ΟΥΡΩΝ
+12.01.03.01.002	Urine Protein/CSF		ΛΕΥΚΩΜΑ ΟΥΡΩΝ/ΕΝΥ	
+12.01.03.02.001	Ceruloplasmin		ΣΕΡΟΥΛΟΠΛΑΣΜΙΝΗ	
+12.01.03.03.001	Haptoglobin		ΑΠΤΟΣΦΑΙΡΙΝΗ	
+12.01.03.04.001	Hemopexin		ΑΙΜΟΠΗΞΙΝΗ	
+12.01.03.05.001	Lactoferrin		ΛΑΚΤΟΦΕΡΡΙΝΗ	
+12.01.03.06.001	Pre-albumin / Transthyretin		ΤΡΑΝΣΘΥΡΕΤΙΝΗ	ΠΡΟΑΛΒΟΥΜΙΝΗ
+12.01.03.07.001	Retinol Binding Protein	RBP	ΠΡΩΤΕΙΝΗ ΔΕΣΜΕΥΟΥΣΑ ΤΗΝ ΡΕΤΙΝΟΛΗ	
+12.01.03.08.001	Transferrin		ΤΡΑΝΣΦΕΡΡΙΝΗ	ΣΙΔΗΡΟΦΙΛΙΝΗ
+12.01.03.08.002	Transferrin saturation		ΚΟΡΕΣΜΟΣ ΤΡΑΝΣΦΕΡΡΙΝΗΣ	
+12.01.03.09.001	Transcobalamin (S)		ΤΡΑΝΣΚΟΒΑΛΑΜΙΝΗ	
+12.01.03.90.900	Other Transport Proteins		ΑΛΛΕΣ ΠΡΩΤΕΙΝΕΣ ΜΕΤΑΦΟΡΑΣ	
+12.01.04.01.001	Apolipoprotein A I	Apo A I	ΑΠΟΛΙΠΟΠΡΩΤΕΙΝΗ Α Ι	
+12.01.04.02.001	Apolipoprotein A II	Apo A II	ΑΠΟΛΙΠΟΠΡΩΤΕΙΝΗ Α ΙΙ	
+12.01.04.03.001	Apolipoprotein B	Apo B	ΑΠΟΛΙΠΟΠΡΩΤΕΙΝΗ Β	
+12.01.04.03.002	Apolipoprotein B to Apolipoprotein A Ι Ratio	Apo B/Apo AI	ΛΟΓΟΣ ΑΠΟΛΙΠΟΠΡΩΤΕΙΝΗΣ Β/ΑΠΟΛΙΠΟΠΡΩΤΕΙΝΗ Α Ι	
+12.01.04.11.001	Apolipoprotein E	Apo E	ΑΠΟΛΙΠΟΠΡΩΤΕΙΝΗ Ε	
+12.01.04.21.001	Lipoprotein (a)	LP(a)	ΛΙΠΟΠΡΩΤΕΙΝΗ (a)	
+12.01.04.90.900	Other Lipoproteins		ΑΛΛΕΣ ΛΙΠΟΠΡΩΤΕΙΝΕΣ	
+12.01.90.01.001	a1-Acid Glycoprotein (Orosomucoid )	AGP	α1 ΟΞΙΝΗ ΓΛΥΚΟΠΡΩΤΕΙΝΗ	
+12.01.90.02.001	a1-Antitrypsin (Protease inhibitor )	AAT	α1-ΑΝΤΙΘΡΥΨΙΝΗ	
+12.01.90.03.001	a2-Macroglobulin	A2M	α2-ΜΑΚΡΟΣΦΑΙΡΙΝΗ	
+12.01.90.04.001	a1-Microglobulin	A1M	α1-ΜΙΚΡΟΣΦΑΙΡΙΝΗ	
+12.01.90.05.001	Fibronectin		ΙΝΩΔΟΝΕΚΤΙΝΗ	ΦΙΒΡΟΝΕΚΤΙΝΗ
+12.01.90.09.001	Cystatin C		ΚΥΣΤΑΤΙΝΗ C	ΣΥΣΤΑΤΙΝΗ C
+12.01.90.10.001	Amyloid A		ΑΜΥΛΟΕΙΔΕΣ Α	
+12.01.90.90.900	Other Proteins		ΑΛΛΕΣ ΠΡΩΤΕΙΝΕΣ	
+12.03.01.01.001	Bladder Tissue Antigen	BTA	ΚΑΡΚΙΝΙΚΟ ΑΝΤΙΓΟΝΟ ΟΥΡΟΔΟΧΟΥ ΚΥΣΤΕΩΣ	
+12.03.01.02.001	Cancer Antigen 15-3	CA 15-3	ΚΑΡΚΙΝΙΚΟ ΑΝΤΙΓΟΝΟ 15-3	
+12.03.01.03.001	Cancer Antigen 19-9	CA 19-9	ΚΑΡΚΙΝΙΚΟ ΑΝΤΙΓΟΝΟ 19-9	
+12.03.01.04.001	Cancer Antigen 50	CA 50	ΚΑΡΚΙΝΙΚΟ ΑΝΤΙΓΟΝΟ 50	
+12.03.01.05.001	Cancer Antigen 72-4	CA 72-4	ΚΑΡΚΙΝΙΚΟ ΑΝΤΙΓΟΝΟ 72-4	
+12.03.01.06.001	Cancer Antigen 125	CA 125	ΚΑΡΚΙΝΙΚΟ ΑΝΤΙΓΟΝΟ 125	
+12.03.01.20.001	CYFRA 21-1	CYFRA 21-1	ΚΥΤΤΑΡΟΚΕΡΑΤΙΝΗ 19 (CK 19)	
+12.03.01.21.001	Human Epididymis Protein 4	HE-4	ΠΡΩΤΕΙΝΗ 4 ΤΗΣ ΑΝΘΡΩΠΙΝΗΣ ΕΠΙΔΙΔΥΜΙΔΟΣ	
+12.03.01.31.001	Carcinoembryonic Antigen	CEA	ΚΑΡΚΙΝΟΕΜΒΡΥΙΚΟ ΑΝΤΙΓΟΝΟ	
+12.03.01.32.001	Total Prostatic Specific Antigen	tPSA	ΟΛΙΚΟ ΕΙΔΙΚΟ ΠΡΟΣΤΑΤΙΚΟ ΑΝΤΙΓΟΝΟ	
+12.03.01.33.001	Free Prostatic Specific Antigen	fPSA	ΕΛΕΥΘΕΡΟ ΕΙΔΙΚΟ ΠΡΟΣΤΑΤΙΚΟ ΑΝΤΙΓΟΝΟ	
+12.03.01.33.002	Prostatic Specific Antigen ratio	PSA ratio	ΛΟΓΟΣ ΕΙΔΙΚΟΥ ΠΡΟΣΤΑΤΙΚΟΥ ΑΝΤΙΓΟΝΟΥ	ΛΟΓΟΣ PSA
+12.03.01.35.001	Squamous Cell Carcinoma Antigen	SCC	ΑΝΤΙΓΟΝΟ ΕΚ ΚΑΡΚΙΝΩΜΑΤΟΣ ΠΛΑΚΩΔΩΝ ΚΥΤΤΑΡΩΝ	
+12.03.01.36.001	Tumor Polypeptide Antigen (TPA - incl. TPS)	TPA	ΠΟΛΥΠΕΠΤΙΔΙΚΟ ΑΝΤΙΓΟΝΟ ΙΣΤΩΝ (ΚΥΤΤΑΡΟΚΕΡΑΤΙΝΕΣ CK8,18,19)	
+12.03.01.37.001	Prostatic Acid Phosphatase	PAP	ΟΞΙΝΗ ΠΡΟΣΤΑΤΙΚΗ ΦΩΣΦΑΤΑΣΗ (ΜΑΖΑ)	
+12.03.01.38.001	Pro-Gastrin-Releasing Peptide	Pro-GRP	ΠΕΠΤΙΔΙΟ ΑΠΕΛΕΥΘΕΡΩΣΗΣ ΠΡΟ-ΓΑΣΤΡΙΝΗΣ	
+12.03.01.90.900	Other Cancer Antigens		ΑΛΛΑ ΚΑΡΚΙΝΙΚΑ ΑΝΤΙΓΟΝΑ	
+12.03.02.01.001	Estrogen Receptor Assays	ER	ΥΠΟΔΟΧΕΙΣ ΟΙΣΤΡΟΓΟΝΩΝ	
+12.03.02.02.001	Progesterone Receptor Assays	PR	ΥΠΟΔΟΧΕΙΣ ΠΡΟΓΕΣΤΕΡΟΝΗΣ	
+12.03.02.90.900	Other Receptor Assays		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΥΠΟΔΟΧΕΩΝ	
+12.03.03.01.001	HER-2/neu	HER-2/neu	ΟΓΚΟΠΡΩΤΕΙΝΗ HER-2/NEU	
+12.03.03.02.001	p53	p53	ΟΓΚΟΚΑΤΑΣΤΑΛΤΙΚΗ ΠΡΩΤΕΙΝΗ P53	
+12.03.03.90.900	Other Oncoproteins		ΑΛΛΕΣ ΟΓΚΟΠΡΩΤΕΙΝΕΣ	
+12.03.90.01.001	Alphafetoprotein	AFP	Α-ΕΜΒΡΥΪΚΗ ΣΦΑΙΡΙΝΗ	
+12.03.90.02.001	Beta2-Microglobulin	ß2-M	Β2 ΜΙΚΡΟΣΦΑΙΡΙΝΗ	
+12.03.90.03.001	Cathepsin-D		ΚΑΘΕΨΙΝΗ D	
+12.03.90.05.001	5-Hydroxyindoleacetic acid	5-HIAA	5-ΥΔΡΟΞΥ ΙΝΔΟΛΟΞΙΚΟ ΟΞΥ	
+12.03.90.06.001	Human Placenta Like Alkaline Phosphatase	hPLAP	ΠΛΑΚΟΥΝΤΙΑΚΗ ΑΛΚΑΛΙΚΗ ΦΩΣΦΑΤΑΣΗ	
+12.03.90.08.001	Neuron Specific Enolase	NSE	ΕΙΔΙΚΗ ΝΕΥΡΩΝΙΚΗ ΕΝΟΛΑΣΗ	
+12.03.90.12.001	Thymidine Kinase	TK	ΚΙΝΑΣΗ ΘΥΜΙΔΙΝΗΣ	
+12.03.90.16.001	Matrix-Metalloproteinase-2	MMP-2	ΜΕΤΑΛΛΟΠΡΩΤΕΙΝΑΣΗ ΕΞΩΚΥΤΤΑΡΙΑΣ ΟΥΣΙΑΣ-2	ΜΕΤΑΛΛΟΠΡΩΤΕΙΝΑΣΗ ΥΠΟΣΤΡΩΜΑΤΟΣ-2
+12.03.90.16.002	Matrix-Metalloproteinase-9	MMP-9	ΜΕΤΑΛΛΟΠΡΩΤΕΙΝΑΣΗ ΕΞΩΚΥΤΤΑΡΙΑΣ ΟΥΣΙΑΣ-9	ΜΕΤΑΛΛΟΠΡΩΤΕΙΝΑΣΗ ΥΠΟΣΤΡΩΜΑΤΟΣ-3
+12.03.90.17.001	Serotonine		ΣΕΡΟΤΟΝΙΝΗ	
+12.03.90.18.001	Protein S-100 B	S-100B	ΠΡΩΤΕΙΝΗ S100-B	
+12.03.90.20.001	Chromogranin A		ΧΡΩΜΟΓΡΑΝΙΝΗ-Α	
+12.03.90.30.001	Tumor M2 Pyruvate Kinase	Tumor M2-PK	ΚΑΡΚΙΝΙΚΟ ΔΙΜΕΡΕΣ ΠΥΡΟΥΒΙΚΗΣ ΚΙΝΑΣΗΣ	
+12.03.90.90.900	Other Tumour Markers		ΑΛΛΟΙ ΝΕΟΠΛΑΣΜΑΤΙΚΟΙ ΔΕΙΚΤΕΣ	
+12.04.01.01.001	Free Triiodothyronine	FT3	ΕΛΕΥΘΕΡΗ ΤΡΙΙΩΔΟΘΥΡΟΝΙΝΗ	
+12.04.01.02.001	Free Thyroxine	FT4	ΕΛΕΥΘΕΡΗ ΘΥΡΟΞΙΝΗ	
+12.04.01.04.001	Reverse Triiodothyronine	Rev T3	ΑΝΑΣΤΡΟΦΗ ΤΡΙΙΩΔΟΘΥΡΟΝΙΝΗ	ΑΝΑΣΤΡΟΦΗ Τ3
+12.04.01.05.001	Triiodothyronine	TT3	ΤΡΙΙΩΔΟΘΥΡΟΝΙΝΗ	
+12.04.01.06.001	T- Uptake	T3-U	Τ3-ΠΡΟΣΛΗΨΗ	
+12.04.01.07.001	Thyroxine	TT4	ΘΥΡΟΞΙΝΗ	
+12.04.01.07.002	Free Thyroxine Index	FTI	ΔΕΙΚΤΗΣ ΕΛΕΥΘΕΡΗΣ ΘΥΡΟΞΙΝΗΣ	
+12.04.01.08.001	Thyroglobulin	TG	ΘΥΡΕΟΣΦΑΙΡΙΝΗ	
+12.04.01.09.001	Thyroid binding globulin	TBG	ΘΥΡΕΟΔΕΣΜΕΥΤΙΚΗ ΣΦΑΙΡΙΝΗ	ΣΦΑΙΡΙΝΗ ΔΕΣΜΕΥΟΥΣΑ ΤΙΣ ΟΡΜΟΝΕΣ ΤΟΥ ΘΥΡΕΟΕΙΔΟΥΣ
+12.04.01.11.001	Thyroid Stimulating Hormone	TSH	ΘΥΡΕΟΕΙΔΟΤΡΟΠΟΣ ΟΡΜΟΝΗ	
+12.04.01.90.900	Other thyroid hormones		ΑΛΛΕΣ ΟΡΜΟΝΕΣ ΤΟΥ ΘΥΡΕΟΕΙΔΟΥΣ	
+12.05.01.01.001	Androstenedione	Δ4Α	ΑΝΔΡΟΣΤΕΝΔΙΟΝΗ	Δ4 ΑΝΔΡΟΣΤΕΝΔΙΟΝΗ
+12.05.01.02.001	Dehydro-epiandrosterone Sulphate	DHEAS ή DHEA-SO4	ΘΕΙΙΚΗ ΔΙΫΔΡΟΕΠΙΑΝΔΡΟΣΤΕΡΟΝΗ	
+12.05.01.02.002	Dehydro-epiandrosterone	DHEA	ΔΙΫΔΡΟΕΠΙΑΝΔΡΟΣΤΕΡΟΝΗ	
+12.05.01.03.001	Estradiol	E2 ή O2	ΟΙΣΤΡΑΔΙΟΛΗ	
+12.05.01.04.001	Follicle Stimulating Hormone	FSH	ΘΥΛΑΚΙΟΤΡΟΠΟΣ ΟΡΜΟΝΗ	
+12.05.01.05.001	Luteinising Hormone	LH	ΩΧΡΙΝΟΤΡΟΠΟΣ ΟΡΜΟΝΗ	
+12.05.01.05.002	LH/FSH ratio	LH/FSH	ΛΟΓΟΣ LH/FSH	
+12.05.01.06.001	Progesterone	PRG ή P	ΠΡΟΓΕΣΤΕΡΟΝΗ	
+12.05.01.07.001	17 OH Progesterone	17OHP	17 ΥΔΡΟΞΥ-ΠΡΟΓΕΣΤΕΡΟΝΗ	
+12.05.01.08.001	Prolactin	PRL	ΠΡΟΛΑΚΤΙΝΗ	
+12.05.01.09.001	Sex Hormone Binding Globulin	SHBG	ΣΦΑΙΡΙΝΗ ΔΕΣΜΕΥΟΥΣΑ ΤΙΣ ΟΡΜΟΝΕΣ ΤΟΥ ΦΥΛΟΥ	
+12.05.01.10.001	Testosterone	T ή Testo	ΤΕΣΤΟΣΤΕΡΟΝΗ (ΟΛΙΚΗ)	
+12.05.01.10.002	Testosterone Free	FTesto	ΕΛΕΥΘΕΡΗ ΤΕΣΤΟΣΤΕΡΟΝΗ	
+12.05.01.10.003	Free Androgen Index	FAI	ΔΕΙΚΤΗΣ ΕΛΕΥΘΕΡΩΝ ΑΝΔΡΟΓΟΝΩΝ	
+12.05.01.11.001	Androsterone		ΑΝΔΡΟΣΤΕΡΟΝΗ	
+12.05.01.12.001	Androstanediol-Glucuronide	3a-diol G	ΓΛΥΚΟΥΡΟΝΙΔΙΟ ΤΗΣ ΑΝΔΡΟΣΤΕΝΔΙΟΛΗΣ	3A-Androstanediol-Glucuronide
+12.05.01.14.001	11-Desoxycortisol		11-ΔΕΣΟΞΥ ΚΟΡΤΙΖΟΛΗ	
+12.05.01.15.001	Corticosteron		ΚΟΡΤΙΚΟΣΤΕΡΟΝΗ	
+12.05.01.20.001	Anti-Mûllerian Hormone	AMH	ΑΝΤΙ-ΜΥΛΛΕΡΙΑΝΗ ΟΡΜΟΝΗ	MIF (MULLERIAN INHIBITING FACTOR)
+12.05.01.90.900	Other Fertility Function Hormones		ΑΛΛΕΣ ΟΡΜΟΝΕΣ/ΠΡΩΤΕΙΝΕΣ ΓΟΝΙΜΟΤΗΤΑΣ	
+12.05.02.01.001	Alpha2-Pregnancy Associated Glycoprotein	a2-PAG	α2 ΓΛΥΚΟΠΡΩΤΕΙΝΗ ΣΧΕΤΙΖΟΜΕΝΗ ΜΕ ΚΥΗΣΗ	
+12.05.02.02.001	Estriol	E3 ή TE3	ΟΛΙΚΗ ΟΙΣΤΡΙΟΛΗ	
+12.05.02.03.001	Unconjugated (free) Estriol	uE3 ή FE3	ΑΣΥΖΕΥΚΤΗ ΟΙΣΤΡΙΟΛΗ	ΕΛΕΥΘΕΡΗ ΟΙΣΤΡΙΟΛΗ
+12.05.02.04.001	Estrone	E1	ΟΙΣΤΡΟΝΗ	
+12.05.02.05.001	Human Chorionic Gonadotropin	hCG ή HCG	ΧΟΡΙΑΚΗ ΓΟΝΑΔΟΤΡΟΠΙΝΗ	
+12.05.02.07.001	Human Placental Lactogen	HPL	ΠΛΑΚΟΥΝΤΙΑΚΟ ΓΑΛΑΚΤΟΓΟΝΟ	
+12.05.02.08.001	Pregnancy Specific B1 -glycoprotein	SP1	ΕΙΔΙΚΗ β1 ΓΛΥΚΟΠΡΩΤΕΙΝΗ ΤΗΣ ΚΥΗΣΗΣ	
+12.05.02.10.001	Pregnancy associated Plasma Protein-A	PAPP-A	ΣΧΕΤΙΖΟΜΕΝΗ ΜΕ ΤΗΝ ΚΥΗΣΗ ΠΡΩΤΕΙΝΗ Α ΤΟΥ ΠΛΑΣΜΑΤΟΣ	
+12.05.02.11.001	Placental Growth Factor (Pre-eclampsia)	PLGF ή PlGF	ΠΛΑΚΟΥΝΤΙΑΚΟΣ ΑΥΞΗΤΙΚΟΣ ΠΑΡΑΓΩΝ	
+12.05.02.12.001	Soluble fms-like tyrosine kinase-1	sFlt-1	ΔΙΑΛΥΤΟΣ ΥΠΟΔΟΧΕΑΣ ΤΥΠΟΥ ΤΥΡΟΣΙΝΙΚΗΣ ΚΙΝΑΣΗΣ-1	ΔΙΑΛΥΤΟΣ ΥΠΟΔΟΧΕΑΣ ΤΟΥ ΑΓΓΕΙΑΚΟΥ ΕΝΔΟΘΗΛΙΑΚΟΥ ΑΥΞΗΤΙΚΟΥ ΠΑΡΑΓΟΝΤΑ
+12.05.02.13.001	Free Beta Human Chorionic Gonadotropin	fbHCG	ΕΛΕΥΘΕΡΗ β-ΥΠΟΜΟΝΑΔΑ ΤΗΣ ΧΟΡΙΑΚΗΣ ΓΟΝΑΔΟΤΡΟΠΙΝΗΣ	
+12.05.02.14.001	Inhibin A	InhA	ΑΝΑΣΤΑΛΤΙΝΗ Α	
+12.05.02.14.002	Inhibin B	InhB	ΑΝΑΣΤΑΛΤΙΝΗ Β	
+12.05.02.90.900	Other Pregnancy Testing Hormones / Proteins		ΑΛΛΕΣ ΟΡΜΟΝΕΣ/ΠΡΩΤΕΙΝΕΣ ΚΥΗΣΗΣ	
+12.06.01.01.001	C-Peptide		ΠΕΠΤΙΔΙΟ C	
+12.06.01.02.001	Glucagon		ΓΛΥΚΑΓΟΝΗ	
+12.06.01.03.001	Insulin		ΙΝΣΟΥΛΙΝΗ	
+12.06.01.04.001	Insulin Antibody	IAAbs	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΤΙ ΙΝΣΟΥΛΙΝΗΣ	
+12.06.01.05.001	anti-GAD 65	CADAbs	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΑΠΟΚΑΡΒΟΞΥΛΑΣΗΣ ΤΟΥ ΓΛΟΥΤΑΜΙΝΙΚΟΥ ΟΞΕΟΣ	
+12.06.01.07.001	Thyrosin Phosphatase IA2 Antibodies	IA2 Abs	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΥΡΟΣΙΝΙΚΗΣ ΦΩΣΦΑΤΑΣΗΣ IA2	
+12.06.01.08.001	Proinsulin		ΠΡΟ-ΙΝΣΟΥΛΙΝΗ	
+12.06.01.09.001	Islet Cell Ab	ICAbs	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΝΗΣΙΔΙΩΝ ΠΑΓΚΡΕΑΤΟΣ (ICA)	
+12.06.01.10.001	Antibodies to Zn-T8	a-Zn-T8	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΜΕΤΑΦΟΡΕΑ 8 ΤΟΥ ΨΕΥΔΑΡΓΥΡΟΥ	
+12.06.01.20.001	Antidiuretic hormone	ADH	ΑΝΤΙΔΙΟΥΡΗΤΙΚΗ ΟΡΜΟΝΗ	ΒΑΣΟΠΡΕΣΣΙΝΗ
+12.06.01.90.900	Other Diabetes Assays		ΑΛΛΕΣ ΟΡΜΟΝΕΣ/ΠΡΩΤΕΙΝΕΣ ΕΛΕΓΧΟΥ ΔΙΑΒΗΤΗ	
+12.06.02.01.001	Aldosterone		ΑΛΔΟΣΤΕΡΟΝΗ	
+12.06.02.02.001	Angiotensin I / II		ΑΓΓΕΙΟΤΑΣΙΝΗ Ι / ΙΙ	ΑΓΓΕΙΟΤΕΝΣΙΝΗ Ι / ΙΙ
+12.06.02.03.001	Angiotensin Converting Enzyme	ACE	ΜΕΤΑΤΡΕΠΤΙΚΟ ΕΝΖΥΜΟ ΑΓΓΕΙΟΤΑΣΙΝΗΣ	ΜΕΤΑΤΡΕΠΤΙΚΟ ΕΝΖΥΜΟ ΑΓΓΕΙΟΤΕΝΣΙΝΗΣ
+12.06.02.04.001	Cortisol	F	ΚΟΡΤΙΖΟΛΗ	
+12.06.02.05.001	Renine (Plasma Renine Activity)	PRA	ΡΕΝΙΝΗ (ΕΝΕΡΓΟΤΗΤΑ ΡΕΝΙΝΗΣ ΠΛΑΣΜΑΤΟΣ)	
+12.06.02.06.001	Renine Direct		ΡΕΝΙΝΗ (ΜΑΖΑ)	
+12.06.02.07.001	Neutrophil Gelatinase associated Lipocalin	NGAL	ΛΙΠΟΚΑΛΙΝΗ ΣΧΕΤΙΖΟΜΕΝΗ ΜΕ ΤΗΝ ΖΕΛΑΤΙΝΑΣΗ ΤΩΝ ΟΥΔΕΤΕΡΟΦΙΛΩΝ	ΛΙΠΟΚΑΛΙΝΗ 2
+12.06.02.20.001	Urinary Cortisol	UFC	ΚΟΡΤΙΖΟΛΗ ΟΥΡΩΝ 24ΩΡΟΥ	
+12.06.02.90.900	Other Renal Metabolism Assays		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΕΛΕΓΧΟΥ ΝΕΦΡΙΚΟΥ ΜΕΤΑΒΟΛΙΣΜΟΥ ΚΑΙ ΕΠΙΝΕΦΡΙΔΙΩΝ	
+12.06.03.01.001	Bone Alkaline Phosphatase	BAP	ΟΣΤΙΚΗ ΑΛΚΑΛΙΚΗ ΦΩΣΦΑΤΑΣΗ	
+12.06.03.02.001	Calcitonin		ΚΑΛΣΙΤΟΝΙΝΗ	
+12.06.03.03.001	Collagen Type I C-terminal Propeptide	C I CP	ΚΑΡΒΟΞΥΤΕΛΙΚΟ ΠΡΟΠΕΠΤΙΔΙΟ ΤΟΥ ΚΟΛΛΑΓΟΝΟΥ ΤΥΠΟΥ Ι	
+12.06.03.04.001	Collagen Type III C-terminal Propeptide		ΚΑΡΒΟΞΥΤΕΛΙΚΟ ΠΡΟΠΕΠΤΙΔΙΟ ΤΟΥ ΚΟΛΛΑΓΟΝΟΥ ΤΥΠΟΥ ΙΙΙ	
+12.06.03.05.001	Cross-Linked C-Telopeptides	CTx	ΔΙΑΣΤΑΥΡΟΥΜΕΝΑ C-ΤΕΛΟΠΕΠΤΙΔΙΑ ΚΟΛΛΑΓΟΝΟΥ	
+12.06.03.06.001	Cross-Linked N-Telopeptides	NTx	ΔΙΑΣΤΑΥΡΟΥΜΕΝΑ Ν-ΤΕΛΟΠΕΠΤΙΔΙΑ ΚΟΛΛΑΓΟΝΟΥ	
+12.06.03.07.001	Cyclic Adenosin Monophosphate	CAMP/cAMP	ΚΥΚΛΙΚΟ ΑΔΕΝΟΣΙΝΟ ΜΟΝΟΦΩΣΦΩΡΙΚΟ ΟΞΥ (AMP)	
+12.06.03.08.001	Deoxypyridinoline	DPD	ΔΕΣΟΞΥ-ΠΥΡΙΔΙΝΟΛΙΝΗ	
+12.06.03.09.001	1,25-Dihydroxyvitamin D	1,25(OH)D	1,25 ΔΙΥΔΡΟΞΥ-ΒΙΤΑΜΙΝΗ D	
+12.06.03.10.001	25-Hydroxyvitamin D	25(OH)D	25 YΔΡΟΞΥ-ΒΙΤΑΜΙΝΗ D	
+12.06.03.11.001	Hydroxyproline		ΥΔΡΟΞΥΠΡΟΛΙΝΗ	
+12.06.03.12.001	Osteocalcine	Osteo	ΟΣΤΕΟΚΑΛΣΙΝΗ	
+12.06.03.13.001	Parathyroid Hormone (intact)	Intact PTH	ΠΑΡΑΘΟΡΜΟΝΗ (ΑΚΕΡΑΙΟ ΜΟΡΙΟ)	ΠΑΡΑΘΟΡΜΟΝΗ
+12.06.03.14.001	Parathyroid Hormone (C-/N-terminal, M-regional)	PTH	ΠΑΡΑΘΟΡΜΟΝΗ	
+12.06.03.15.001	Parathyroid Hormone related Peptide	PTHrP	ΠΕΠΤΙΔΙΟ ΣΧΕΤΙΖΟΜΕΝΟ ΜΕ ΤΗΝ ΠΑΡΑΘΟΡΜΟΝΗ	
+12.06.03.16.001	Pyridinoline	PYD	ΠΥΡΙΔΙΝΟΛΙΝΗ	
+12.06.03.17.001	Tartrate-resistant Acid Phosphatase 5b	TRAP	ΟΞΙΝΗ ΦΩΣΦΑΤΑΣΗ ΑΝΘΕΚΤΙΚΗ ΣΤΟ ΤΡΥΓΙΚΟ	
+12.06.03.18.001	Procollagen Type I N terminal propeptide	PiNP	ΑΜΙΝΟΤΕΛΙΚΟ ΠΡΟΠΕΠΤΙΔΙΟ ΤΟΥ ΠΡΟΚΟΛΛΑΓΟΝΟΥ ΤΥΠΟΥ Ι	
+12.06.03.20.001	Cartilage Oligomeric matrix PRC	COMP	ΟΛΙΓΟΜΕΡΗΣ ΜΗΤΡΙΚΗ ΠΡΩΤΕΙΝΗ ΤΩΝ ΧΟΝΔΡΩΝ	
+12.06.03.21.001	Osteoprotegerin	OPG	ΟΣΤΕΟΠΡΟΤΕΓΕΡΙΝΗ	
+12.06.03.22.001	Osteopontin	OPN	ΟΣΤΕΟΠΟNTINH	
+12.06.03.90.900	Other Bone and Mineral Metabolism Assays		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΕΛΕΓΧΟΥ ΟΣΤΙΚΟΥ ΜΕΤΑΒΟΛΙΣΜΟΥ	
+12.06.04.01.001	Adrenocortiotropic Hormone	ACTH	ΦΛΟΙΟΕΠΙΝΕΦΡΙΔΙΟΤΡΟΠΟΣ ΟΡΜΟΝΗ	ΚΟΡΤΙΚΟΤΡΟΠΟΣ ΟΡΜΟΝΗ
+12.06.04.02.001	Human Growth Hormone	HGH	ΑΥΞΗΤΙΚΗ ΟΡΜΟΝΗ	ΑΝΘΡΩΠΙΝΗ ΑΥΞΗΤΙΚΗ ΟΡΜΟΝΗ
+12.06.04.03.001	Insulin-like Growth Factor I (Somatomedin C)	IGF I	ΙΝΣΟΥΛΙΝΟΜΟΡΦΟΣ ΑΥΞΗΤΙΚΟΣ ΠΑΡΑΓΩΝ Ι	ΣΩΜΑΤΟΜΕΔΙΝΗ C
+12.06.04.04.001	Insulin-like Growth Factor II	IGF II	ΙΝΣΟΥΛΙΝΟΜΟΡΦΟΣ ΑΥΞΗΤΙΚΟΣ ΠΑΡΑΓΩΝ ΙI	
+12.06.04.05.001	Insulin-like Growth Factor Binding Protein 1	IGFBP-1	ΔΕΣΜΕΥΤΙΚΗ ΠΡΩΤΕΙΝΗ-1 ΤΟΥ ΙΝΣΟΥΛΙΝΟΜΟΡΦΟΥ ΑΥΞΗΤΙΚΟΥ ΠΑΡΑΓΟΝΤΑ	
+12.06.04.06.001	Insulin-like Growth Factor Binding Protein 3	IGFBP-3	ΔΕΣΜΕΥΤΙΚΗ ΠΡΩΤΕΙΝΗ-3 ΤΟΥ ΙΝΣΟΥΛΙΝΟΜΟΡΦΟΥ ΑΥΞΗΤΙΚΟΥ ΠΑΡΑΓΟΝΤΑ	
+12.06.04.07.001	Vasointestinal Peptide	VIP	ΑΓΓΕΙΟΔΡΑΣΤΙΚΟ ΕΝΤΕΡΙΚΟ ΠΕΠΤΙΔΙΟ	
+12.06.04.20.001	Vascular endothelial growth factor	VEGF	ΠΑΡΑΓΩΝ ΑΝΑΠΤΥΞΗΣ ΑΓΓΕΙΑΚΟΥ ΕΝΔΟΘΗΛΙΟΥ	
+12.06.04.25.001	Human Pancreatic Polypeptide	PP	ΠΑΓΚΡΕΑΤΙΚΟ ΠΟΛΥΠΕΠΤΙΔΙΟ	
+12.06.04.90.900	Endocrine Hormones and Peptides		ΑΛΛΕΣ ΟΡΜΟΝΕΣ ΚΑΙ ΠΕΠΤΙΔΙΑ	
+12.06.05.02.001	b-Endorphin		β-ΕΝΔΟΡΦΙΝΗ	
+12.06.05.03.001	17-Hydroxy-Ketosterone	17OHCS	17-ΥΔΡΟΞΥ-ΚΟΡΤΙΚΟΣΤΕΡΟΕΙΔΗ ΟΥΡΩΝ	
+12.06.05.04.001	17-Ketogenic Steroids	17KGS	17-ΚΕΤΟΓΟΝΑ ΣΤΕΡΟΕΙΔΗ ΟΥΡΩΝ	
+12.06.05.05.001	17-Ketosteroids	17KS	17-ΚΕΤΟΣΤΕΡΟΕΙΔΗ ΟΥΡΩΝ	
+12.06.05.08.001	Somatostatin		ΣΩΜΑΤΟΣΤΑΤΙΝΗ	
+12.06.05.20.001	Vanillylmandelic Acid	VMA	ΒΑΝΙΛΛΙΝΟΜΑΝΔΕΛΙΚΟ ΟΞΥ ΟΥΡΩΝ	
+12.06.05.21.001	Homovanillic Acid	HVA	ΟΜΟΒΑΝΙΛΛΙΚΟ ΟΞΥ ΟΥΡΩΝ	
+12.06.05.22.001	Metanephrines		ΜΕΤΑΝΕΦΡΙΝΕΣ ΟΥΡΩΝ	
+12.06.05.23.001	Metanephrine		ΜΕΤΑΝΕΦΡΙΝΗ ΟΥΡΩΝ	
+12.06.05.24.001	Nor-metanephrine		ΝΟΡΜΕΤΑΝΕΦΡΙΝΗ ΟΥΡΩΝ	
+12.06.05.90.900	Other Neuroendocrine Function Assays		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΝΕΥΡΟΕΝΔΟΚΡΙΝΙΚΗΣ ΛΕΙΤΟΥΡΓΙΑΣ	
+12.06.90.01.001	Gastrin		ΓΑΣΤΡΙΝΗ	
+12.06.90.02.001	Gonadotropin-Releasing Hormone	LHRH	ΕΚΛΥΤΙΚΗ ΟΡΜΟΝΗ ΤΩΝ ΓΟΝΑΔΟΤΡΟΠΙΝΩΝ	ΓΟΝΑΔΟΡΕΛΙΝΗ
+12.06.90.06.001	Melatonine		ΜΕΛΑΤΟΝΙΝΗ	
+12.06.90.07.001	Neopterine		ΝΕΟΠΤΕΡΙΝΗ	
+12.06.90.08.001	Oxytocin		ΩΚΥΤΟΚΙΝΗ	
+12.06.90.09.001	Pepsinogen		ΠΕΨΙΝΟΓΟΝΟ	
+12.06.90.10.001	Prostaglandin		ΠΡΟΣΤΑΓΛΑΝΔΙΝΕΣ	
+12.06.90.12.001	Elastase (Pancreatic)		ΕΛΑΣΤΑΣΗ (ΠΑΓΚΡΕΑΤΙΚΗ)	
+12.06.90.13.001	Adrenalin		ΑΔΡΕΝΑΛΙΝΗ	ΕΠΙΝΕΦΡΙΝΗ
+12.06.90.14.001	Noradrenalin		ΝΟΡΑΔΡΕΝΑΛΙΝΗ	ΝΟΡΕΠΙΝΕΦΡΙΝΗ
+12.06.90.15.001	Dopamine		ΝΤΟΠΑΜΙΝΗ	
+12.06.90.16.001	Procalcitonin	PCT	ΠΡΟΚΑΛΣΙΤΟΝΙΝΗ	
+12.06.90.17.001	Leptin		ΛΕΠΤΙΝΗ	
+12.06.90.19.001	Cyclic Guanosine Monophosphate	cGMP	ΚΥΚΛΙΚΟ GMP	
+12.06.90.20.001	Catecholamines		ΚΑΤΕΧΟΛΑΜΙΝΕΣ	
+12.06.90.90.900	Other Individual and Specified Hormones		ΑΛΛΕΣ ΕΙΔΙΚΕΣ ΟΡΜΟΝΕΣ/ΠΡΩΤΕΙΝΕΣ	
+12.07.01.01.001	Erythropoietin	EPO	ΕΡΥΘΡΟΠΟΙΗΤΙΝΗ	
+12.07.01.02.001	Ferritin		ΦΕΡΡΙΤΙΝΗ	
+12.07.01.03.001	Folate acid	FA	ΦΥΛΛΙΚΟ ΟΞΥ	
+12.07.01.03.002	Erythrocyte Folate acid		ΦΥΛΛΙΚΟ ΟΞΥ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ	
+12.07.01.06.001	Soluble Transferrin Receptor	sTfR	ΔΙΑΛΥΤΟΣ ΥΠΟΔΟΧΕΑΣ ΤΡΑΝΣΦΕΡΡΙΝΗΣ	
+12.07.01.90.900	Other Anemia related tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΑΝΑΙΜΙΑΣ	
+12.07.02.01.001	Vitamin B1		ΒΙΤΑΜΙΝΗ Β1	ΘΕΙΑΜΙΝΗ
+12.07.02.02.001	Vitamin B2		ΒΙΤΑΜΙΝΗ Β2	ΡΙΒΟΦΛΑΒΙΝΗ
+12.07.02.03.001	Vitamin B6		ΒΙΤΑΜΙΝΗ Β6	ΦΩΣΦΩΡΙΚΗ ΠΥΡΙΔΟΞΑΛΗ
+12.07.02.04.001	Vitamin B12	B12	ΒΙΤΑΜΙΝΗ Β12	ΚΥΑΝΟΚΟΒΑΛΑΜΙΝΗ
+12.07.02.05.001	Vitamin D (Cholecalciferol)	VitD	ΒΙΤΑΜΙΝΗ D	ΚΑΛΣΙΦΕΡΟΛΗ
+12.07.02.10.001	Intrinsic Factor (blocking Antibody)	IFbAb	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΕΝΔΟΓΕΝΟΥΣ ΠΑΡΑΓΟΝΤΑ	
+12.07.02.20.001	Vitamin A		ΒΙΤΑΜΙΝΗ Α	ΡΕΤΙΝΟΛΗ
+12.07.02.90.900	Other Vitamines		ΑΛΛΕΣ ΒΙΤΑΜΙΝΕΣ	
+12.08.01.01.001	Digoxin		ΔΙΓΟΞΙΝΗ	
+12.08.01.02.001	Digitoxin		ΔΙΓΙΤΟΞΙΝΗ	
+12.08.01.03.001	Disopyramide		ΔΙΣΟΠΥΡΑΜΙΔΗ	
+12.08.01.04.001	Flecainide		ΦΛΕΚΑΪΝΙΔΗ	
+12.08.01.05.001	Lidocaine		ΛΙΔΟΚΑΪΝΗ	
+12.08.01.06.001	N-Acetylprocainamide	NAPA	Ν-ΑΚΕΤΥΛΟΠΡΟΚΑΪΝΑΜΙΔΗ	
+12.08.01.07.001	Procainamide		ΠΡΟΚΑΪΝΑΜΙΔΗ	
+12.08.01.08.001	Propranolol		ΠΡΟΠΑΝΟΛΟΛΗ	
+12.08.01.09.001	Quinidine		ΚΙΝΙΔΙΝΗ	
+12.08.01.90.900	Other Cardiovascular TDM		ΑΛΛΑ ΦΑΡΜΑΚΑ ΚΑΡΔΙΟΑΓΓΕΙΑΚΟΥ	
+12.08.02.01.001	Carbamazepine	CBZ	ΚΑΡΒΑΜΑΖΕΠΙΝΗ	
+12.08.02.02.001	Ethosuximide		ΑΙΘΟΣΟΥΞΙΜΙΔΗ	
+12.08.02.03.001	Free Carbamazepine		ΕΛΕΥΘΕΡΟ ΚΛΑΣΜΑ ΚΑΡΒΑΜΑΖΕΠΙΝΗΣ	
+12.08.02.04.001	Free Phenytoin		ΕΛΕΥΘΕΡΟ ΚΛΑΣΜΑ ΦΑΙΝΥΤΟΪΝΗΣ	
+12.08.02.05.001	Free Primodone		ΕΛΕΥΘΕΡΟ ΚΛΑΣΜΑ ΠΡΙΜΙΔΟΝΗΣ	
+12.08.02.06.001	Free Valproic Acid		ΕΛΕΥΘΕΡΟ ΚΛΑΣΜΑ ΒΑΛΠΡΟΪΚΟΥ ΟΞΕΟΣ	
+12.08.02.07.001	Phenobarbital	PB	ΦΑΙΝΟΒΑΡΒΙΤΑΛΗ	
+12.08.02.08.001	Phenytoin	PHT	ΦΑΙΝΥΤΟΪΝΗ	
+12.08.02.09.001	Primidone		ΠΡΙΜΙΔΟΝΗ	
+12.08.02.10.001	Valproic Acid	VPA	ΒΑΛΠΡΟΪΚΟ ΟΞΥ	
+12.08.02.90.900	Other Central Nervous System TDM		ΑΛΛΑ ΦΑΡΜΑΚΑ ΚΕΝΤΡΙΚΟΥ ΝΕΥΡΙΚΟΥ ΣΥΣΤΗΜΑΤΟΣ	
+12.08.03.01.001	Amikacin		ΑΜΙΚΑΣΙΝΗ	
+12.08.03.02.001	Chloramphenicol		ΧΛΩΡΑΜΦΑΙΝΙΚΟΛΗ	
+12.08.03.03.001	Dibekacin		ΝΤΙΜΠΕΚΑΣΙΝΗ	
+12.08.03.04.001	Gentamicin		ΓΕΝΤΑΜΥΚΙΝΗ	
+12.08.03.05.001	Kanamycin		ΚΑΝΑΜΥΚΙΝΗ	
+12.08.03.06.001	Netilmycin		ΝΕΤΙΛΜΥΚΙΝΗ	
+12.08.03.07.001	Sisomycin		ΣΙΣΟΜΥΚΙΝΗ	
+12.08.03.08.001	Streptomycin		ΣΤΡΕΠΤΟΜΥΚΙΝΗ	
+12.08.03.09.001	Tobramycin		ΤΟΜΠΡΑΜΥΚΙΝΗ	
+12.08.03.10.001	Vancomycin		ΒΑΝΚΟΜΥΚΙΝΗ	
+12.08.03.11.001	Teicoplanine		ΤΕΪΚΟΠΛΑΝΙΝΗ	
+12.08.03.90.900	Other Antibiotics TDM		ΑΛΛΑ ΑΝΤΙΒΙΟΤΙΚΑ/ΑΝΤΙΙΙΚΑ ΦΑΡΜΑΚΑ	
+12.08.04.01.001	Caffeine		ΚΑΦΕΪΝΗ	
+12.08.04.02.001	Theophylline		ΘΕΟΦΥΛΛΙΝΗ	
+12.08.04.90.900	Other Anti-asthma TDM		ΑΛΛΑ ΑΝΤΙΑΣΘΜΑΤΙΚΑ ΦΑΡΜΑΚΑ	
+12.08.05.01.001	Methotrexate		ΜΕΘΟΤΡΕΞΑΤΗ	
+12.08.05.90.900	Other Anti-neoplastic TDM		ΑΛΛΑ ΑΝΤΙΝΕΟΠΛΑΣΜΑΤΙΚΑ ΦΑΡΜΑΚΑ	
+12.08.06.01.001	Cyclosporine Total		ΚΥΚΛΟΣΠΟΡΙΝΗ ΟΛΙΚΗ	
+12.08.06.02.001	Cyclosporine Specific		ΚΥΚΛΟΣΠΟΡΙΝΗ ΚΛΑΣΜΑ	
+12.08.06.03.001	Tacrolimus	FK506	ΤΑΚΡΟΛΙΜΟΥΣ	FK506
+12.08.06.04.001	Rapamycin (Sirolimus)		ΣΙΡΟΛΙΜΟΥΣ	
+12.08.06.05.001	Mycophenolate		ΜΥΚΟΦΑΙΝΟΛΑΤΗ	ΜΥΚΟΦΑΙΝΟΛΙΚΟ
+12.08.06.06.001	Everolimus		ΕΒΕΡΟΛΙΜΟΥΣ	
+12.08.06.90.900	Other Immunosuppressant TDM		ΑΛΛΑ ΑΝΟΣΟΚΑΤΑΣΤΑΛΤΙΚΑ ΦΑΡΜΑΚΑ	
+12.09.01.01.001	Amphetamines Group		ΑΜΦΕΤΑΜΙΝΕΣ	
+12.09.01.02.001	Amphetamine/Methamphetamine Specific (+Ecstasy)		ΑΜΦΕΤΑΜΙΝΕΣ/ΜΕΘΑΜΦΕΤΑΜΙΝΗ+ΕΚΣΤΑΣΗ	
+12.09.01.03.001	Barbiturates		ΒΑΡΒΙΤΟΥΡΙΚΑ	
+12.09.01.04.001	Benzodiazepines		ΒΕΝΖΟΔΙΑΖΕΠΙΝΕΣ	
+12.09.01.05.001	Cannabinoids	THC	ΚΑΝΝΑΒΙΝΟΕΙΔΗ	
+12.09.01.06.001	Cocaine + Cocaine Metabolites		ΚΟΚΑΪΝΗ+ΜΕΤΑΒΟΛΙΤΕΣ ΚΟΚΑΪΝΗΣ	
+12.09.01.07.001	Codeine		ΚΩΔΕΙΝΗ	
+12.09.01.08.001	Cotinine		ΚΩΤΙΝΙΝΗ	
+12.09.01.09.001	Lysergic acid diethylamide	LSD	ΔΙΑΙΘΥΛΑΜΙΔΙΟ ΤΟΥ ΛΥΣΕΡΓΙΚΟΥ ΟΞΕΟΣ	
+12.09.01.10.001	Methadone incl. EDDP		ΜΕΘΑΔΟΝΗ	
+12.09.01.11.001	Methaqualone		ΜΕΘΑΚΟΥΑΛΟΝΗ	
+12.09.01.12.001	Morphines		ΜΟΡΦΙΝΗ	
+12.09.01.13.001	Opiates		ΟΠΙΟΥΧΑ	
+12.09.01.14.001	Phencyclidine	PCP	ΦΑΙΝΣΥΚΛΙΔΙΝΗ	
+12.09.01.15.001	Propoxyphene		ΠΡΟΠΟΞΥΦΑΙΝΗ	
+12.09.01.16.001	6-Acethylmorphium		6-ΑΚΕΤΥΛΟΜΟΡΦΙΝΗ	
+12.09.01.17.001	Buprenorphine		ΒΟΥΠΡΕΝΟΡΦΙΝΗ	
+12.09.01.90.900	Other drugs of abuse		ΑΛΛΑ ΕΞΑΡΤΗΣΙΟΓΟΝΑ ΦΑΡΜΑΚΑ	
+12.09.02.01.001	Acetaminophene (Paracetamol)		ΑΚΕΤΑΜΙΝΟΦΑΙΝΗ	
+12.09.02.02.001	5-Aminolevulinate Dehydratase		5-ΑΜΙΝΟΛΕΒΟΛΙΝΕΪΚΗ ΔΕΫΔΡΑΤΑΣΗ	
+12.09.02.03.001	Amitriptyline		ΑΜΙΤΡΙΠΤΥΛΙΝΗ	
+12.09.02.05.001	Desipramine		ΔΕΣΙΠΡΑΜΙΝΗ	
+12.09.02.06.001	Doxepin plus metabolites		ΔΟΞΕΠΙΝΗ ΚΑΙ ΜΕΤΑΒΟΛΙΤΕΣ	
+12.09.02.07.001	Ethanol (Alcohol)		ΑΙΘΑΝΟΛΗ	ΑΙΘΥΛΙΚΗ ΑΛΚΟΟΛΗ
+12.09.02.08.001	Hippuric Acid		ΙΠΠΟΥΡΙΚΟ ΟΞΥ	
+12.09.02.09.001	Imipramine		ΙΜΙΠΡΑΜΙΝΗ	
+12.09.02.10.001	Nortriptyline		ΝΟΡΤΡΙΠΤΥΛΙΝΗ	
+12.09.02.11.001	Phenols		ΦΑΙΝΟΛΕΣ	
+12.09.02.12.001	Protoporphyrin IX		ΠΡΩΤΟΠΟΡΦΥΡΙΝΗ	
+12.09.02.13.001	Salicylate		ΣΑΛΙΚΥΛΙΚΑ	
+12.09.02.14.001	Trichloroacetic Acid		ΤΡΙΧΛΩΡΟΞΙΚΟ ΟΞΥ	
+12.09.02.15.001	Tricyclic Antidepressants (Total)	TAD / TCA	ΤΡΙΚΥΚΛΙΚΑ ΑΝΤΙΚΑΤΑΘΛΙΠΤΙΚΑ	
+12.09.02.16.001	Uro/Coproporphyrins		ΟΥΡΟ/ΚΟΠΡΟΠΟΡΦΥΡΙΝΕΣ	
+12.09.02.20.001	Ethly Glucuronide	ETG	ΑΙΘΥΛΟ-ΓΛΥΚΟΥΡΟΝΙΔΙΟ	
+12.09.02.90.900	Other Toxicology		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΤΟΞΙΚΟΛΟΓΙΑΣ	
+12.12.01.01.001	MEGX		ΜΟΝΟΕΘΥΛΓΛΥΚΥΛΞΥΛΙΔΙΝΗ	
+12.12.01.02.001	Carbo Hydrate Deficient Transferrin	CDT	ΥΔΑΤΑΝΘΡΑΚΙΚΗ ΜΟΡΦΗ ΤΡΑΝΦΕΡΡΙΝΗΣ	
+12.12.01.03.001	Hyaluronic acid	HA	ΥΑΛΟΟΥΡΟΝΙΚΟ ΟΞΥ	
+12.12.01.04.001	Procollagen III Amino Terminal Peptide	PIIINP	ΑΜΙΝΟΤΕΛΙΚΟ ΠΕΠΤΙΔΙΟ ΠΡΟΚΑΛΟΓΟΝΟΥ ΤΥΠΟΥ ΙΙΙ	
+12.12.01.05.001	Tissue Inhibitor of Metalloproteinase 1	TIMP-1	ΑΝΑΣΤΟΛΕΑΣ ΙΣΤΙΚΩΝ ΜΕΤΑΛΟΠΡΩΤΕΑΣΩΝ-1	
+12.12.01.20.001	Tissue Inhibitor of Metalloproteinase 2	TIMP-2	ΑΝΑΣΤΟΛΕΑΣ ΙΣΤΙΚΩΝ ΜΕΤΑΛΟΠΡΩΤΕΑΣΩΝ-2	
+12.12.01.90.900	Other Liver Function		ΑΛΛΕΣ ΕΙΔΙΚΕΣ ΕΞΕΤΑΣΕΙΣ ΕΛΕΓΧΟΥ ΗΠΑΤΙΚΗΣ ΛΕΙΤΟΥΡΓΙΑΣ	
+12.13.01.01.001	BNP / proBNP (including other Natriuric Peptides)	BNP/proBNP	ΑΜΙΝΟΤΕΛΙΚΟ ΑΚΡΟ ΤΟΥ ΠΡΟΠΕΠΤΙΔΙΟΥ ΤΟΥ ΕΓΚΕΦΑΛΙΚΟΥ ΝΑΤΡΙΟΥΡΗΤΙΚΟΥ ΠΕΠΤΙΔΙΟΥ	Β-ΤΥΠΟΥ ΝΑΤΡΙΟΥΡΗΤΙΚΟ ΠΕΠΤΙΔΙΟ, proBNP
+12.13.01.02.001	Creatine Kinase - MB mass	CK-MB (mass)	ΙΣΟΕΝΖΥΜΟ ΜΒ ΤΗΣ KΡΕΑΤΙΝΟΚΙΝΑΣΗΣ(ΜΑΖΑ)	
+12.13.01.03.001	Heart-Type Fatty Acid-Binding Protein	H-FABP	ΣΥΝΔΕΤΙΚΗ ΠΡΩΤΕΙΝΗ ΤΩΝ ΛΙΠΑΡΩΝ ΟΞΕΩΝ ΤΗΣ ΚΑΡΔΙΑΣ	
+12.13.01.05.001	Myoglobin	MYO	ΜΥΟΣΦΑΙΡΙΝΗ	
+12.13.01.06.001	Myosin Light Chain		ΜΥΟΣΦΑΙΡΙΝΗ ΕΛΑΦΡΕΣ ΑΛΥΣΙΔΕΣ	
+12.13.01.07.001	Troponin Ι ή T		ΤΡΟΠΟΝΙΝΗ Ι ή T	
+12.13.01.09.001	Homocysteine		ΟΜΟΚΥΣΤΕΪΝΗ	
+12.13.01.10.001	High-Sensitivity C-Reactive Protein	hs-CRP	C-ΑΝΤΙΔΡΩΣΑ ΠΡΩΤΕΙΝΗ ΥΨΗΛΗΣ ΕΥΑΙΣΘΗΣΙΑΣ	
+12.13.01.11.001	Ischemia Modified Albumin	IMA	ΤΡΟΠΟΠΟΙΗΜΕΝΗ ΑΛΒΟΥΜΙΝΗ ΛΟΓΩ ΙΣΧΑΙΜΙΑΣ	
+12.13.01.12.001	Myeloperoxidase	MPO	ΜΥΕΛΟ-ΥΠΕΡΟΞΕΙΔΑΣΗ	
+12.13.01.13.001	Lipoprotein-associated phospholipase A2	Lp-PLA2	ΣΧΕΤΙΖΟΜΕΝΗ ΜΕ ΤΙΣ ΛΙΠΟΠΡΩΤΕΙΝΕΣ ΦΩΣΦΟΛΙΠΑΣΗ Α2	PLAC Test
+12.13.01.90.900	Other Cardiac Markers		ΑΛΛΟΙ ΔΕΙΚΤΕΣ ΚΑΡΔΙΑΚΗΣ ΛΕΙΤΟΥΡΓΙΑΣ	
+12.14.01.04.001	Tumour Necrosis Factors (TNFa,TNFb)	TNFa	ΠΑΡΑΓΟΝΤΑΣ ΝΕΚΡΩΣΗΣ ΤΩΝ ΟΓΚΩΝ	
+12.14.01.11.001	Interleukin 1b	IL-1b	ΙΝΤΕΡΛΕΥΚΙΝΗ 1b	
+12.14.01.12.001	Interleukin-2 Receptor	IL-2R	ΥΠΟΔΟΧΕΑΣ ΙΝΤΕΡΛΕΥΚΙΝΗΣ-2	
+12.14.01.20.001	Interleukin-6	IL-6	ΙΝΤΕΡΛΕΥΚΙΝΗ-6	
+12.14.01.21.001	Interleukin-7	IL-7	ΙΝΤΕΡΛΕΥΚΙΝΗ-7	
+12.14.01.22.001	Interleukin-8	IL-8	ΙΝΤΕΡΛΕΥΚΙΝΗ-8	
+12.14.01.23.001	Interleukin-10	IL-10	ΙΝΤΕΡΛΕΥΚΙΝΗ-10	
+12.14.01.24.001	Interleukin-17a	IL-17a	ΙΝΤΕΡΛΕΥΚΙΝΗ-17a	
+12.14.01.25.001	Interferon γ	INFγ	ΙΝΤΕΡΦΕΡΟΝΗ γ	
+12.14.01.26.001	soluble Fas ligand	sFasL	ΔΙΑΛΥΤΟΣ ΣΥΝΔΕΤΗΣ Fas	
+12.14.01.90.900	Other Cytokines (Lymphokines) / Immunmodulators		ΑΛΛΕΣ ΚΥΤΤΑΡΟΚΙΝΕΣ	
+12.70.05.02.001	HCG - Rapid Test	TEST ΚΥΗΣΗΣ	ΤΑΧΕΙΑ ΕΞΕΤΑΣΗ HCG (TEST ΚΥΗΣΗΣ)	ΤΕΣΤ ΚΥΗΣΗΣ
+12.70.05.90.900	Other Fertility/Pregnancy Rapid Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΓΟΝΙΜΟΤΗΤΑΣ-ΚΥΗΣΗΣ	
+12.70.06.06.001	Neutrophil Gelatinase associated Lipocalin (lipocalin 2) - Rapid Test	NGAL-rapid	ΤΑΧΕΙΑ ΕΞΕΤΑΣΗ NGAL	
+12.70.06.20.001	Placental Growth Factor-Rapid test	PlGF-rapid	ΤΑΧΕΙΑ ΕΞΕΤΑΣΗ ΠΛΑΚΟΥΝΤΙΑΚΟΥ ΑΥΞΗΤΙΚΟΥ ΠΑΡΑΓΟΝΤΑ	
+12.70.06.90.900	Other Individual and Specified Hormones/Proteins Rapid Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΟΡΜΟΝΩΝ/ΠΡΩΤΕΙΝΩΝ	
+12.70.08.90.900	Other TDM Rapid Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΦΑΡΜΑΚΩΝ	
+12.70.09.90.900	Other Drugs of Abuse/Toxicology Rapid Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΕΞΑΡΤΗΣΙΟΓΟΝΩΝ ΦΑΡΜΑΚΩΝ/ΤΟΞΙΚΟΛΟΓΙΑΣ	
+12.70.11.01.001	C-Reactive Protein - Rapid Test	CRP	C-ΑΝΤΙΔΡΩΣΑ ΠΡΩΤΕΙΝΗ -ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	
+12.70.11.90.900	Other Rheumatoid / Inflammatory Disease Rapid Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΡΕΥΜΑΤΟΕΙΔΩΝ/ΦΛΕΓΜΟΝΩΔΩΝ ΝΟΣΗΜΑΤΩΝ	
+12.70.13.01.001	Creatine Kinase - MB mass - Rapid Test	CK-MB-rapid	ΙΣΟΕΝΖΥΜΟ ΜΒ ΤΗΣ KΡΕΑΤΙΝΟΚΙΝΑΣΗΣ (ΜΑΖΑ) -ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	
+12.70.13.02.001	Myoglobin - Rapid Test	MYO	ΜΥΟΣΦΑΙΡΙΝΗ -ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	
+12.70.13.03.001	Troponin I/T - Rapid Test		ΤΡΟΠΟΝΙΝΗ Ι / Τ-ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	
+12.70.13.04.001	BNP / proBNP - Rapid Test (including other Natriuric Peptides)		ΑΜΙΝΟΤΕΛΙΚΟ ΑΚΡΟ ΤΟΥ ΠΡΟΠΕΠΤΙΔΙΟΥ ΤΟΥ ΕΓΚΕΦΑΛΙΚΟΥ ΝΑΤΡΙΟΥΡΗΤΙΚΟΥ ΠΕΠΤΙΔΙΟΥ-ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	Β-ΤΥΠΟΥ ΝΑΤΡΙΟΥΡΗΤΙΚΟ ΠΕΠΤΙΔΙΟ, proBNP (ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ)
+12.70.13.05.001	Heart-Type Fatty Acid-Binding Protein - Rapid Test	H-FABP	ΣΥΝΔΕΤΙΚΗ ΠΡΩΤΕΙΝΗ ΤΩΝ ΛΙΠΑΡΩΝ ΟΞΕΩΝ ΤΗΣ ΚΑΡΔΙΑΣ -ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	
+12.70.13.90.900	Other Cardiac Markers - Rapid Tests		ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΑΛΛΩΝ ΔΕΙΚΤΩΝ ΚΑΡΔΙΑΚΗΣ ΛΕΙΤΟΥΡΓΙΑΣ	
+12.90.90.90.900	Other Other Immunochemistry tests		ΑΛΛΕΣ ΑΝΟΣΟΧΗΜΙΚΕΣ ΕΞΕΤΑΣΕΙΣ ΠΟΥ ΔΕΝ ΑΝΑΦΕΡΟΝΤΑΙ ΑΛΛΟΥ	
+13.01.01.01.001	Complete Blood Count	CBC-3	ΠΛΗΡΗΣ ΓΕΝΙΚΗ ΑΙΜΑΤΟΣ ΜΕ ΔΙΑΧΩΡΙΣΜΟ 3 ΥΠΟΠΛΗΘΥΣΜΩΝ ΛΕΥΚΟΚΥΤΤΑΡΩΝ	
+13.01.01.01.002	Complete Blood Count	CBC-5	ΠΛΗΡΗΣ ΓΕΝΙΚΗ ΑΙΜΑΤΟΣ ΜΕ ΔΙΑΧΩΡΙΣΜΟ 5 ΥΠΟΠΛΗΘΥΣΜΩΝ ΛΕΥΚΟΚΥΤΤΑΡΩΝ	
+13.01.01.01.003	Complete Blood Count plus RET	CBC-RET	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΔΙΚΤΥΟΕΡΥΘΡΟΚΥΤΤΑΡΩΝ (ΔΕΚ) ΣΕ ΑΥΤΟΜΑΤΟ ΑΝΑΛΥΤΗ	
+13.01.01.01.004	Complete Blood Count plus NRBC	CBC-NRBC	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΕΡΥΘΡΟΒΛΑΣΤΩΝ (NRBC) ΣΕ ΑΥΤΟΜΑΤΟ ΑΝΑΛΥΤΗ	
+13.01.01.10.001	Specific Reticulocyte Reagents count (manually)	RET	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΔΙΚΤΥΟΕΡΥΘΡΟΚΥΤΤΑΡΩΝ (ΔΕΚ) ΣΕ ΕΠΙΧΡΙΣΜΑ ΑΙΜΑΤΟΣ ΜΕ ΧΕΙΡΟΚΙΝΗΤΗ ΜΕΘΟΔΟ	
+13.01.01.90.900	Other tests for (Automated) Haematology Analyzer		ΑΛΛΕΣ ΠΑΡΑΜΕΤΡΟΙ ΓΕΝΙΚΗΣ ΑΙΜΑΤΟΣ	
+13.01.02.01.001	Haemoglobin determinations (Total Hb)	Hb	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΟΛΙΚΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ	
+13.01.02.02.001	Haemoglobin subtypes HbA2,HbC,HbF,HbS,etc.(excl. HbA1)		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ ΚΑΙ ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΜΕ ΧΡΩΜΑΤΟΓΡΑΦΙΑ ΥΨΗΛΗΣ ΠΙΣΤΟΤΗΤΑΣ (πχ, Α2, S, C, F)	
+13.01.02.20.001	Cellulose acetate electrophoresis Hb		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ ΣΕ ΤΑΙΝΙΑ ΟΞΕΙΚΗΣ ΚΥΤΤΑΡΙΝΗΣ	
+13.01.02.21.001	Electrophoresis Hb by Isoelectric focusing (IEF)		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ ΜΕ ΙΣΟΗΛΕΚΤΡΙΚΗ ΕΣΤΙΑΣΗ	
+13.01.02.22.001	Agar gel electrophoresis Hb		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ ΣΕ ΤΑΙΝΙΑ ΑΓΑΡΟΖΗΣ	
+13.01.02.23.001	Capillary zone electrophoresis Hb		ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ ΜΕ ΤΕΧΝΙΚΗ ΤΡΙΧΟΕΙΔΙΚΗΣ ΗΛΕΚΤΡΟΦΟΡΗΣΗΣ	
+13.01.02.24.001	Test for unstable haemoglobin		ΔΟΚΙΜΑΣΙΑ ΓΙΑ ΑΣΤΑΘΕΙΣ ΑΙΜΟΣΦΑΙΡΙΝΕΣ	
+13.01.02.25.001	Stained preparations for Heinz Bodies		ΔΟΚΙΜΑΣΙΑ ΓΙΑ ΣΩΜΑΤΙΑ HEINZ, ΑΜΕΣΗ ΧΡΩΣΗ	
+13.01.02.26.001	Heinz Bodies after incubation with acetylphenylhydrazine		ΔΟΚΙΜΑΣΙΑ ΓΙΑ ΣΩΜΑΤΙΑ HEINZ, ΕΠΑΓΟΜΕΝΗ ΧΡΩΣΗ ΜΕ ΑΚΕΤΥΛΟΦΑΙΝΥΛΥΔΡΑΖΙΝΗ	
+13.01.02.27.001	Globin chain synthesis rates		ΒΙΟΣΥΝΘΕΣΗ ΑΙΜΟΣΦΑΙΡΙΝΗΣ (α- ΚΑΙ β- ΑΛΥΣΕΙΣ)	
+13.01.02.28.001	Osmotic fragility of RBCs		ΩΣΜΩΤΙΚΗ ΑΝΤΙΣΤΑΣΗ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ ΧΩΡΙΣ ΕΠΩΑΣΗ	
+13.01.02.29.001	Osmotic fragility of RBCs after incubation		ΩΣΜΩΤΙΚΗ ΑΝΤΙΣΤΑΣΗ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ ΜΕ ΕΠΩΑΣΗ	
+13.01.02.30.001	Qualitative solubility test for HbS		ΔΟΚΙΜΑΣΙΑ ΔΡΕΠΑΝΩΣΕΩΣ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ (TEST ΔΙΑΛΥΤΟΤΗΤΑΣ)	
+13.01.02.31.001	Oxygen dissociation curve of Hb		ΚΑΜΠΥΛΗ ΚΟΡΕΣΜΟΥ Ο2-ΑΙΜΟΣΦΑΙΡΙΝΗΣ	
+13.01.02.32.001	Demostration of carboxyhaemoglobin		ΑΝΘΡΑΚΥΛΑΙΜΟΣΦΑΙΡΙΝΗ, ΠΟΣΟΤΙΚΗ	
+13.01.02.33.001	Determination of carboxyhaemoglobin		ΑΝΘΡΑΚΥΛΑΙΜΟΣΦΑΙΡΙΝΗ, ΠΟΙΟΤΙΚΗ	
+13.01.02.34.001	Demostration of sulphaemoglobin		ΘΕΙΑΙΜΟΣΦΑΙΡΙΝΗ, ΠΟΙΟΤΙΚΗ	
+13.01.02.35.001	Mesurment of sulphaemoglobin		ΘΕΙΑΙΜΟΣΦΑΙΡΙΝΗ, ΠΟΣΟΤΙΚΗ	
+13.01.02.36.001	Screening method for methaemoglobin		ΜΕΘΑΙΜΟΣΦΑΙΡΙΝΗ, ΠΟΙΟΤΙΚΗ	
+13.01.02.37.001	Mesurment of methaemoglobin		ΜΕΘΑΙΜΟΣΦΑΙΡΙΝΗ, ΠΟΣΟΤΙΚΗ	
+13.01.02.38.001	Estimation of HbF by methods of ΒETKE or JONXIS		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΕΜΒΡΥΪΚΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ F ΚΑΤΑ BETKE Η JONXIS	
+13.01.02.39.001	Screening for HbF		ΑΝΙΧΝΕΥΣΗ ΕΜΒΡΥΪΚΗΣ ΑΙΜΟΣΦΑΙΡΙΝΗΣ F	
+13.01.02.90.900	Other Haemoglobin (Types) Testing		ΑΛΛΕΣ ΔΟΚΙΜΑΣΙΕΣ (ΠΛΗΝ ΜΟΡΙΑΚΩΝ) ΓΙΑ ΤΟΝ ΕΛΕΓΧΟ ΤΩΝ ΑΙΜΟΣΦΑΙΡΙΝΟΠΑΘΕΙΩΝ	
+13.01.03.02.001	May-Grünwald-Giemsa stain blood smear (manually)		ΧΡΩΣΗ ΚΑΙ ΜΕΛΕΤΗ ΕΠΙΧΡΙΣΜΑΤΟΣ ΑΙΜΑΤΟΣ ΜΕ MAY GRÜNWALD-GIEMSA (ΧΕΙΡΟΚΙΝΗΤΗ)	
+13.01.03.02.002	May-Grünwald-Giemsa stain bone marrow aspiration		ΧΡΩΣΗ ΚΑΙ ΜΕΛΕΤΗ ΕΠΙΧΡΙΣΜΑΤΟΣ ΜΥΕΛΟΥ ΤΩΝ ΟΣΤΩΝ ΜΕΤΑ ΑΝΑΡΡΟΦΗΣΗ ΜΕ MAY GRÜNWALD-GIEMSA	
+13.01.03.02.003	May-Grünwald-Giemsa stain blood smear (automated)		ΧΡΩΣΗ ΚΑΙ ΜΕΛΕΤΗ ΕΠΙΧΡΙΣΜΑΤΟΣ ΑΙΜΑΤΟΣ ΜΕ MAY GRÜNWALD-GIEMSA (ΑΥΤΟΜΑΤΟΠΟΙΗΜΕΝΗ)	
+13.01.03.20.001	Neutrophil Alkaline Phosphatase stain	NAP -s	ΑΛΚΑΛΙΚΗ ΦΩΣΦΑΤΑΣΗ ΟΥΔΕΤΕΡΟΦΙΛΩΝ (ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ)	Leukocyte Alkaline Phosphatase (LAP)
+13.01.03.21.001	Tartrate-resistant Leukocyte Acid Phosphatase stain	TRAP-s	ΟΞΙΝΗ ΦΩΣΦΑΤΑΣΗ ΑΝΘΕΚΤΙΚΗ ΣΤΟ ΤΡΥΓΙΚΟ ΟΞΥ (ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ)	
+13.01.03.22.001	Acid Phosphatase Leukocyte stain	APL-s	ΟΞΙΝΗ ΦΩΣΦΑΤΑΣΗ (ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ)	
+13.01.03.23.001	Periodic Acid-Schiff stain	PAS-s	PERIODIC ACID-SCHIFF, PAS (ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ)	
+13.01.03.24.001	a-Napthyl Acetate Esterase stain	ANAE-s	ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ ΜΗ ΕΙΔΙΚΗΣ ΕΣΤΕΡΑΣΗΣ ΜΕ ΥΠΟΣΤΡΩΜΑ A-NAPTHYL ACETATE	
+13.01.03.25.001	a-Naphthyl Βutyrate esterase stain	ANBE-s	ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ ΜΗ ΕΙΔΙΚΗΣ ΕΣΤΕΡΑΣΗΣ ΜΕ ΥΠΟΣΤΡΩΜΑ A-NAPHTHYL ΒUTYRATE	
+13.01.03.26.001	a-Naphthol AS-D chloroacetate esterase	CAE-s	ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ ΕΙΔΙΚΗΣ ΕΣΤΕΡΑΣΗΣ ΜΕ ΥΠΟΣΤΡΩΜΑ A-NAPHTHOL AS-D CHLOROACETATE	
+13.01.03.27.001	a-Napthyl Acetate Esterase with NaF stain	ANAE-NaF-s	ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ ΜΗ ΕΙΔΙΚΗΣ ΕΣΤΕΡΑΣΗΣ ΜΕ ΥΠΟΣΤΡΩΜΑ A-NAPTHYL ACETATE ΠΑΡΟΥΣΙΑ NAF	
+13.01.03.28.001	Leukocyte Peroxidase Stain	MPO-s	ΜΥΕΛΟΫΠΕΡΟΞΕΙΔΑΣΗ (ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ)	
+13.01.03.29.001	Sudan Black b stain	SBB-s	SUDAN BLACK B (ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ)	
+13.01.03.30.001	Potassium ferrocyanide iron stain	Iron-s	ΚΥΤΤΑΡΟΧΗΜΙΚΗ ΧΡΩΣΗ ΣΙΔΗΡΟΚΥΑΝΙΟΥΧΟΥ ΚΑΛΙΟΥ ΓΙΑ ΧΡΩΣΗ ΣΙΔΗΡΟΥ	Iron stain
+13.01.03.90.900	Other Haematology Stains for Microscopy		ΑΛΛΕΣ ΚΥΤΤΑΡΟΧΗΜΙΚΕΣ ΧΡΩΣΕΙΣ ΣΤΗΝ ΑΙΜΑΤΟΛΟΓΙΑ	
+13.01.09.01.001	Glucose-6-phosphate dehydrogenase (G-6-PD)	G-6-PD	ΑΦΥΔΡΟΓΟΝΑΣΗ ΤΗΣ 6-ΦΩΣΦΟΡΙΚΗΣ ΓΛΥΚΟΖΗΣ	
+13.01.09.01.002	Screnning test for glucose-6-phosphate dehydrogenase deficiency (Screen G-6-PD)	G-6-PD Screen	ΔΟΚΙΜΑΣΙΑ ΔΙΑΛΟΓΗΣ ΓΙΑ ΤΗΝ ΑΝΕΠΑΡΚΕΙΑ ΤΗΣ ΑΦΥΔΡΟΓΟΝΑΣΗΣ ΤΗΣ 6-ΦΩΣΦΟΡΙΚΗΣ ΓΛΥΚΟΖΗΣ	
+13.01.09.01.003	Pyuvate Kinase		ΠΥΡΟΣΤΑΦΥΛΙΚΗ ΚΙΝΑΣΗ	
+13.01.09.01.004	Glucose Phosphate Isomerase		ΓΛΥΚΟΖΟ-ΙΣΟΜΕΡΑΣΗ	
+13.01.09.01.005	Pyrimidine-5-Nucleotidase		ΠΙΡΙΜΙΔΙΝΟ-5-ΝΟΥΛΕΟΤΙΔΑΣΗ	
+13.01.09.01.006	Phosphoglycerate Kinase		ΦΩΣΦΟΓΛΥΚΕΡΙΝΙΚΗ ΚΙΝΑΣΗ	
+13.01.09.01.007	Triosephosphate isomerase		ΤΡΙΟΖΟΦΩΣΦΟΡΙΚΗ ΙΣΟΜΕΡΑΣΗ	
+13.01.09.01.008	Hexokinase		ΕΞΟΚΙΝΑΣΗ	
+13.01.09.01.009	Glutathione		ΓΛΟΥΤΑΘΕΙΟΝΗ	ΓΛΟΥΤΑΘΕΙΟ
+13.01.09.01.010	GSH synthetase		ΣΥΝΘΕΤΑΣΗ ΤΗΣ ΓΛΟΥΤΑΘΕΙΟΝΗΣ	ΣΥΝΘΕΤΑΣΗ ΤΟΥ ΓΛΟΥΤΑΘΕΙΟΥ
+13.01.09.01.011	Glutathione reductase		ΑΝΑΓΩΓΑΣΗ ΤΗΣ ΓΛΟΥΤΑΘΕΙΟΝΗΣ	ΑΝΑΓΩΓΑΣΗ ΤΟΥ ΓΛΟΥΤΑΘΕΙΟΥ
+13.01.09.01.012	2,3-Diphosphoglycerate	2,3-DPG	2,3-ΔΙΦΩΣΦΟΓΛΥΚΕΡΙΝΙΚΟ ΟΞΥ	
+13.01.09.11.001	Erythrocyte Sedimentation Rate Test (automated)	ESR (auto)	ΤΑΧΥΤΗΤΑ ΚΑΘΙΖΗΣΗΣ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ (ΑΥΤΟΜΑΤΟΠΟΙΗΜΕΝΗ)	
+13.01.09.11.002	Erythrocyte Sedimentation Rate Test (manually)	ESR	ΤΑΧΥΤΗΤΑ ΚΑΘΙΖΗΣΗΣ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ (ΧΕΙΡΟΚΙΝΗΤΗ)	
+13.01.09.20.001	Determination of Red Blood Cells Membrane Protein		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΠΡΩΤΕΙΝΩΝ ΜΕΜΒΡΑΝΗΣ ΕΡΥΘΡΟΚΥΤΤΑΡΟΥ	
+13.01.09.21.001	Acidfied-serum test (Ham test)	ΗΑΜ TEST	ΔΟΚΙΜΑΣΙΑ ΛΥΣΕΩΣ ΕΡΥΘΡΟΚΥΤΤΑΡΩΝ ΣΕ ΟΞΙΝΙΣΘΕΝΤΑ ΟΡΟ (HAM TEST)	
+13.01.09.22.001	Sucrose lysis test	SUCROSE TEST	ΔΟΚΙΜΑΣΙΑ ΣΟΥΚΡΟΖΗΣ (SUCROSE LYSIS TEST)	
+13.01.09.90.900	Other Haematology tests		ΔΙΑΦΟΡΕΣ ΑΛΛΕΣ ΔΟΚΙΜΑΣΙΕΣ ΠΟΥ ΑΦΟΡΟΥΝ ΤΗΝ ΑΙΜΑΤΟΛΟΓΙΑ	
+13.01.70.03.001	Haematocrit	HCT	ΑΙΜΑΤΟΚΡΙΤΗΣ	ΜΙΚΡΟΑΙΜΑΤΟΚΡΙΤΗΣ
+13.01.70.90.900	Other Rapid Haematology Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΜΕΘΟΔΟΙ ΑΙΜΑΤΟΛΟΓΙΑΣ	
+13.02.01.01.001	Prothrombin time (Quick Test, INR)	PT	ΧΡΟΝΟΣ ΠΡΟΘΡΟΜΒΙΝΗΣ, INR, (%)	
+13.02.01.02.001	Activated Partial Thromboplastin Time	APTT	ΕΝΕΡΓΟΠΟΙΗΜΕΝΟΣ ΧΡΟΝΟΣ ΜΕΡΙΚΗΣ ΘΡΟΜΒΟΠΛΑΣΤΙΝΗΣ	
+13.02.01.03.001	Thrombin Time	TT	ΧΡΟΝΟΣ ΘΡΟΜΒΙΝΗΣ	
+13.02.01.03.002	Reptilase Time		ΧΡΟΝΟΣ ΡΕΠΤΙΛΑΣΗΣ	
+13.02.01.04.001	Clotting Time (Lee White method)	CT	XΡΟΝΟΣ ΠΗΞΗΣ ΚΑΤΑ LEE WHITE	
+13.02.01.20.001	Bleeding time (Ivy method)	BT-Ivy	ΧΡΟΝΟΣ ΡΟΗΣ ΚΑΤΑ IVY	
+13.02.01.90.900	Other Global Coagulation Tests		ΑΛΛΕΣ ΒΑΣΙΚΕΣ ΔΟΚΙΜΑΣΙΕΣ ΑΙΜΟΣΤΑΣΗΣ	
+13.02.02.01.001	Fibrinogen Assays (Factor I)	FIB	ΙΝΩΔΟΓΟΝΟ	
+13.02.02.02.001	Coagulation factor II (Prothrombin) activity	F II	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ ΙΙ (ΠΡΟΘΡΟΜΒΙΝΗ)	
+13.02.02.03.001	Coagulation factor IIa (Thrombin) activity	F IIa	ΔΡΑΣΤΙΚΟΤΗΤΑ ΕΝΕΡΓΟΠΟΙΗΜΕΝΟΥ ΠΑΡΑΓΟΝΤΑ ΙΙ (ΘΡΟΜΒΙΝΗ)	
+13.02.02.04.001	Coagulation factor V activity	F V	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ V	
+13.02.02.05.001	Coagulation factor VII activity	F VII	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ VII	
+13.02.02.06.001	Coagulation factor VIIa activity	F VIIa	ΔΡΑΣΤΙΚΟΤΗΤΑ ΕΝΕΡΓΟΠΟΙΗΜΕΝΟΥ ΠΑΡΑΓΟΝΤΑ VIΙ	
+13.02.02.07.001	Coagulation factor VIII activity	F VIII	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ VIII	
+13.02.02.08.001	Coagulation factor IX activity	F IX	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ IX	
+13.02.02.09.001	Coagulation factor X activity	F X	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ X	
+13.02.02.11.001	Coagulation factor XI activity	F XI	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ XI	
+13.02.02.12.001	Coagulation factor XII activity	F XII	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ XII	
+13.02.02.13.001	Coagulation factor XIIa activity	F XIIa	ΔΡΑΣΤΙΚΟΤΗΤΑ ΕΝΕΡΓΟΠΟΙΗΜΕΝΟΥ ΠΑΡΑΓΟΝΤΑ XIΙ	
+13.02.02.14.001	Coagulation factor XIII activity	F XIII	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ XIII	
+13.02.02.17.001	Coagulation factor HMW-Kininogen (Fitzgerald)	HMWK	ΔΡΑΣΤΙΚΟΤΗΤΑ ΥΨΗΛΟΥ ΜΟΡΙΑΚΟΥ ΒΑΡΟΥΣ ΚΙΝΙΝΟΓΟΝΟΥ	
+13.02.02.18.001	Coagulation factor von Willebrand Activity	vWF	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ VON WILLEBRAND	
+13.02.02.19.001	Prekallikrein / Kallikrein (Fletcher factor)		ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΡΟΚΑΛΛΙΚΡΕΪΝΗΣ	
+13.02.02.21.001	Coagulation factor von Willebrand Activity / Ristocetin Cofactor	vWF(RiCof)	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ VON WILLEBRAND ΜΕ ΣΥΜΠΑΡΑΓΟΝΤΑ ΡΙΣΤΟΣΕΤΙΝΗ (RICOF)	
+13.02.02.22.001	Coagulation factor von Willebrand Collagen Binding Assay	vWF(CBA)	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΑΡΑΓΟΝΤΑ VON WILLEBRAND ΜΕ ΕΛΕΓΧΟ ΤΗΣ ΔΕΣΜΕΥΣΗΣ ΤΟΥ ΚΟΛΛΑΓΟΝΟΥ (CBA)	
+13.02.02.23.001	Coagulation factor V		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ V	
+13.02.02.24.001	Coagulation factor VII		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ VII	
+13.02.02.25.001	Coagulation factor VIII		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ VIII	
+13.02.02.26.001	Coagulation factor IX		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ IX	
+13.02.02.27.001	Coagulation factor X		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ X	
+13.02.02.28.001	Coagulation factor XIII		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ XIII	
+13.02.02.29.001	Coagulation von Willebrand factor		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ VON WILLEBRAND	
+13.02.02.30.001	Coagulation factor ΙΙ		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ ΙΙ	
+13.02.02.31.001	Coagulation factor XΙ		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ XΙ	
+13.02.02.32.001	Coagulation factor XΙΙ		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ XΙΙ	
+13.02.02.33.001	Electrophoresis Separated von Willebrand Factor Multimers		ΑΝΑΛΥΣΗ ΠΟΛΥΜΕΡΩΝ ΠΑΡΑΓΟΝΤΑ VON WILLEBRAND (ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΠΟΛΥΜΕΡΩΝ)	
+13.02.02.90.900	Other Coagulation Factors		ΕΠΙΠΡΟΣΘΕΤΟΙ ΠΡΟΣΔΙΟΡΙΣΜΟΙ ΠΑΡΑΓΟΝΤΩΝ ΠΗΞΗΣ	
+13.02.03.03.001	Fibrin sensitivity monomer		ΔΙΑΛΥΤΑ ΜΟΝΟΜΕΡΗ ΙΝΩΔΟΥΣ	
+13.02.03.04.001	Fibrinopeptide A		ΙΝΩΔΟΠΕΠΤΙΔΙΟ Α	
+13.02.03.05.001	Heparin		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΕΠΙΠΕΔΩΝ ΗΠΑΡΙΝΗΣ	
+13.02.03.06.001	Hirudin Test		ΧΡΟΝΟΣ ΕΚΑΡΙΝΗΣ	Ecarin Clotting Time
+13.02.03.07.001	Plasmin - a2 - Antiplasmin Complex		ΣΥΜΠΛΟΚΟ ΠΛΑΣΜΙΝΗΣ-Α2 ΑΝΤΙΠΛΑΣΜΙΝΗΣ	
+13.02.03.08.001	Prothrombin Fragment 1 + 2		ΚΛΑΣΜΑ ΠΡΟΘΡΟΜΒΙΝΗΣ 1+2	
+13.02.03.09.001	Thrombin-Antithrombin III-Complex		ΣΥΜΠΛΟΚΟ ΘΡΟΜΒΙΝΗΣ-ΑΝΤΙΘΡΟΜΒΙΝΗΣ ΙΙΙ	
+13.02.03.20.001	Anti Xa activity (Heparin, LMWH)		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΗΣ ΑΝΤΙ-Xa ΔΡΑΣΤΙΚΟΤΗΤΑΣ (ΘΕΡΑΠΕΙΑ ΜΕ ΚΛΑΣΙΚΗ ΗΠΑΡΙΝΗ Η ΗΠΑΡΙΝΗ ΧΑΜΗΛΟΥ ΜΟΡΙΑΚΟΥ ΒΑΡΟΥΣ)	
+13.02.03.21.001	Anti Xa activity (Fondaparinux )		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΗΣ ΑΝΤΙ-Xa ΔΡΑΣΤΙΚΟΤΗΤΑΣ (ΘΕΡΑΠΕΙΑ ΜΕ FONDAPARINUX)	
+13.02.03.22.001	Anti Xa activity (Rivaroxaban)		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΗΣ ΑΝΤΙ-Xa ΔΡΑΣΤΙΚΟΤΗΤΑΣ (ΘΕΡΑΠΕΙΑ ΜΕ RIVAROXABAN)	
+13.02.03.23.001	Βinding capacity of von Willebrand to F VIII		ΙΚΑΝΟΤΗΤΑ ΔΕΣΜΕΥΣΗΣ ΤΟΥ VWF ΣΤΟΝ FVIII	
+13.02.03.24.001	von Willebrand factor propeptide		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΠΡΟΠΕΠΤΙΔΙΟΥ ΤΟΥ ΠΑΡΑΓΟΝΤΑ VON WILLEBRAND	
+13.02.03.25.001	ADAMTS -13 activity		ΔΡΑΣΤΙΚΟΤΗΤΑ ΤΗΣ ΜΕΤΑΛΛΟΠΡΩΤΕΑΣΗΣ ADAMTS-13	
+13.02.03.26.001	ADAMTS -13 antigen		ΑΝΤΙΓΟΝΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΗΣ ΜΕΤΑΛΛΟΠΡΩΤΕΑΣΗΣ ADAMTS-13	
+13.02.03.27.001	ADAMTS-13 antibodies		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙ-ADAMTS-13 ΑΝΤΙΣΩΜΑΤΩΝ	
+13.02.03.90.900	Other Special Coagulation Tests		ΑΛΛΕΣ ΕΞΕΙΔΙΚΕΥΜΕΝΕΣ ΕΞΕΤΑΣΕΙΣ ΑΙΜΟΣΤΑΣΗΣ	
+13.02.04.01.001	Platelet activation in whole blood with different stimulators (per stimulator)		ΕΛΕΓΧΟΣ ΛΕΙΤΟΥΡΓΙΚΟΤΗΤΑΣ ΑΙΜΟΠΕΤΑΛΙΩΝ ΣΕ ΟΛΙΚΟ ΑΙΜΑ ΜΕ ΔΙΑΦΟΡΕΤΙΚΟΥΣ ΕΝΕΡΓΟΠΟΙΗΤΕΣ (ΑΝΑ ΕΝΕΡΓΟΠΟΙΗΤΗ)	
+13.02.04.01.002	Platelet activation in platelet rich plasma (PRP) with different stimulators (per stimulator)		ΕΛΕΓΧΟΣ ΛΕΙΤΟΥΡΓΙΚΟΤΗΤΑΣ ΑΙΜΟΠΕΤΑΛΙΩΝ ΣΕ ΠΛΑΣΜΑ ΠΛΟΥΣΙΟ ΣΕ ΑΙΜΟΠΕΤΑΛΙΑ ΜΕ ΔΙΑΦΟΡΕΤΙΚΟΥΣ ΕΝΕΡΓΟΠΟΙΗΤΕΣ (ΑΝΑ ΕΝΕΡΓΟΠΟΙΗΤΗ)	
+13.02.04.01.003	Platelet activation for the assessment of antiplatelet therapy (per drug)		ΕΛΕΓΧΟΣ ΛΕΙΤΟΥΡΓΙΚΟΤΗΤΑΣ ΑΙΜΟΠΕΤΑΛΙΩΝ ΓΙΑ ΤΗΝ ΕΚΤΙΜΙΣΗ ΤΗΣ ΑΝΤΙΑΙΜΟΠΕΤΑΛΙΑΚΗΣ ΘΕΡΑΠΕΙΑΣ (ΑΝΑ ΦΑΡΜΑΚΕΥΤΙΚΗ ΟΥΣΙΑ)	
+13.02.04.02.001	Platelet Factor 4	PF4	ΑΙΜΟΠΕΤΑΛΙΑΚΟΣ ΠΑΡΑΓΟΝΤΑΣ 4	
+13.02.04.03.001	Prostacyclin	PG12	ΠΡΟΣΤΑΚΥΚΛΙΝΗ (ΠΡΟΣΤΑΓΛΑΝΔΙΝΗ 12)	
+13.02.04.04.001	Thromboxane	TX	ΘΡΟΜΒΟΞΑΝΗ	
+13.02.04.05.001	b-Thromboglobulin	B-TG	Β-ΘΡΟΜΒΟΣΦΑΙΡΙΝΗ	
+13.02.04.90.900	Other Primary Hemostasis/Platelet Factors		ΑΛΛΕΣ ΔΟΚΙΜΑΣΙΕΣ ΕΛΕΓΧΟΥ ΛΕΙΤΟΥΡΓΙΚΟΤΗΤΑΣ ΑΙΜΟΠΕΤΑΛΙΩΝ	
+13.02.05.01.001	a2-Antiplasmin		ΔΡΑΣΤΙΚΟΤΗΤΑ Α2 ΑΝΤΙΠΛΑΣΜΙΝΗΣ	
+13.02.05.02.001	Fibrinogen Degradation Products	FDP	ΠΡΟΪΟΝΤΑ ΑΠΟΔΟΜΗΣ ΙΝΩΔΟΥΣ- ΙΝΩΔΟΓΟΝΟΥ	
+13.02.05.03.001	D-Dimer (semi quantitative)		D-ΔΙΜΕΡΗ (ΗΜΙΠΟΣΟΤΙΚΟΣ ΕΛΕΓΧΟΣ)	
+13.02.05.03.002	D-Dimer (quantitative)		D-ΔΙΜΕΡΗ (ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ)	
+13.02.05.04.001	Plasmin		ΠΛΑΣΜΙΝΗ	
+13.02.05.05.001	Plasminogen		ΠΛΑΣΜΙΝΟΓΟΝΟ	
+13.02.05.06.001	Plasminogen Activator-Inhibitor	PAI	ΑΝΑΣΤΑΛΤΗΣ ΤΟΥ ΕΝΕΡΓΟΠΟΙΗΤΗ ΤΟΥ ΠΛΑΣΜΙΝΟΓΟΝΟΥ	
+13.02.05.07.001	Tissue Plasminogen Activator antigen	tPA Ag	ΑΝΤΙΓΟΝΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΤΟΥ ΕΝΕΡΓΟΠΟΙΗΤΗ ΤΟΥ ΙΣΤΙΚΟΥ ΠΛΑΣΜΙΝΟΓΟΝΟΥ	
+13.02.05.07.002	Tissue Plasminogen Activator activity	tPA	ΔΡΑΣΤΙΚΟΤΗΤΑ ΕΝΕΡΓΟΠΟΙΗΤΗ ΤΟΥ ΙΣΤΙΚΟΥ ΠΛΑΣΜΙΝΟΓΟΝΟΥ	
+13.02.05.08.001	Urokinase Plasminogen Activator	UPA	ΕΝΕΡΓΟΠΟΙΗΤΗΣ ΠΛΑΣΜΙΝΟΓΟΝΟΥ ΤΥΠΟΥ ΟΥΡΟΚΙΝΑΣΗΣ	
+13.02.05.09.001	Thrombin Activating Fibrinolysis Inhibitor	TAFI	ΑΝΑΣΤΑΛΤΗΣ ΤΗΣ ΙΝΩΔΟΛΥΣΗΣ ΕΝΕΡΓΟΠΟΙΟΥΜΕΝΟΣ ΑΠΟ ΘΡΟΜΒΙΝΗ (TAFI)	
+13.02.05.90.900	Other Fibrinolysis Tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΙΝΩΔΟΛΥΣΗΣ	
+13.02.06.02.001	Antithrombin ΙΙΙ activity	ATIII	ΔΡΑΣΤΙΚΟΤΗΤΑ ΑΝΤΙΘΡΟΜΒΙΝΗΣ ΙΙΙ	
+13.02.06.02.002	Antithrombin ΙΙΙ antigen		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΘΡΟΜΒΙΝΗΣ ΙΙΙ	
+13.02.06.04.001	Coagulation factor VIII Inhibitor		ΑΝΑΣΤΑΛΤΗΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ VIII	
+13.02.06.05.001	Coagulation factor IX Inhibitor		ΑΝΑΣΤΑΛΤΗΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ IX	
+13.02.06.06.001	Coagulation factor X Inhibitor		ΑΝΑΣΤΑΛΤΗΣ ΤΟΥ ΠΑΡΑΓΟΝΤΑ X	
+13.02.06.07.001	Lupus Anticoagulant ( APTT screen)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (APTT SCREEN)	
+13.02.06.07.002	Lupus Anticoagulant ( exagonal phase pospholipids confirm)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (ΕΠΙΒΕΒΑΙΩΤΙΚΗ ΜΕ ΕΞΑΓΩΝΙΚΑ ΦΩΣΦΟΛΙΠΙΔΙΑ)	
+13.02.06.07.003	Lupus Anticoagulant ( DRVV screen)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (DRVV SCREEN)	
+13.02.06.07.004	Lupus Anticoagulant (DRVV confirm)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (DRVV CONFIRM)	
+13.02.06.07.005	Lupus Anticoagulant (DPT screen)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (DPT SCREEN)	
+13.02.06.07.006	Lupus Anticoagulant (DPT confirm)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (DPT CONFIRM)	
+13.02.06.07.007	Lupus Anticoagulant (KCT screen)		ΑΝΤΙΠΗΚΤΙΚΑ ΛΥΚΟΥ (KCT SCREEN)	
+13.02.06.08.001	Protein C activity	PC	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΡΩΤΕΙΝΗΣ C	
+13.02.06.10.001	Heparin Cofactor II		ΔΡΑΣΤΙΚΟΤΗΤΑ ΣΥΜΠΑΡΑΓΟΝΤΑ ΙΙ ΤΗΣ ΗΠΑΡΙΝΗΣ	
+13.02.06.11.001	APC Resistance	APC-R	ΑΝΤΙΣΤΑΣΗ ΣΤΗΝ ΕΝΕΡΓΟΠΟΙΗΜΕΝΗ ΠΡΩΤΕΙΝΗ C	
+13.02.06.12.001	Pro C		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΠΡΩΤΕΙΝΗΣ C	
+13.02.06.13.001	Free Protein S Antigen	Free PS	ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΜΟΣ ΕΛΕΥΘΕΡΗΣ ΠΡΩΤΕΙΝΗΣ S	
+13.02.06.14.001	Total Protein S Antigen		ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΜΟΣ ΟΛΙΚΗΣ ΠΡΩΤΕΙΝΗΣ S	
+13.02.06.15.001	Protein S Activity	PS	ΔΡΑΣΤΙΚΟΤΗΤΑ ΠΡΩΤΕΙΝΗΣ S	
+13.02.06.17.001	Tissue Factor Pathway Inhibitor	TFPI	ΑΝΑΣΤΑΛΤΗΣ ΙΣΤΙΚΟΥ ΠΑΡΑΓΟΝΤΑ (TFPI)	
+13.02.06.20.001	Plasma mixing test for coagulation factor Inhibitors		ΔΟΚΙΜΑΣΙΑ ΑΝΑΜΕΙΞΗΣ ΓΙΑ ΕΛΕΓΧΟ ΕΠΙΚΤΗΤΩΝ ΑΝΑΣΤΑΛΤΩΝ ΤΗΣ ΠΗΞΗΣ	
+13.02.06.21.001	Plasma dilution test for coagulation factor Inhibitors		ΔΟΚΙΜΑΣΙΑ ΑΡΑΙΩΣΕΩΝ ΓΙΑ ΕΛΕΓΧΟ ΕΠΙΚΤΗΤΩΝ ΑΝΑΣΤΑΛΤΩΝ ΤΗΣ ΠΗΞΗΣ	
+13.02.06.22.001	Thrombomodulin		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΘΡΟΜΒΟΜΟΝΤΟΥΛΙΝΗΣ	
+13.02.06.90.900	Other Coagulation Inhibitors		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΛΛΩΝ ΑΝΑΣΤΑΛΤΩΝ ΑΙΜΟΣΤΑΣΗΣ	
+13.02.70.03.001	D-Dimer - Rapid Test		ΠΡΟΣΔΙΟΡΙΣΜΟΣ D-ΔΙΜΕΡΩΝ ΤΟΥ ΙΝΩΔΟΥΣ -ΤΑΧΕΙΑ ΜΕΘΟΔΟΣ	
+13.02.70.90.900	Other Haemostasis Rapid Tests		ΑΛΛΕΣ ΤΑΧΕΙΕΣ ΕΞΕΤΑΣΕΙΣ ΑΙΜΟΣΤΑΣΗΣ	
+13.02.90.20.001	Thromboelastography, global hemostasis test with and without stimulation (per stimulator)		ΘΡΟΜΒΟΕΛΑΣΤΟΓΡΑΦΙΑ ΓΙΑ ΤΗΝ ΣΥΝΟΛΙΚΗ ΕΚΤΙΜΗΣΗ ΤΟΥ ΑΙΜΟΣΤΑΤΙΚΟΥ ΜΗΧΑΝΙΣΜΟΥ ΜΕ ΚΑΙ ΧΩΡΙΣ ΔΙΕΓΕΡΣΗ (ΑΝΑ ΔΙΕΓΕΡΤΗ) (ΕΚΤΙΜΗΣΗ ΑΙΜΟΣΤΑΤΙΚΟΥ)ΜΗΧΑΝΙΣΜΟΥ, ΕΚΤΙΜΗΣΗ ΕΝΔΟΓΕΝΟΥΣ ΟΔΟΥ, ΕΚΤΙΜΗΣΗ ΕΞΩΓΕΝΟΥΣ ΟΔΟΥ, ΕΚΤΙΜΗΣΗ ΙΝΩΔΟΛΥΣΗΣ)	
+13.02.90.21.001	Thromboelastography (heparin therapy)		ΘΡΟΜΒΟΕΛΑΣΤΟΓΡΑΦΙΑ ΓΙΑ ΤΗΝ ΣΥΝΟΛΙΚΗ ΕΚΤΙΜΗΣΗ ΤΟΥ ΑΙΜΟΣΤΑΤΙΚΟΥ ΜΗΧΑΝΙΣΜΟΥ ΣΕ ΑΣΘΕΝΕΙΣ ΥΠΟ ΗΠΑΡΙΝΗ	
+13.02.90.22.001	Anti platelet factor 4/heparin antibodies (quantitative)	Anti-PF4/H (quantitative)	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΣΥΜΠΛΕΓΜΑΤΟΣ ΑΙΜΟΠΕΤΑΛΙΑΚΟΥ ΠΑΡΑΓΟΝΤΑ 4/ΗΠΑΡΙΝΗΣ (ΠΟΙΟΤΙΚΗ ΜΕΘΟΔΟΣ)	
+13.02.90.23.001	Anti platelet factor 4/heparin antibodies (qualitative)	Anti-PF4/H (qualitative)	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΣΥΜΠΛΕΓΜΑΤΟΣ ΑΙΜΟΠΕΤΑΛΙΑΚΟΥ ΠΑΡΑΓΟΝΤΑ 4/ΗΠΑΡΙΝΗΣ (ΠΟΣΟΤΙΚΗ ΜΕΘΟΔΟΣ)	
+13.02.90.24.001	Anti platelet factor 4/heparin antibodies (functional assay)	Anti-PF4/H (functional)	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΣΥΜΠΛΕΓΜΑΤΟΣ ΑΙΜΟΠΕΤΑΛΙΑΚΟΥ ΠΑΡΑΓΟΝΤΑ 4/ΗΠΑΡΙΝΗΣ (ΛΕΙΤΟΥΡΓΙΚΗ ΜΕΘΟΔΟΣ)	
+13.02.90.90.900	Other Haemostasis tests		ΑΛΛΕΣ ΔΙΑΦΟΡΕΣ ΔΟΚΙΜΑΣΙΕΣ ΑΙΜΟΣΤΑΣΗΣ	
+13.03.01.01.001	ABO grouping cells (forward)	ΑΒΟ	ΟΜΑΔΑ ΑΒΟ (ΕΥΘΕΙΑ)	Ομάδα ΑΒΟ (ευθεία ομάδα)
+13.03.01.02.001	ABO sera (reverse)	ΑΒΟ	ΟΜΑΔΑ ΑΒΟ (ΑΝΑΣΤΡΟΦΗ)	Ομάδα ΑΒΟ (ανάστροφη ομάδα)
+13.03.01.20.001	Subgroup A1	Α1	ΠΡΟΣΔΙΟΡΙΣΜΟΣ Α1 ΥΠΟΟΜΑΔΑΣ	Κατηγοριοποίηση της ομάδας Α σε Α1 ή Α2
+13.03.01.21.001	Bombay blood group	ΒΟΜΒΑΥ	ΟΜΑΔΑ ΒΟΜΒΑΗ Ή ΠΑΡΑΒΟΜΒΑΗ	
+13.03.01.22.001	ABO blood group(forward and reverse)	ABO	ΟΜΑΔΑ ΑΒΟ (ΕΥΘΕΙΑ ΚΑΙ ΑΝΑΣΤΡΟΦΗ)	
+13.03.01.90.900	Other ABO Typing Tests		ΑΛΛΟΙ ΠΡΟΣΔΙΟΡΙΣΜΟΙ ΟΜΑΔΟΣ ΑΒΟ	
+13.03.02.01.001	Rhesus D	RhD	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ RhD	
+13.03.02.02.001	Rhesus Phenotypes	C, c, E, e	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΩΝ Rh C, c, E, e	Πλήρης φαινότυπος Rhesus (Αντιγόνα C, c, E, e)
+13.03.02.20.001	Dweek or Du	Dweek ή Du	ΠΡΟΣΔΙΟΡΙΣΜΟΣ Dweek ή Du	
+13.03.02.21.001	D variant	D variant	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΠΑΡΑΛΛΑΓΩΝ D ΑΝΤΙΓΟΝΟΥ	
+13.03.02.22.001	C antigen	C antigen	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ C	
+13.03.02.23.001	c antigen	c antigen	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ c	
+13.03.02.24.001	E antigen	E antigen	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Ε	
+13.03.02.25.001	e antigen	e antigen	ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ e	
+13.03.02.90.900	Other Rhesus Typing Assays		ΑΛΛΟΙ ΠΡΟΣΔΙΟΡΙΣΜΟΙ RHESUS	
+13.03.03.01.001	Combined ABO typing + Rhesus D	ABO-RhD	ΟΜΑΔΑ ABO-RhD	
+13.03.03.02.001	Combined ABO typing + Rhesus Phenotypes	ABO-RhD-C-c-E-e	ΟΜΑΔΑ ABO-RhD ΚΑΙ ΠΛΗΡΗΣ ΦΑΙΝΟΤΥΠΟΣ RHESUS	
+13.03.03.90.900	Other ABO Typing Tests + Rhesus Typing		ΑΛΛΟΙ ΣΥΝΔΙΑΣΜΕΝΟΙ ΠΡΟΣΔΙΟΡΙΣΜΟΙ ΟΜΑΔΟΣ ΑΒΟ ΚΑΙ RHESUS	
+13.03.04.01.001	Antibody 2 cell screening	IAT-2cells	ΕΜΜΕΣΗ COOMBS ΜΕ 2 ΕΥΘΡΟΚΥΤΤΑΡΙΚΑ ΔΕΙΓΜΑΤΑ	
+13.03.04.02.001	Antibody 3 cell screening	IAT-3cells	ΕΜΜΕΣΗ COOMBS ΜΕ 3 ή 4 ΕΥΘΡΟΚΥΤΤΑΡΙΚΑ ΔΕΙΓΜΑΤΑ	
+13.03.04.03.001	Antibody screening with enzymes treated red cells	IAT-enz	ΕΜΜΕΣΗ COOMBS ΜΕ ΕΡΥΘΡΑ ΚΑΤΕΡΓΑΣΜΕΝΑ ΜΕ ΕΝΖΥΜΟ	
+13.03.04.03.002	Antibody identification cell panels with polyspecific antiglobulin serum	PANEL-untreated	PANEL ΓΙΑ ΤΑΥΤΟΠΟΙΗΣΗ ΜΗ ΑΝΑΜΕΝΟΜΕΝΩΝ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ ΜΕ ΑΝΤΙΣΦΑΙΡΙΝΙΚΟ ΟΡΟ (ΕΜΜΕΣΗ COOMBS)	
+13.03.04.03.003	Antibody identification cell panels with enzymes treated red cells	PANEL-treated	PANEL ΓΙΑ ΤΑΥΤΟΠΟΙΗΣΗ ΜΗ ΑΝΑΜΕΝΟΜΕΝΩΝ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ ΜΕ ΕΝΖΥΜΟ (ΠΑΠΑΪΝΗ, ΦΙΣΙΝΗ, ΒΡΩΜΕΛΙΝΗ, ΚΑ)	
+13.03.04.20.001	Direct antiglobulin test or Direct COOMBS	DAT	ΑΜΕΣΗ COOMBS	
+13.03.04.21.001	Direct antiglobulin test-IgG subclasses		TΑΥΤΟΠΟΙΗΣΗ ΥΠΟΤΑΞΕΩΝ IgG ΕΠΙ ΘΕΤΙΚΗΣ ΑΜΕΣΗΣ COOMBS	
+13.03.04.22.001	Direct antiglobulin test with monospecific antiglobulin reagent (IgG, IgM, IgA, C3d, etc)		ΤΑΥΤΟΠΟΙΗΣΗ ΑΜΕΣΗΣ COOMBS ΜΕ ΜΟΝΟΔΥΝΑΜΟΥΣ ΑΝΤΙΟΡΟΥΣ (IgG, IgM, IgA, C3D ΚΟΚ)	
+13.03.04.23.001	Direct COOMBS titration		ΤΙΤΛΟΠΟΙΗΣΗ ΑΜΕΣΗΣ COOMBS	
+13.03.04.24.001	Cold-reactive autoagglutinins		ΕΛΕΓΧΟΣ ΨΥΧΡΟΣΥΓΚΟΛΛΗΤΙΝΩΝ	
+13.03.04.25.001	Indirect COOMBS titration		ΤΙΤΛΟΠΟΙΗΣΗ ΕΜΜΕΣΗΣ COOMBS	
+13.03.04.26.001	Cold-reactive autoagglutinins titration		ΤΙΤΛΟΠΟΙΗΣΗ ΨΥΧΡΟΣΥΓΚΟΛΛΗΤΙΝΩΝ	
+13.03.04.27.001	Anti-A and Anti-B titration		ΤΙΤΛΟΠΟΙΗΣΗ ΑΙΜΟΣΥΓΚΟΛΛΗΤΙΝΩΝ ΑΝΤΙ-Α ΚΑΙ ΑΝΤΙ-Β	
+13.03.04.28.001	Autologus adsorption		ΑΥΤΟΛΟΓΗ ΠΡΟΣΡΟΦΗΣΗ ΓΙΑ ΤΑΥΤΟΠΟΙΗΣΗ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ	
+13.03.04.29.001	Allogeneic adsorption		ΑΛΛΟΓΕΝΗΣ ΠΡΟΣΡΟΦΗΣΗ ΓΙΑ ΤΑΥΤΟΠΟΙΗΣΗ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ	
+13.03.04.30.001	Compatibility testing or crossmatching		ΔΟΚΙΜΑΣΙΑ ΣΥΜΒΑΤΟΤΗΤΑΣ (ΔΙΑΣΤΑΥΡΩΣΗ ΑΙΜΑΤΟΣ)	
+13.03.04.31.001	Acid elution techniques for investigation of a positive DAT		ΕΚΛΟΥΣΗ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ (ΕΚΛΟΥΜΑ)	
+13.03.04.32.001	Donath-Landsteiner test		ΔΟΚΙΜΑΣΙΑ DONATH-LANDSTEINER (ΔΙΦΑΣΙΚΗ ΑΙΜΟΛΥΣΙΝΗ)	
+13.03.04.33.001	Heat elution techniques for investigation of a positive DAT		ΕΚΛΟΥΣΗ ΜΕ ΘΕΡΜΑΝΣΗ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ ΜΕ ΟΞΙΝΟ ΑΝΤΙΔΡΑΣΤΗΡΙΟ (ΘΕΡΜΟ ΕΚΛΟΥΣΜΑ)	
+13.03.04.34.001	Other elution techniques for investigation of a positive DAT		ΕΚΛΟΥΣΗ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ ΜΕ ΆΛΛΕΣ ΤΕΧΝΙΚΕΣ	
+13.03.04.90.900	Other Antibody detection (Immunohaematology)		ΑΛΛΕΣ ΔΟΚΙΜΑΣΙΕΣ ΑΝΙΧΝΕΥΣΗΣ ΚΑΙ ΤΑΥΤΟΠΟΙΗΣΗΣ ΜΗ ΑΝΑΜΕΝΟΜΕΝΩΝ ΑΝΤΙΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ	
+13.03.05.90.001	Other Antigen typing reagents (KELL, CELLANO, JKa, JKb, Lea, Leb, Fya, Fyb, M, N, S, s, P1, Lua, Lub)		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΕΚΤΕΤΑΜΕΝΟΥ ΦΑΙΝΟΤΥΠΟΥ ΕΡΥΘΡΩΝ ΠΟΥ ΠΕΡΙΛΑΜΒΑΝΕΙ ΤΑ ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΑ ΑΝΤΙΓΟΝΑ KELL, CELLANO, JKa, JKb, Lea, Leb, Fya, Fyb, M, N, S, S, P1, Lua, Lub	
+13.03.05.90.002	KELL antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ KELL	
+13.03.05.90.003	CELLANO antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ CELLANO	
+13.03.05.90.004	Jka antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Jka	
+13.03.05.90.005	JKb antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ JKb	
+13.03.05.90.006	Lea antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Lea	
+13.03.05.90.007	Leb antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Leb	
+13.03.05.90.008	Fya antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Fya	
+13.03.05.90.009	Fyb antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ FYb	
+13.03.05.90.010	M antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ M	
+13.03.05.90.011	N antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ N	
+13.03.05.90.012	S antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ S	
+13.03.05.90.013	s antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ s	
+13.03.05.90.014	P1 nantigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ P1	
+13.03.05.90.015	Lua antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Lua	
+13.03.05.90.016	Lub antigen typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΝΤΙΓΟΝΟΥ Lub	
+13.03.05.90.900	Other Rare Antigen Typing		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΛΛΩΝ ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΩΝ ΑΝΤΙΓΟΝΩΝ ΕΚΤΟΣ ABO & RHESUS, ΠΟΥ ΔΕΝ ΠΕΡΙΛΑΜΒΑΝΟΝΤΑΙ ΣΤΑ ΠΑΡΑΠΑΝΩ (ΑΝΑ ΑΝΤΙΓΟΝΟ)	
+13.03.90.20.001	Typing platelet-antibodies (platelet alloimmunization)		ΤΑΥΤΟΠΟΙΗΣΗ ΑΝΤΙΑΙΜΟΠΕΤΑΛΙΑΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ	
+13.03.90.21.001	Typing platelet-specific antigens		ΤΥΠΟΠΟΙΗΣΗ ΑΝΤΙΓΟΝΩΝ ΑΙΜΟΠΕΤΑΛΙΩΝ (ΗΡΑ) (ΑΝΑ ΑΝΤΙΓΟΝΟ)	
+13.03.90.22.001	Compatibility platelets testing		ΔΙΑΣΤΑΥΡΩΣΗ ΑΙΜΟΠΕΤΑΛΙΩΝ	
+13.03.90.23.001	Blood group chimerism by flow cytometry		ΜΕΛΕΤΗ ΧΙΜΑΙΡΙΣΜΟΥ ΟΜΑΔΩΝ ΑΙΜΑΤΟΣ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.03.90.24.001	Other Immunohaematology of transfusion tests		ΑΛΛΕΣ ΔΟΚΙΜΑΣΙΕΣ ΑΝΟΣΟΑΙΜΑΤΟΛΟΓΙΑΣ ΤΗΣ ΜΕΤΑΓΓΙΣΗΣ ΠΟΥ ΔΕΝ ΠΕΡΙΛΑΜΒΑΝΟΝΤΑΙ ΣΤΙΣ ΠΑΡΑΠΑΝΩ	
+13.03.90.25.001	Molecural typing of blood group (per antigen)		ΜΟΡΙΑΚΗ ΤΑΥΤΟΠΟΙΗΣΗ ΟΜΑΔΩΝ ΑΙΜΑΤΟΣ (ΑΝΑ ΑΝΤΙΓΟΝΟ)	
+13.03.90.90.900	Unclassifiable and Other Immunohaematology Tests		ΑΛΛΕΣ ΜΗ ΚΑΤΗΓΟΡΙΟΠΟΙΗΜΕΝΕΣ ΔΟΚΙΜΑΣΙΕΣ ΑΙΜΟΔΟΣΙΑΣ	
+13.05.01.20.001	Flow cytometry lymphocyte immunophenotyping (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΛΕΜΦΟΚΥΤΤΑΡΩΝ ΠΕΡΙΦΕΡΙΚΟΥ ΑΙΜΑΤΟΣ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.21.001	Flow cytometry immunophenotyping for neutrophils (CD64) and monocytes (CD16)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΠΕΡΙΦΕΡΙΚΟΥ ΑΙΜΑΤΟΣ ΜΕ ΔΕΙΚΤΕΣ ΕΝΕΡΓΟΠΟΙΗΣΗΣ ΠΟΛΥΜΟΡΦΟΠΥΡΗΝΩΝ (CD64) ΚΑΙ ΜΟΝΟΚΥΤΤΑΡΩΝ (CD16)	
+13.05.01.22.001	TCRVβ repertoire with flow cytometry		ΜΕΛΕΤΗ ΡΕΠΕΡΤΟΡΙΟΥ TCRVΒ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.01.23.001	Flow cytometry immunophenotyping for acute leukemias (AML, Τ, Β- ALL) in PB or BM (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΟΞΕΙΑΣ ΛΕΥΧΑΙΜΙΑΣ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΙΜΑ Η ΜΥΕΛΟΣ ΤΩΝ ΟΣΤΩΝ) (AML, Τ, Β- ALL) (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.24.001	Flow cytometry immunophenotyping for chronic lymphocytic leukemias (CLL) (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ Β ΧΡΟΝΙΑΣ ΛΕΜΦΟΚΥΤΤΑΡΙΚΗΣ ΛΕΥΧΑΙΜΙΑΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.25.001	Flow cytometry immunophenotyping for lymphoproliferative disorders (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΛΕΜΦΟΫΠΕΡΠΛΑΣΤΙΚΩΝ ΣΥΝΔΡΟΜΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.26.001	Flow cytometry immunophenotyping for multiple myeloma (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΠΟΛΛΑΠΛΟΥ ΜΥΕΛΩΜΑΤΟΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.27.001	Flow cytometry immunophenotyping for myelodysplastic disorders (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΜΥΕΛΟΔΥΣΠΛΑΣΤΙΚΩΝ ΣΥΝΔΡΟΜΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.28.001	Flow cytometry immunophenotyping for T-chronic lymphoproliferative disorders (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΜΕΛΕΤΗ Τ-ΧΡΟΝΙΩΝ ΛΕΜΦΟΫΠΕΡΠΛΑΣΤΙΚΩΝ ΣΥΝΔΡΟΜΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.29.001	Flow cytometry immunophenotyping for minimal residual disease in acute leukemia(per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΓΙΑ ΤΗΝ ΑΝΙΧΝΕΥΣΗ ΕΛΑΧΙΣΤΗΣ ΥΠΟΛΕΙΜΜΑΤΙΚΗΣ ΝΟΣΟΥ ΕΠΙ ΟΞΕΙΑΣ ΛΕΥΧΑΙΜΙΑΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.30.001	Flow cytometry immunophenotyping for minimal residual disease in B chronic lymphocytic leukemias (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΓΙΑ ΤΗΝ ΑΝΙΧΝΕΥΣΗ ΕΛΑΧΙΣΤΗΣ ΥΠΟΛΕΙΜΜΑΤΙΚΗΣ ΝΟΣΟΥ ΕΠΙ Β ΧΡΟΝΙΑΣ ΛΕΜΦΟΚΥΤΤΑΡΙΚΗΣ ΛΕΥΧΑΙΜΙΑΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.31.001	Flow cytometry immunophenotyping for minimal residual disease in lymphoproliferative disorders (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΓΙΑ ΤΗΝ ΑΝΙΧΝΕΥΣΗ ΕΛΑΧΙΣΤΗΣ ΥΠΟΛΕΙΜΜΑΤΙΚΗΣ ΝΟΣΟΥ ΕΠΙ ΛΕΜΦΟΫΠΕΡΠΛΑΣΤΙΚΩΝ ΣΥΝΔΡΟΜΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.32.001	Flow cytometry immunophenotyping for minimal residual disease in multiple myeloma (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΓΙΑ ΤΗΝ ΑΝΙΧΝΕΥΣΗ ΕΛΑΧΙΣΤΗΣ ΥΠΟΛΕΙΜΜΑΤΙΚΗΣ ΝΟΣΟΥ ΕΠΙ ΠΟΛΛΑΠΛΟΥ ΜΥΕΛΩΜΑΤΟΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.33.001	Flow cytometry immunophenotyping for minimal residual disease in myelodysplastic disorders (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΓΙΑ ΤΗΝ ΑΝΙΧΝΕΥΣΗ ΕΛΑΧΙΣΤΗΣ ΥΠΟΛΕΙΜΜΑΤΙΚΗΣ ΝΟΣΟΥ ΕΠΙ ΜΥΕΛΟΔΥΣΠΛΑΣΤΙΚΩΝ ΣΥΝΔΡΟΜΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.34.001	Flow cytometry immunophenotyping for minimal residual disease in T- lymphoproliferative disorders (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΓΙΑ ΤΗΝ ΑΝΙΧΝΕΥΣΗ ΕΛΑΧΙΣΤΗΣ ΥΠΟΛΕΙΜΜΑΤΙΚΗΣ ΝΟΣΟΥ ΕΠΙ Τ-ΧΡΟΝΙΩΝ ΛΕΜΦΟΫΠΕΡΠΛΑΣΤΙΚΩΝ ΣΥΝΔΡΟΜΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.35.001	Flow cytometry immynophenotyping for mast cells (CD2, CD25)		ΜΑΣΤΟΚΥΤΤΑΡΑ ΚΑΙ ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΜΑΣΤΟΚΥΤΤΑΡΩΝ CD2, CD25	
+13.05.01.36.001	Flow cytometry crossmatch of donor B and T lymphocytes in transplantations (per monoclonal antibody)		ΔΙΑΣΤΑΥΡΩΣΗ Β ΚΑΙ Τ ΛΕΜΦΟΚΥΤΤΑΡΩΝ ΔΟΤΟΥ ΜΕ ΟΡΟ ΛΗΠΤΗ ΕΠΙ ΜΕΤΑΜΟΣΧΕΥΣΕΩΝ ΣΥΜΠΑΓΩΝ ΟΡΓΑΝΩΝ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.37.001	Flow cytometry bone marrow biopsy immunophenotyping (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΜΥΕΛΟΥ ΤΩΝ ΟΣΤΩΝ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.38.001	Flow cytometry bone marrow aspiration immunophenotyping (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΟΣ ΕΝΑΙΩΡΗΜΑΤΟΣ ΜΥΕΛΟΥ ΤΩΝ ΟΣΤΩΝ ΑΠΟ ΟΣΤΕΟΜΥΕΛΙΚΗ ΒΙΟΨΙΑ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.39.001	DNA ploidy and S-phase fraction with flow cytometry		ΑΝΑΛΥΣΗ DNA ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΕΛΕΓΧΟΣ ΠΛΟΕΙΔΙΑΣ ΚΥΤΤΑΡΩΝ ΚΑΙ ΦΑΣΕΩΝ ΤΟΥ ΚΥΤΤΑΡΙΚΟΥ ΚΥΚΛΟΥ ΣΕ ΒΙΟΛΟΓΙΚΑ ΥΓΡΑ ΚΑΙ ΣΥΜΠΑΓΕΙΣ ΟΓΚΟΥΣ)	
+13.05.01.40.001	Flow cytometry immunophenotyping for paroxysmal nocturnal hemoglobinuria (PNH) (per monoclonal antibody)		ΕΛΕΓΧΟΣ ΠΑΡΟΞΥΣΜΙΚΗΣ ΝΥΚΤΕΡΙΝΗΣ ΑΙΜΟΣΦΑΙΡΙΝΟΥΡΙΑΣ (ΡΝΗ) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.41.001	Flow cytometry immunophenotyping for hemolytic uremic syndrome (CD46)		ΠΡΟΣΔΙΟΡΙΣΜΟΣ CD46 ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΣΕ ΑΙΜΟΛΥΤΙΚΟ ΟΥΡΑΙΜΙΚΟ ΣΥΝΔΡΟΜΟ	
+13.05.01.42.001	Fetal-Maternal Hemorrhage with Flow Cytometry		ΑΝΑΖΗΤΗΣΗ ΕΜΒΡΥΙΚΩΝ ΚΥΤΤΑΡΩΝ ΣΤΟ ΑΙΜΑ ΤΗΣ ΜΗΤΕΡΑΣ (ΥΠΟΝΟΙΑ ΕΜΒΡΥΟΜΗΤΡΙΚΗΣ ΑΙΜΟΡΡΑΓΙΑΣ) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.01.43.001	Phagocytosis measurement by flow cytometry		ΕΛΕΓΧΟΣ ΦΑΓΟΚΥΤΤΑΡΩΣΗΣ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.01.44.001	Flow cytometry study of polymorphonuclear neutrophil oxidative burst		ΕΛΕΓΧΟΣ ΟΞΕΙΔΩΤΙΚΗΣ ΕΚΡΗΞΗΣ ΠΟΛΥΜΟΡΦΟΠΥΡΗΝΩΝ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.01.45.001	Flow cytometry immunophenotyping of cerebrospinal fluid (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΕΓΚΕΦΑΛΟΝΩΤΙΑΙΟΥ ΥΓΡΟΥ (ENY) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.46.001	Flow cytometry immunophenotyping of ascites, pleural, pericardial or synovial fluid (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΑΣΚΙΤΙΚΟΥ, ΠΛΕΥΡΙΤΙΚΟΥ, ΠΕΡΙΚΑΡΔΙΑΚΟΥ Η ΑΡΘΡΙΚΟΥ ΥΓΡΟΥ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.47.001	Flow cytometry immunophenotyping of bronchoalveolar lavage (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΒΡΟΓΧΟΚΥΨΕΛΙΔΙΚΟΥ ΕΚΠΛΥΜΑΤΟΣ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.48.001	Flow cytometry immunophenotyping of lymph node fine needle aspiration (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΥΛΙΚΟΥ ΒΙΟΨΙΑΣ ΛΕΜΦΑΔΕΝΑ ΔΙΑ ΛΕΠΤΗΣ ΒΕΛΟΝΗΣ (FNA) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.49.001	Flow cytometry immunophenotyping of fresh lymph node biopsy (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΥΛΙΚΟΥ ΒΙΟΨΙΑΣ (ΝΩΠΟ ΤΕΜΑΧΙΟ) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.50.001	Flow cytometry immunophenotyping of vitreous or aqueous humor (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΥΑΛΟΕΙΔΟΥΣ Η ΥΔΑΤΟΕΙΔΟΥΣ ΥΓΡΟΥ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.51.001	Flow cytometry lymphocyte immunophenotyping-percentage and absolute values (per monoclonal antibody)		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΠΟΛΥΤΟΥ ΑΡΙΘΜΟΥ ΥΠΟΠΛΗΘΥΣΜΩΝ ΛΕΜΦΟΚΥΤΤΑΡΩΝ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.52.001	Flow cytometry immunophenotyping for cutaneous lymphoma (per monoclonal antibody)		ΑΝΟΣΟΦΑΙΝΟΤΥΠΙΚΗ ΑΝΑΛΥΣΗ ΔΕΡΜΑΤΙΚΩΝ ΛΕΜΦΩΜΑΤΩΝ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ (ΑΝΑ ΜΟΝΟΚΛΩΝΙΚΟ)	
+13.05.01.90.900	Other Monoclonal Antibodies for Flow Cytometry		ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΛΛΩΝ ΜΟΝΟΚΛΩΝΙΚΩΝ ΑΝΤΙΣΩΜΑΤΩΝ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.03.01.001	Stem Cell Enumeration (CD34) in peripheral blood with flow cytometry		ΜΕΤΡΗΣΗ CD34 ΑΡΧΕΓΟΝΩΝ ΑΙΜΟΠΟΙΗΤΙΚΩΝ ΚΥΤΤΑΡΩΝ (STEM CELLS) ΣΕ ΠΕΡΙΦΕΡΙΚΟ ΑΙΜΑ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.03.01.002	Stem Cell Enumeration (CD34) in buffy coats with flow cytometry		ΜΕΤΡΗΣΗ CD34 ΑΡΧΕΓΟΝΩΝ ΑΙΜΟΠΟΙΗΤΙΚΩΝ ΚΥΤΤΑΡΩΝ (STEM CELLS) ΣΕ ΠΡΟΪΟΝ ΛΕΥΚΑΦΑΙΡΕΣΗΣ ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ	
+13.05.03.90.900	Other Stem Cell Enumeration tests		ΑΛΛΕΣ ΔΟΚΙΜΑΣΙΕΣ ΠΡΟΣΔΙΟΡΙΣΜΟΥ ΑΡΧΕΓΟΝΩΝ ΑΙΜΟΠΟΙΗΤΙΚΩΝ ΚΥΤΤΑΡΩΝ	
+13.90.90.90.900	Unclassifiable and Other Haematology		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΑΙΜΑΤΟΛΟΓΙΑΣ ΠΟΥ ΔΕΝ ΑΝΑΦΕΡΟΝΤΑΙ ΑΛΛΟΥ	
+18.01.01.01.001	Immunoglobulin A	IgA	ΑΝΟΣΟΣΦΑΙΡΙΝΗ Α	
+18.01.01.03.001	Immunoglobulin D	IgD	ΑΝΟΣΟΣΦΑΙΡΙΝΗ D	
+18.01.01.05.001	Immunoglobulin G	IgG	ΑΝΟΣΟΣΦΑΙΡΙΝΗ G	
+18.01.01.06.001	Immunoglobulin G subclass reagents		ΑΝΟΣΟΣΦΑΙΡΙΝΗ G (ΥΠΟΤΑΞΕΙΣ)	ΥΠΟΤΑΞΕΙΣ IgG (IgG1, IgG2, IgG3, IgG4)
+18.01.01.07.001	Immunoglobulin M	IgM	ΑΝΟΣΟΣΦΑΙΡΙΝΗ Μ	
+18.01.01.20.001	Kappa and Lambda light chains		ΕΛΑΦΡΕΣ ΚΑΠΑ, ΛΑΜΔΑ ΑΛΥΣΙΔΕΣ	
+18.01.01.30.001	Immunoelectrophoresis		ΑΝΟΣΟΗΛΕΚΤΡΟΦΟΡΗΣΗ	
+18.01.01.30.002	Ιmmunosubtraction capillary electrophoresis	IS-CE	ΤΡΙΧΟΕΙΔΙΚΗ ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΠΡΩΤΕΙΝΩΝ	
+18.01.01.31.001	Immunofixation		ΑΝΟΣΟΚΑΘΗΛΩΣΗ	
+18.01.01.33.001	IgG index		ΕΛΕΓΧΟΣ ΕΝΔΟΓΕΝΟΥΣ ΣΥΝΘΕΣΗΣ IgG ΣΤΟ ΕΝΥ (IgG index)	
+18.01.01.34.001	Cryoglobulin Identification		ΚΡΥΟΣΦΑΙΡΙΝΕΣ, ΑΝΙΧΝΕΥΣΗ ΚΡΥΟΪΖΗΜΑΤΟΣ	
+18.01.01.35.001	Cryoglobulin Typing		ΤΥΠΟΠΟΙΗΣΗ ΚΡΥΟΣΦΑΙΡΙΝΩΝ ΜΕ ΑΝΟΣΟΚΑΘΗΛΩΣΗ	
+18.01.01.36.001	u Immunofixation		ΑΝΟΣΟΚΑΘΗΚΩΣΗ ΟΥΡΩΝ ΜΕΤΑ ΣΥΜΠΥΚΝΩΣΗ	
+18.01.01.37.001	CSF Immunofixation		ΑΝΟΣΟΚΑΘΗΛΩΣΗ ΕΝΥ ΜΕΤΑ ΑΠΟ ΣΥΜΠΥΚΝΩΣΗ	
+18.01.01.38.001	Kappa and Lambda free light chains		ΕΛΕΥΘΕΡΕΣ ΕΛΑΦΡΕΣ ΚΑΠΑ ΚΑΙ ΛΑΜΔΑ ΑΛΥΣΙΔΕΣ	
+18.01.01.38.002	Kappa/Lambda free light chain ratio		ΛΟΓΟΣ ΕΛΕΥΘΕΡΩΝ ΕΛΑΦΡΩΝ ΚΑΠΑ/ΛΑΜΔΑ ΑΛΥΣΙΔΩΝ	
+18.01.01.39.001	Serum IgAκ, IgAλ intact heavy chains	IgAκ, IgAλ	ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΚΕΡΑΙΩΝ ΜΟΡΙΩΝ ΑΝΟΣΟΣΦΑΙΡΙΝΩΝ IgA ΙΣΟΤΥΠΟΥ ΣΥΝΔΕΔΕΜΕΝΩΝ ΜΕ ΕΛΑΦΡΕΣ κ ή λ ΑΛΥΣΙΔΕΣ	
+18.01.01.40.001	Serum IgGκ, IgGλ intact heavy chains	IgGκ, IgGλ	ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΚΕΡΑΙΩΝ ΜΟΡΙΩΝ ΑΝΟΣΟΣΦΑΙΡΙΝΩΝ IgG ΙΣΟΤΥΠΟΥ ΣΥΝΔΕΔΕΜΕΝΩΝ ΜΕ ΕΛΑΦΡΕΣ κ ή λ ΑΛΥΣΙΔΕΣ	
+18.01.01.41.001	Serum IgMκ, IgMλ intact heavy chains	IgMκ, IgMλ	ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ ΑΚΕΡΑΙΩΝ ΜΟΡΙΩΝ ΑΝΟΣΟΣΦΑΙΡΙΝΩΝ IgM ΙΣΟΤΥΠΟΥ ΣΥΝΔΕΔΕΜΕΝΩΝ ΜΕ ΕΛΑΦΡΕΣ κ ή λ ΑΛΥΣΙΔΕΣ	
+18.01.01.42.001	Electrophoresis for Isoelectric focusing for Multiple Sclerosis (cerebrospinal fluid)		IgG ΟΛΙΓΟΚΛΩΝΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ΣΤΟ ΕΝΥ (ΑΝΟΣΟΚΑΘΗΛΩΣΗ ΜΕΤΑ ΗΛΕΚΤΡΟΦΟΡΗΣΗ ΙΣΟΗΛΕΚΤΡΙΚΗΣ ΕΣΤΙΑΣΗΣ-ISOELECTRIC FOCUSING-IEF)	
+18.01.01.43.001	CSF Immunoglobulins		ΑΝΟΣΟΣΦΑΙΡΙΝΕΣ IgG, IgM, IgA ΣΤΟ ΕΝΥ	
+18.01.01.90.900	Other Immunoglobulins		ΕΞΕΤΑΣΕΙΣ ΑΛΛΩΝ ΑΝΟΣΟΣΦΑΙΡΙΝΩΝ (ΕΚΤΟΣ IGE)	
+18.01.02.01.001	Complement Component C1q	C1q	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ C1q	
+18.01.02.02.001	Complement Component C1 inactivator	C1-INH	ΑΝΑΣΤΟΛΕΑΣ της C1 ΕΣΤΕΡΑΣΗΣ (C1 inhibitor)	C1 INA
+18.01.02.03.001	Complement Component C3	C3	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ C3	
+18.01.02.04.001	Complement Component for Bb	FBb	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ Β	
+18.01.02.05.001	Complement Component C4	C4	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ C4	
+18.01.02.06.001	Complement Component C5a	C5a	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ C5A	
+18.01.02.07.001	Complement Component C5-9	C5-9	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ C5-9	MAC ΣΥΜΠΕΛΓΜΑ ΠΡΟΣΒΟΛΗΣ ΜΕΜΒΡΑΝΗΣ (C5-9)
+18.01.02.11.001	Total Complement Activity (CH50)	CH50	ΟΛΙΚΟ ΑΙΜΟΛΥΤΙΚΟ ΣΥΜΠΛΗΡΩΜΑ CΗ50	
+18.01.02.20.001	Alternative Pathway Activity	APH50	ΕΚΤΙΜΗΣΗ ΤΗΣ ΛΕΙΤΟΥΡΓΙΚΗΣ ΔΡΑΣΤΗΡΙΟΤΗΤΑΣ ΤΗΣ ΕΝΑΛΛΑΚΤΙΚΗΣ ΟΔΟΥ ΤΟΥ ΣΥΜΠΛΗΡΩΜΑΤΟΣ APΗ50	
+18.01.02.21.001	Lectin Pathway		ΕΚΤΙΜΗΣΗ ΤΗΣ ΛΕΙΤΟΥΡΓΙΚΗΣ ΔΡΑΣΤΗΡΙΟΤΗΤΑΣ ΤΗΣ ΟΔΟΥ ΤΩΝ ΛΕΚΤΙΝΩΝ	
+18.01.02.22.001	Complement Component C2	C2	ΠΑΡΑΓΟΝΤΑΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ C2	
+18.01.02.23.001	Properdin		ΠΡΟΠΕΡΔΙΝΗ	
+18.01.02.24.001	Alternative Pathway Complement Component		ΑΙΜΟΛΥΤΙΚΟΣ ΤΙΤΛΟΣ ΕΝΑΛΛΑΚΤΙΚΗΣ ΟΔΟΥ ΣΥΜΠΛΗΡΩΜΑΤΟΣ (ΑΝΑ ΠΑΡΑΓΟΝΤΑ)	
+18.01.02.25.001	MANNOSE BINDING PROTEIN	MBP	MANNOSE BINDING PROTEIN	
+18.01.02.90.900	Other Complement Components		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΣΥΜΠΛΗΡΩΜΑΤΟΣ	
+18.02.01.01.001	Histamine		ΙΣΤΑΜΙΝΗ	
+18.02.01.02.001	Immunoglobulin E - Total	IgE Total	ΟΛΙΚΗ ΑΝΟΣΟΣΦΑΙΡΙΝΗ Ε	
+18.02.01.06.001	Immunoglobulin E - Screen	sp-IgE	ΕΙΔΙΚΕΣ IgE ΕΝΑΝΤΙ ΑΛΛΕΡΓΙΟΓΟΝΩΝ (RAST)	
+18.02.01.20.001	Leukocyte Histamine Release	LHR	ΔΟΚΙΜΑΣΙΑ ΑΠΕΛΕΥΘΕΡΩΣΗΣ ΙΣΤΑΜΙΝΗΣ ΑΠΟ ΛΕΥΚΟΚΥΤΤΑΡΑ	
+18.02.01.21.001	Tryptase		ΤΡΥΠΤΑΣΗ	
+18.02.01.22.001	Allergene specific IgG		IgG ΟΡΟΥ ΕΙΔΙΚΕΣ ΕΝΑΝΤΙ ΑΛΛΕΡΓΙΟΓΟΝΩΝ / ΑΝΑ ΕΙΔΟΣ	
+18.02.01.23.001	Eosinophil cationic protein	ECP	ΚΑΤΙΟΝΙΚΗ ΠΡΩΤΕΪΝΗ ΤΩΝ ΗΩΣΙΝΟΦΙΛΩΝ (ECP)	
+18.02.01.90.900	Other Allergy Tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΕΛΕΓΧΟΥ ΑΛΕΡΓΙΑΣ	
+18.04.01.02.001	CDC-T Comlement Depented cytotoxicity with T-cells	anti -HLA abs CDC-T	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ Τ ΛΕΜΦΟΚΥΤΤΑΡΩΝ (ΙGG ΚΑΙ IgM)	
+18.04.01.02.002	CDC-B Comlement Depented cytotoxicity with B-cells	anti -HLA abs CDC-B	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ B ΛΕΜΦΟΚΥΤΤΑΡΩΝ (ΙGG ΚΑΙ IgM)	
+18.04.01.02.003	anti -HLA abs detection with Solid Phase Assays Luminex	anti -HLA abs SPI screening lmx	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ,ΑΝΙΧΝΕΥΣΗ ΑΝΤΙΣΩΜΑΤΩΝ ΕΙΔΙΚΩΝ ΕΝΑΝΤΙ HLA ΑΝΤΙΓΟΝΩΝ ΜΕ ΜΕΘΟΔΟ LUMINEX	
+18.04.01.02.004	anti -HLA abs screening with Solid Phase Assays Luminex Class I	anti -HLA abs SPI detection class I lmx	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ,ΤΑΥΤΟΠΟΙΗΣΗ ΑΝΤΙΣΩΜΑΤΩΝ ΕΙΔΙΚΩΝ ΓΙΑ HLA ΤΑΞΗΣ Ι ΜΕ ΜΕΘΟΔΟ LUMINEX	
+18.04.01.02.005	anti -HLA abs screening with Solid Phase Assays Luminex Class II	anti -HLA abs SPI detection class I lmx	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ,ΤΑΥΤΟΠΟΙΗΣΗ ΑΝΤΙΣΩΜΑΤΩΝ ΕΙΔΙΚΩΝ ΓΙΑ HLA ΤΑΞΗΣ ΙΙ ΜΕ ΜΕΘΟΔΟ LUMINEX	
+18.04.01.02.006	anti -HLA abs identification with Solid Phase Assays Luminex Class I	anti -HLA abs SAB class I lmx	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ,ΤΑΥΤΟΠΟΙΗΣΗ ΕΙΔΙΚΟΤΗΤΑΣ ΑΝΤΙΣΩΜΑΤΩΝ ΓΙΑ HLA ΤΑΞΗΣ Ι ΜΕ ΜΕΘΟΔΟ LUMINEX (SINGLE ANTIGEN CLASS I)	
+18.04.01.02.007	anti -HLA abs identification with Solid Phase Assays Luminex Class II	anti -HLA abs SAB class II lmx	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ,ΤΑΥΤΟΠΟΙΗΣΗ ΕΙΔΙΚΟΤΗΤΑΣ ΑΝΤΙΣΩΜΑΤΩΝ ΓΙΑ HLA ΤΑΞΗΣ ΙI ΜΕ ΜΕΘΟΔΟ LUMINEX (SINGLE ANTIGEN CLASS II)	
+18.04.01.02.008	anti -HLA abs detection with ELISA	anti -HLA abs SPI screening ELISA	ΚΥΤΤΑΡΟΤΟΞΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ,ΑΝΙΧΝΕΥΣΗ ΑΝΤΙΣΩΜΑΤΩΝ ΕΙΔΙΚΩΝ ΕΝΑΝΤΙ HLA ΑΝΤΙΓΟΝΩΝ ΜΕ ΜΕΘΟΔΟ ELISA	
+18.04.01.02.009	anti-MICA abs detection with Solid Phase Assays Luminex	abs SPI screening lmx MICA	ANTI-ΜΙCA ΑΝΤΙΣΩΜΑΤΑ, ΑΝΙΧΝΕΥΣΗ ΜΕ LUMINEX	
+18.04.01.02.010	anti-MICA abs identification with Solid Phase Assays Luminex	antibodies SAB MICA	ANTI-ΜΙCA ΑΝΤΙΣΩΜΑΤΑ, ΤΑΥΤΟΠΟΙΗΣΗ ΜΕ LUMINEX	
+18.04.01.02.011	anti-paternal abs		ΑΝΤΙΠΑΤΡΙΚΑ ΑΝΤΙΣΩΜΑΤΑ	
+18.04.01.03.001	Serology HLA typing Class I (ABC)	HLA-ABC (serology)	ΟΡΟΛΟΓΙΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-TAΞΗΣ Ι (ABC)	
+18.04.01.03.002	Serology HLA typing Class II (DR,DQ)	HLA-DR,DQ (serology)	ΟΡΟΛΟΓΙΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-TAΞΗΣ ΙI (DR,DQ)	
+18.04.01.03.003	Serology typing HLA-B27	HLA-B27(serology)	ΟΡΟΛΟΓΙΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-B27	
+18.04.01.03.004	Serology typing HLA-B51	HLA-B51(serology)	ΟΡΟΛΟΓΙΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-B51	
+18.04.01.03.005	Serology Paternity testing		ΟΡΟΛΟΓΙΚΟΣ ΕΛΕΓΧΟΣ ΠΑΤΡΟΤΗΤΑΣ ΜΕ HLA ΑΝΤΙΓΟΝΑ	
+18.04.01.03.006	Molecular typing of HLA-A Low Res.	DNA HLA-A (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-A XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.007	Molecular typing of HLA-A High Res.	DNA HLA-A (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-A ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.008	Molecular typing of HLA-B Low Res.	DNA HLA-B (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-Β XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.009	Molecular typing of HLA-B High Res.	DNA HLA-B (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-Β ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.010	Molecular typing of HLA-B27	DNA HLA-B27	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-Β27	
+18.04.01.03.011	Molecular typing of HLA-B57	DNA HLA-B57	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-Β57	
+18.04.01.03.012	Molecular typing of HLA-C Low Res.	DNA HLA-C (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-C XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.013	Molecular typing of HLA-C High Res.	DNA HLA-C (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-C ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.014	Molecular typing of HLA-DRB1 Low Res.	DNA HLA-DRB1(LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA- DRB1 XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.015	Molecular typing of HLA-DRB1High Res.	DNA HLA-DRB1 (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DRB1 ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.016	Molecular typing of HLA-DRB3,4,5 Low Res.	DNA HLA-DRB3,4,5 (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DRB3,4,5 XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.017	Molecular typing of HLA-DRB3,4,5 High Res.	DNA HLA-DRB3,4,5 (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DRB3,4,5 ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.018	Molecular typing of HLA-DQB1 Low Res.	DNA HLA-DQB (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DQB1 ΧΑΜΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.019	Molecular typing of HLA-DQB1High Res.	DNA HLA-DQB1 (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DQB1 ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.020	Molecular typing of HLA-DQA1 Low Res.	DNA HLA-DQA1 (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DQA1 XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.021	Molecular typing of HLA-DQA1High Res.	DNA HLA-DQA1 (HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DQA1 ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.022	Molecular typing of HLA-DPB1 Low Res.	DNA HLA-DPB1 LOCUS (LR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DPB1 XAMHΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.023	Molecular typing of HLA-DPB1 High Res.	DNA HLA-DPB1(HR)	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ HLA-DPB1 ΥΨΗΛΗΣ ΑΝΑΛΥΣΗΣ	
+18.04.01.03.024	Molecular typing of MINORs Ags	DNA MINORs Ag	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ ΑΝΤΙΓΟΝΩΝ EΛΑΣΣΟΝΟΣ ΣΥΣΤΗΜΑΤΟΣ ΙΣΤΟΣΥΜΒΑΤΟΤΗΤΑΣ (MINORS ANTIGENS)	
+18.04.01.03.025	Molecular typing of MICA Ag	DNA MICA Ag	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ-MICA	
+18.04.01.03.026	Molecular typing of KIRs	DNA KIRs receptors	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ ΥΠΟΔΟΧΕΩΝ ΝΚ ΚΥΤΤΑΡΩΝ (KIRS)	
+18.04.01.03.027	Molecular typing of Cytokines	DNA Cytokines	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ ΚΥΤΤΑΡΟΚΙΝΩΝ	
+18.04.01.03.028	Molecular typing of SINGLE NUCLEOTIDES POLYMORPHISM	SNPs molecular typing	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ ΜΟΝΟΝΟΥΚΛΕΟΤΙΔΙΚΩΝ ΓΟΝΙΔΙΑΚΩΝ ΠΟΛΥΜΟΡΦΙΣΜΩΝ (SNPS)	
+18.04.01.03.029	Human Neutrofil Antigens (HNA) genotyping	DNA-HNA Ag	ΓΟΝΙΔΙΑΚΗ ΤΥΠΟΠΟΙΗΣΗ -ΗΝΑ	
+18.04.01.03.030	Paternity DNA testing with HLA alleles		ΓΟΝΙΔΙΑΚΟΣ ΕΛΕΓΧΟΣ ΠΑΤΡΟΤΗΤΑΣ ΜΕ HLA ΑΛΛΗΛΟΜΟΡΦΑ	
+18.04.01.03.031	Paternity DNA testing with STRs markers		ΓΟΝΙΔΙΑΚΟΣ ΕΛΕΓΧΟΣ ΠΑΤΡΟΤΗΤΑΣ ΜΕ STRS MARKERS	
+18.04.01.03.032	Sequence Based Typing	SBT for Primary Immunodeficiencies	ΓΟΝΙΔΙΑΚΟΣ ΚΑΘΟΡΙΣΜΟΣ ΑΛΛΗΛΟΥΧΙΩΝ ΒΑΣΕΩΝ (SEQUENCING) ΓΙΑ ΤΥΠΟΠΟΙΗΣΗ ΠΡΩΤΟΠΑΘΩΝ ΑΝΟΣΟΑΝΕΠΑΡΚΕΙΩΝ	
+18.04.01.03.033	Detection of T-cell clonality	PCR-ΤCR	ΕΛΕΓΧΟΣ ΚΛΩΝΙΚΟΤΗΤΑΣ ΥΠΟΔΟΧΕΑ Τ-ΛΕΜΦΟΚΥΤΤΑΡΩΝ	
+18.04.01.03.034	Detection of B-cell clonality	PCR-BCR	ΕΛΕΓΧΟΣ ΚΛΩΝΙΚΟΤΗΤΑΣ ΥΠΟΔΟΧΕΑ B-ΛΕΜΦΟΚΥΤΤΑΡΩΝ	
+18.04.01.03.035	Proteins, enzymes genotyping		ΓΟΝΟΤΥΠΟΣ ΠΡΩΤΕΙΝΩΝ, ΕΝΖΥΜΩΝ, Κ.Α. ΜΕ ΜΟΡΙΑΚΕΣ ΤΕΧΝΙΚΕΣ (PCR)	
+18.04.01.03.036	ACE Genotype		ΓΟΝΟΤΥΠΟΣ ΑCE	
+18.04.01.90.900	Unclassifiable and Other Tissue Typing Reagents		ΑΛΛΗ ΤΥΠΟΠΟΙΗΣΗ ΑΝΤΙΓΟΝΩΝ ΙΣΤΟΣΥΜΒΑΤΟΤΗΤΑΣ	
+18.05.01.20.001	Complement Depented cytotoxicity Crossmatch	CDC XM	ΔΙΑΣΤΑΥΡΩΣΗ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ ΛΕΜΦΟΚΥΤΤΑΡΟΤΟΞΙΚΗ ΜΕΘΟΔΟ ΜΕ ΟΛΙΚΑ ΛΕΜΦΟΚΥΤΤΑΡΑ	
+18.05.01.21.001	Complement Depented cytotoxicity T- Crossmatch	CDC-T XM	ΔΙΑΣΤΑΥΡΩΣΗ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ ΛΕΜΦΟΚΥΤΤΑΡΟΤΟΞΙΚΗ ΜΕΘΟΔΟ ΜΕ Τ ΛΕΜΦΟΚΥΤΤΑΡΑ	
+18.05.01.22.001	Complement Depented cytotoxicity B- Crossmatch	CDC-B XM	ΔΙΑΣΤΑΥΡΩΣΗ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ ΛΕΜΦΟΚΥΤΤΑΡΟΤΟΞΙΚΗ ΜΕΘΟΔΟ ΜΕ Β ΛΕΜΦΟΚΥΤΤΑΡΑ	
+18.05.01.23.001	Flow Cytometry T-Crossmatch	FC-T XM	ΔΙΑΣΤΑΥΡΩΣΗ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΜΕ Τ ΛΕΜΦΟΚΥΤΤΑΡΑ	
+18.05.01.24.001	Flow Cytometry B-Crossmatch	FC-B XM	ΔΙΑΣΤΑΥΡΩΣΗ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ ΚΥΤΤΑΡΟΜΕΤΡΙΑ ΡΟΗΣ ΜΕ Β ΛΕΜΦΟΚΥΤΤΑΡΑ	
+18.05.01.25.001	Luminex/ELISA Complement Depented cytotoxicity Crossmatch	LMX / ELISA XM	ΔΙΑΣΤΑΥΡΩΣΗ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ LUMINEX H ELISA	
+18.05.01.26.001	Endothelial cell crossmatch XM-ONE	XM-ONE	ΔΙΑΣΤΑΥΡΩΣΗ ΣΥΜΒΑΤΟΤΗΤΑΣ (CROSSMATCH) ΜΕ TIE-2(+) ΚΥΤΤΑΡΑ-ΕΝΔΟΘΗΛΙΑΚΟ CROSSMATCH	
+18.05.01.90.900	Other Crossmatch tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΔΙΑΣΤΑΥΡΩΣΗΣ HLA ΣΥΜΒΑΤΟΤΗΤΑΣ	
+18.10.01.01.001	ANA Screening	ANA	ΑΝΤΙΠΥΡΗΝΙΚΑ ΑΝΤΙΣΩΜΑΤΑ	
+18.10.01.02.001	ENA Screening	Αντι-ENA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΕΚΧΥΛΙΣΙΜΩΝ ΑΝΤΙΓΟΝΩΝ ΤΟΥ ΠΥΡΗΝΑ	
+18.10.01.03.001	Anti cytoplasmic - Antibodies	ANCA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΚΥΤΤΑΡΟΠΛΑΣΜΑΤΙΚΩΝ ΑΝΤΙΓΟΝΩΝ ΤΩΝ ΟΥΔΕΤΕΡΟΦΙΛΩΝ	
+18.10.01.05.001	Anti-ds DNA - Antibodies	Anti-dsDNA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΔΙΠΛΗΣ ΕΛΙΚΑΣ ΤΟΥ DNA (ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ)	
+18.10.01.07.001	Histones (H1,H2a,H3,H4,…Hn)		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΙΣΤΟΝΙΚΩΝ ΠΡΩΤΕΙΝΩΝ	
+18.10.01.08.001	Anti-Jo-1 Antibodies	Αντι-Jo	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΙΣΤΙΔΥΛ-tRNA ΣΥΝΘΕΤΑΣΗΣ	
+18.10.01.09.001	PM-Scl - Antibodies	Αντι-PM-Scl	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΠΟΛΥΜΥΟΣΙΤΙΔΑΣ- ΣΚΛΗΡΟΔΕΡΜΑΤΟΣ	
+18.10.01.10.001	Anti-Scl-70 Antibodies	Αντι-Scl-70	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΣΚΛΗΡΟΔΕΡΜΑΤΟΣ 70	
+18.10.01.11.001	Anti-Sm Antibodies	Αντι-Sm	ΑΝΤΙ-Sm ΑΝΤΙΣΩΜΑΤΑ	
+18.10.01.12.001	Anti-SS-A Antibodies	Αντι-SSA	ΑΝΤΙ-SSA (Ro) ΑΝΤΙΣΩΜΑΤΑ	ΑΝΤΙ-Ro
+18.10.01.13.001	Anti-SS-B Antibodies	Αντi-SSB	ΑΝΤI-SSB (La) ΑΝΤΙΣΩΜΑΤΑ	ΑΝΤΙ-La
+18.10.01.14.001	Anti-U1-snRNP - Antibodies	Αντι-U1-snRNP	ΑΝΤΙ-U1-snRNP	
+18.10.01.15.001	Anti-centromere Antibodies	Αντι-Cenp-B	ΑΝΤΙΚΕΝΤΡΟΜΕΡΙΔΙΑΚΑ ΑΝΤΙΣΩΜΑΤΑ	
+18.10.01.90.900	Other Other Auto-Immune Disease Tests		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΓΙΑ ΑΥΤΟΑΝΟΣΑ ΝΟΣΗΜΑΤΑ ΤΟΥ ΣΥΝΔΕΤΙΚΟΥ ΙΣΤΟΥ	
+18.10.02.01.001	Anti-Ganglioside-Antibodies Total		ΟΛΙΚΑ ΑΝΤΙ-ΓΑΓΛΙΟΣΙΔΙΚΑ ΑΝΤΙΣΩΜΑΤΑ	
+18.10.02.02.001	Anti-GM1		ΑΝΤΙ-ΓΑΓΛΙΟΣΙΔΙΚΑ Μ1	
+18.10.02.03.001	Asialo-GM1		ΑΝΤΙ-ΑΣΙΑΛΟΓΑΓΛΙΟΣΙΔΙΚΑ	
+18.10.02.04.001	Anti-GD1b		ANTI-GD1B	
+18.10.02.05.001	Gal(b1-3)		GAL (B1-3)	
+18.10.02.06.001	GalNAc		GalNAC	
+18.10.02.07.001	Anti-MAG (Myelin Associated Glycoprotein)		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΜΥΕΛΙΝΗΣ ΣΥΝΔΕΟΜΕΝΗΣ ΜΕ ΓΛΥΚΟΠΡΩΤΕΙΝΗ	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΜΥΕΛΙΝΗΣ (ΓΛΥΚΟΠΡΩΤΕΙΝΗΣ MAG)
+18.10.02.08.001	Anti-CAR (Cancer Associated Retinopathy)		ANTI-CAR ΑΝΤΙΣΩΜΑΤΑ	
+18.10.02.09.001	Anti-Hu Antibody	ANNA-1	ΑΝΤΙΝΕΥΡΩΝΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ΤΥΠΟΥ 1	
+18.10.02.10.001	Anti-Yo Antibody	PCA-1	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΚΥΤΤΑΡΩΝ ΤΟΥ PURKINJE	
+18.10.02.11.001	Anti-Ri Antibody	ANNA-2	ΑΝΤΙΝΕΥΡΩΝΙΚΑ ΑΝΤΙΣΩΜΑΤΑ ΤΥΠΟΥ 2	
+18.10.02.12.001	Anti-GQ1b		ANTI-GQ1b	
+18.10.02.90.900	Other Neuro-Auto-Immune Disease		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΓΙΑ ΝΕΥΡΟ-ΑΥΤΟΑΝΟΣΑ ΝΟΣΗΜΑΤΑ	
+18.10.03.01.001	Thyroid Peroxidase (incl. Microsomal) Antibodies	Anti-TPO	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΗΣ ΘΥΡΕΟΕΙΔΙΚΗΣ ΥΠΕΡΟΞΕΙΔΑΣΗΣ (TPO)	ΑΝΤΙΜΙΚΡΟΣΩΜΙΑΚΑ ΑΝΤΙΣΩΜΑΤΑ
+18.10.03.03.001	TSH Receptor Antibodies	TSI	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΥΠΟΔΟΧΕΑ ΤΗΣ TSH	
+18.10.03.04.001	Thyroglobulin Autoantibody	Anti-TG	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΗΣ ΘΥΡΕΟΣΦΑΙΡΙΝΗΣ (Tg)	ΑΝΤΙ-ΘΥΡΕΟΣΦΑΙΡΙΝΙΚΑ ΑΝΤΙΣΩΜΑΤΑ
+18.10.03.90.900	Other Thyroid-Auto-Immune Disease		ΑΛΛΕΣ ΕΞΕΤΑΣΕΙΣ ΓΙΑ ΑΥΤΟΑΝΟΣΑ ΝΟΣΗΜΑΤΑ ΤΟΥ ΘΥΡΕΟΕΙΔΟΥΣ	
+18.10.90.01.001	Anti-Cardiolipin Antibodies	ACA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΚΑΡΔΙΟΛΙΠΙΝΗΣ (IgG, IgM)	
+18.10.90.02.001	Anti-Mitochondrial Antibodies	AMA	ΑΝΤΙΜΙΤΟΧΟΝΔΡΙΑΚΑ ΑΝΤΙΣΩΜΑΤΑ	
+18.10.90.03.001	Anti-Phosphatidylserin Antibodies	APLS	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΦΩΣΦΑΤΙΔΥΛΟΣΕΡΙΝΗΣ (IgG, IgM)	
+18.10.90.04.001	Anti-b2-Glycoprotein I Antibodies	b2GPI	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ β2- ΓΛΥΚΟΠΡΩΤΕΙΝΗΣ I (IgG, IgM)	
+18.10.90.06.001	Gliadin Antibodies		ΑΝΤΙΓΛΙΑΔΙΝΙΚΑ ΑΝΤΙΣΩΜΑΤΑ (IgA, IgG)	
+18.10.90.08.001	LKM1 and Related Proteins Antibodies		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΜΙΚΡΟΣΩΜΙΑΚΟΥ ΑΝΤΙΓΟΝΟΥ ΤΟΥ ΗΠΑΤΟΣ-ΝΕΦΡΟΥ (LKM)	
+18.10.90.09.001	MPO ANCA	MPO	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΜΥΕΛΟΫΠΕΡΟΞΕΙΔΑΣΗΣ	
+18.10.90.10.001	PR3 ANCA	PR3	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΠΡΩΤΕΙΝΑΣΗΣ 3	
+18.10.90.11.001	Anti-Parietal Cell Antibodies	APCA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΙΧΩΜΑΤΙΚΩΝ ΚΥΤΤΑΡΩΝ ΣΤΟΜΑΧΟΥ	
+18.10.90.12.001	Sp 100 Antibodies		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΤΟΥ ΠΥΡΗΝΙΚΟΥ ΑΝΤΙΓΟΝΟΥ SP 100	
+18.10.90.13.001	Sperm Antibodies		ΑΝΤΙΣΠΕΡΜΑΤΙΚΑ ΑΝΤΙΣΩΜΑΤΑ	
+18.10.90.15.001	Antibodies to Glomerular Basal Membrane		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΒΑΣΙΚΗΣ ΜΕΜΒΡΑΝΗΣ ΤΟΥ ΣΠΕΙΡΑΜΑΤΟΣ	Goodpasture Antibodies
+18.10.90.16.001	Antibodies to endomysial Autoantigens		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΕΝΔΟΜΥΪΟΥ (IgA, IgG)	
+18.10.90.17.001	Antibodies to soluble Liver antigens		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΔΙΑΛΥΤΟΥ ΑΝΤΙΓΟΝΟΥ ΤΟΥ ΉΠΑΤΟΣ	
+18.10.90.18.001	Nucleosome Antibodies		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΝΟΥΚΛΕΟΣΩΜΑΤΟΣ	
+18.10.90.19.001	Saccharomyces cerevisiae Antibodies		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ SACCHAROMYCES CEREVISIAE (IgA, IgG)	
+18.10.90.20.001	Ribosomal Phosphoprotein Antibodies		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΡΙΒΟΣΩΜΙΑΚΗΣ Ρ ΠΡΩΤΕΙΝΗΣ	
+18.10.90.21.001	Tissue Transglutaminase Antibodies		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΙΣΤΙΚΗΣ ΤΡΑΝΣΓΛΟΥΤΑΜΙΝΑΣΗΣ (IgA, IgG)	
+18.10.90.22.001	Tissue Transglutaminase/ Gliadin Antibodies Combitest		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΙΣΤΙΚΗΣ ΤΡΑΝΣΓΛΟΥΤΑΜΙΝΑΣΗΣ/ΓΛΙΑΔΙΝΗΣ (IgA, IgG)	
+18.10.90.23.001	Acetylcholin Receptor Antibodies	ARA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΥΠΟΔΟΧΕΩΝ ΤΗΣ ΑΚΕΤΥΛΟΧΟΛΙΝΗΣ	
+18.10.90.25.001	Anti-Smooth Muscle Antibodies	ASMA	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΛΕΙΩΝ ΜΥΪΚΩΝ ΙΝΩΝ	
+18.10.90.90.900	Other Other Auto-Immune Disease Tests		ΕΞΕΤΑΣΕΙΣ ΓΙΑ ΑΛΛΑ ΑΥΤΟΑΝΟΣΑ ΝΟΣΗΜΑΤΑ	
+18.11.01.01.001	Anti-Streptococcal Deoxyribonuclease B (Anti-DNAase B)	ADNase B	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΣΤΡΕΠΤΟΚΟΚΚΙΚΗΣ ΔΕΣΟΞΥΡΙΒΟΝΟΥΚΛΕΑΣΗΣ Β	
+18.11.01.02.001	Anti-Streptococcal Hyaluronidase		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΣΤΡΕΠΤΟΚΟΚΚΙΚΗΣ ΥΑΛΟΥΡΟΝΙΔΑΣΗΣ	
+18.11.01.03.001	Anti-Streptokinase	ASK	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΣΤΡΕΠΤΟΚΙΝΑΣΗΣ	
+18.11.01.04.001	Anti-Streptolysin O Reaction Time / Titre (qualitative)	ASR	ΤΙΤΛΟΣ ΑΝΤΙΣΩΜΑΤΩΝ ΕΝΑΝΤΙ ΣΤΡΕΠΤΟΛΥΣΙΝΗΣ Ο	
+18.11.01.05.001	Anti-Streptolysin O (quantitative)	ASL/ASLO	ΑΝΤΙΣΤΡΕΠΤΟΛΥΣΙΝΗ O (ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ)	
+18.11.01.06.001	Anti-Staphylolysin Reaction Time / Titre (qualitative)		ΤΙΤΛΟΣ ΑΝΤΙΣΤΡΕΠΤΟΛΥΣΙΝΗΣ	
+18.11.01.07.001	Anti-Staphylolysin (quantitative)		ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΣΤΑΦΥΛΟΛΥΣΙΝΗΣ (ΠΟΣΟΤΙΚΟΣ ΠΡΟΣΔΙΟΡΙΣΜΟΣ)	
+18.11.01.08.001	Circulating Immune Complexes	CIC	ΚΥΚΛΟΦΟΡΟΥΝΤΑ ΑΝΟΣΟΣΥΜΠΛΕΓΜΑΤΑ	
+18.11.01.09.001	C-Reactive Protein	CRP	C-ΑΝΤΙΔΡΩΣΑ ΠΡΩΤΕΙΝΗ	
+18.11.01.10.001	Rheumatoid Factors	RF	ΡΕΥΜΑΤΟΕΙΔΗΣ ΠΑΡΑΓΩΝ	
+18.11.01.11.001	Anti-Cyclic Citrullinated Peptide	Anti-CCP	ΑΝΤΙΣΩΜΑΤΑ ΕΝΑΝΤΙ ΚΥΚΛΙΚΟΥ ΚΙΤΡΙΛΙΩΜΕΝΟΥ ΠΕΠΤΙΔΙΟΥ	
+18.11.01.90.900	Other Rheumatoid / Inflammatory Disease Markers		ΑΛΛΟΙ ΔΕΙΚΤΕΣ ΡΕΥΜΑΤΟΕΙΔΩΝ-ΦΛΕΓΜΟΝΩΔΩΝ ΝΟΣΗΜΑΤΩΝ	
+18.90.90.90.900	OTHER OTHER IMMUNOLOGY TESTS		ΑΛΛΕΣ ΑΝΟΣΟΛΟΓΙΚΕΣ ΕΞΕΤΑΣΕΙΣ ΠΟΥ ΔΕΝ ΑΝΑΦΕΡΟΝΤΑΙ ΑΛΛΟΥ	

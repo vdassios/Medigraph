@@ -8,6 +8,6 @@
     "noEmit": true,
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "node"]
   }
 }
