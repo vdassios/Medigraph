@@ -1691,6 +1691,11 @@ such as `70`, `-`, `110`. Then assign roles:
 - A two-sided or textual `Έως n` / `μέχρι n` group is always a **range**, including
   when no value exists; textual “up to” stores `{kind:'maxOnly', comparator:'<=',
 max:n}`. Symbolic one-sided ranges preserve their printed strictness exactly.
+- A range cell may repeat its unit — the corpus prints `4,0 - 10,0 k/μl`. **The
+  read-out strips a trailing recognised unit before calling `parseRange`**, which owns
+  the unit allowlist through `isKnownUnit`. `parseRange` itself rejects any trailing
+  token rather than skipping over it, so an unrecognised remainder fails loudly
+  instead of being discarded.
 - In Pass A, the first exact standalone number is the **value**. A comparator group
   is the value when it has a glued/immediately-following recognised unit. Once a value
   exists, the first remaining comparator group is a one-sided range.
@@ -1713,7 +1718,14 @@ status: 'missing'` — do **not** widen the search. This is what correctly reads
 
 The shared number parser applies the ambiguous-thousands rule in **both** modes and
 both passes. It preserves the decimal interpretation for review but adds
-`ambiguous-thousands` and forces low confidence; no Pass-A exemption exists.
+`ambiguous-thousands` and forces low confidence; no Pass-A exemption exists. The rule
+is `/^[+-]?[1-9]\d{0,2}[.,]\d{3}$/`: a leading group of one to three digits, a
+separator, then exactly three digits. `250.000` is either 250 or 250000 and the
+document never says which, because the same template carries both period and comma
+decimals. The leading digit may not be zero — thousands grouping emits no leading-zero
+group, so `0,270` has one possible reading and flagging it would report an ambiguity
+that does not exist. The narrowing removes impossible readings; it never chooses
+between two possible ones.
 
 **Range-vs-value disambiguation without columns.** If exactly one numeric group is
 the two-sided form `n - n`, it is a range and the row is `status:'missing'`—a single
@@ -2243,8 +2255,8 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 | #         | Task                                                                                                                                                                                                                      | Depends on          |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
 | 1.1       | `text.ts` — separate label/abbreviation normalisers (including final sigma), lexical tokens with UTF-16 parent offsets, and no pseudo geometry                                                                            | 0.2                 |
-| 1.2       | `numbers.ts` — comma/dot decimals, separated comparators, shared ambiguous-thousands result, `NUMBER_RE`                                                                                                                  | 0.2                 |
-| 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2                 |
+| 1.2       | `numbers.ts` — comma/dot decimals, separated and glued comparators, shared ambiguous-thousands result                                                                                                                     | 0.2                 |
+| 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2, 1.1, 1.2       |
 | 1.4       | `units.ts` — normalisation + the enumerated conversion table                                                                                                                                                              | 0.2, 1.1            |
 | 1.5       | `dates.ts` — parse, classify and score every candidate; ambiguity/time precision                                                                                                                                          | 0.2, 1.1            |
 | 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic                                                                                                                       | 0.2, 1.1            |
@@ -2266,7 +2278,7 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 | #    | Task                                                                                                                                                                                                                                                                                                                                | Depends on                |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                                  | 1.1, 1.6a, 1.6b-core, 1.8 |
-| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions and range/value disambiguation                                                                                                                                                                                    | 2.1, 1.2–1.4              |
+| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions, stripping a recognised unit repeated inside a range cell, and range/value disambiguation                                                                                                                         | 2.1, 1.2–1.4              |
 | 2.5a | `extract.ts` core — date/identifier passes, both measurement passes, reconciliation, flags/confidence and `unrecognised[]`                                                                                                                                                                                                          | 2.8, 2.1, 1.5, 1.7        |
 | 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                    | 2.5a, 0.5a, 0.6           |
 | 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel.     | 1.6b-core, 0.5a, 2.5b     |
