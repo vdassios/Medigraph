@@ -1,5 +1,9 @@
 ---
 import { MedigraphApp } from '../ui/MedigraphApp';
+
+// Task 4.6 writes the full privacy route and the persistent D13 copy inside
+// PanelView/TrendView. The footer below is the standing D1/D13 disclaimer:
+// always visible, never a dismissible modal.
 ---
 
 <html lang="el">
@@ -10,5 +14,27 @@ import { MedigraphApp } from '../ui/MedigraphApp';
   </head>
   <body>
     <MedigraphApp client:load />
+
+    <footer class="app-disclaimer">
+      <p>
+        Τα έγγραφα και τα αποτελέσματά σας παραμένουν στη συσκευή σας· δεν αποθηκεύουμε κανένα
+        δεδομένο σας σε διακομιστές μας. Η τοπική αποθήκευση είναι χωρίς κρυπτογράφηση.
+      </p>
+      <p>
+        Το Medigraph εμφανίζει όσα ανέφερε το εργαστήριό σας· δεν τα ερμηνεύει και δεν αποτελεί
+        ιατρική συμβουλή.
+      </p>
+    </footer>
   </body>
 </html>
+
+<style>
+  .app-disclaimer {
+    border-top: 1px solid currentColor;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    margin: 2rem auto 0;
+    max-width: 40rem;
+    padding: 1rem;
+  }
+</style>

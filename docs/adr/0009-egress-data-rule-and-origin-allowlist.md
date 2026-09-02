@@ -1,8 +1,16 @@
 # ADR-0009: The egress rule is about data, not origins
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0015](0015-ordinary-network-freedom-under-the-data-rule.md)
 - **Date:** 2026-08-29
 - **Decision:** D1 (supersedes [ADR-0001](0001-no-user-data-egress.md))
+
+> **Superseded on 2026-09-02.** The data rule below still holds and is restated in
+> ADR-0015: nothing derived from a document leaves the device, and Medigraph stores no
+> user data on any server it operates. What was withdrawn is the apparatus this ADR kept
+> around that rule — the mandated-empty `connect-src` allowlist, the non-`self`
+> request-shape rule, the banned-outbound-API list and self-hosting as an obligation.
+> None of it constrained deliberate exfiltration, which this ADR concedes, and all of it
+> constrained ordinary network use. Read ADR-0015 for the current decision.
 
 ## Context
 

@@ -39,12 +39,16 @@ at-rest protection. Medigraph displays what the labs reported; it never interpre
 ## Invariants
 
 - Runtime processing is local; no source or derived user data is sent to any origin —
-  neither Medigraph's own nor a third party's. No telemetry, no error reporting.
+  neither Medigraph's own nor a third party's. Medigraph stores no user data on any
+  server it operates. No telemetry, no error reporting.
 - All inference happens on the device, and off-device inference is barred whether the
   server is a third party's or our own.
-- Third-party _inbound_ asset fetches are permitted only from a declared `connect-src`
-  origin allowlist, empty in v1; requests to a non-`self` origin carry no query, body or
-  app-set header. Declaring an origin never authorises sending anything to it.
+- Network access is otherwise ordinary. Fetching assets, using a CDN or contacting a
+  third-party origin is an ordinary engineering decision; the rule is about what is
+  sent, not about which origins are contacted. The freedom to contact an origin never
+  authorises sending anything to it.
+- The strict CSP, text-only rendering and the prohibition on raw HTML are XSS
+  containment for the plaintext Profile, not egress policy. They stay.
 - Source files, raw text, crops, bitmaps, object URLs and review drafts never enter
   IndexedDB, Cache Storage or `.medigraph`.
 - A Profile has no patient identity. Appending or merging requires an explicit
@@ -84,7 +88,7 @@ the product accepts, and several earlier records only make sense after it.
 - `docs/adr/0006-plaintext-local-profile-storage.md` — plaintext IndexedDB Profile
 - `docs/adr/0007-plaintext-medigraph-files.md` — plaintext `.medigraph` files
 - `docs/adr/0008-csp-style-attribute-amendment.md` — CSP style directives
-- `docs/adr/0009-egress-data-rule-and-origin-allowlist.md` — the egress rule (D1)
+- `docs/adr/0015-ordinary-network-freedom-under-the-data-rule.md` — the egress rule (D1)
 - `docs/adr/0010-display-only-positioning.md` — Medigraph never interprets
 - `docs/adr/0013-ahfy-documents-are-the-only-input.md` — the accepted input class
 - `docs/adr/0014-categorical-measurements.md` — numeric and categorical measurements
@@ -93,7 +97,9 @@ the product accepts, and several earlier records only make sense after it.
 still binds is restated in the invariants above and in the records in force; nothing in
 them authorises anything those do not.
 
-- `docs/adr/0001-no-user-data-egress.md` — superseded by 0009
+- `docs/adr/0001-no-user-data-egress.md` — superseded by 0009, in turn superseded by 0015
+- `docs/adr/0009-egress-data-rule-and-origin-allowlist.md` — superseded by 0015; its data
+  rule survives, its origin allowlist and request-shape machinery do not
 - `docs/adr/0002-local-extraction-tiers.md` and
   `docs/adr/0011-no-vision-language-model-for-v1.md` — the extraction-tier and
   vision-model boundary, closed by 0013 to one local text-layer mode

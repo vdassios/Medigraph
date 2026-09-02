@@ -1,6 +1,7 @@
 ---
-// Zero-hydration landing route (D2). Task 4.6 writes the real copy,
-// which is bound by D13: capability, never clinical insight.
+// Zero-hydration landing route (D2). Task 4.6 writes the full copy in both
+// languages; the disclaimer below is the D1/D13 minimum and is bound by D13:
+// capability, never clinical insight.
 ---
 
 <html lang="el">
@@ -13,6 +14,22 @@
     <main class="landing">
       <h1>Medigraph</h1>
       <p>Δείτε τα δικά σας εργαστηριακά αποτελέσματα στον χρόνο.</p>
+
+      <section class="disclaimer" aria-label="Ιδιωτικότητα και όρια χρήσης">
+        <p>
+          <strong>Τα δεδομένα σας παραμένουν στη συσκευή σας.</strong> Τα έγγραφα, το κείμενο που εξάγεται
+          από αυτά και τα αποτελέσματά σας δεν αποστέλλονται πουθενά — ούτε σε εμάς, ούτε σε τρίτους.
+          Δεν αποθηκεύουμε κανένα δεδομένο σας σε διακομιστές μας.
+        </p>
+        <p>
+          Το ιστορικό σας αποθηκεύεται τοπικά στον browser <strong>χωρίς κρυπτογράφηση</strong>,
+          όπως και τα αρχεία που εξάγετε. Προστατέψτε τα όπως τα πρωτότυπα αποτελέσματά σας.
+        </p>
+        <p>
+          Το Medigraph εμφανίζει όσα ανέφερε το εργαστήριό σας και τα εύρη αναφοράς που το ίδιο
+          τύπωσε. <strong>Δεν τα ερμηνεύει και δεν αποτελεί ιατρική συμβουλή.</strong>
+        </p>
+      </section>
     </main>
   </body>
 </html>
@@ -22,5 +39,13 @@
     margin: 0 auto;
     max-width: 40rem;
     padding: 2rem 1rem;
+  }
+
+  .disclaimer {
+    border-top: 1px solid currentColor;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
   }
 </style>

@@ -47,19 +47,23 @@ flowchart LR
     prof --> exp
   end
 
-  subgraph net["Network — static assets only"]
+  subgraph net["Network — assets in, nothing out"]
     direction TB
-    host["Cloudflare Pages<br/>HTML · JS · pdf.js worker"]
+    host["Static host + any asset origin<br/>HTML · JS · pdf.js worker"]
   end
 
-  host -->|"GET, first-party, no user data"| device
+  host -->|"assets, no user data"| device
   device -.->|"❌ never: documents, text, values,<br/>identifiers, telemetry, error reports"| net
 ```
 
-The site is static assets served first-party: no server-side processing, no account, no
-analytics, no error reporter. Extraction is deterministic text reading — there is no
-recognition step, no OCR runtime, no model weights and no off-device inference anywhere
-in the product.
+The site is static: no server-side processing, no account, no analytics, no error
+reporter, and **no user data stored on any server we operate**. Extraction is
+deterministic text reading — there is no recognition step, no OCR runtime, no model
+weights and no off-device inference anywhere in the product.
+
+The rule is about data, not about the network. Medigraph fetches assets like any other
+web application, and adding a font, a library or a CDN is an ordinary engineering
+decision. What never happens is data going the other way.
 
 ---
 
@@ -152,8 +156,9 @@ chart, which is worse than a missing one.
 
 ## Tool base
 
-Every browser byte is self-hosted and served first-party. No CDN, no analytics, no error
-reporter, no charting library, no crypto dependency, no OCR runtime, no model weights.
+Every browser byte is self-hosted today — a cost and simplicity preference, not a rule;
+a CDN is a perfectly ordinary choice. No analytics, no error reporter, no charting
+library, no crypto dependency, no OCR runtime, no model weights.
 
 | Layer        | Choice                                                                                                    |
 | ------------ | --------------------------------------------------------------------------------------------------------- |
@@ -211,25 +216,25 @@ They are not a menu: if an entry is genuinely wrong, change
 [`docs/plan.md`](docs/plan.md#decisions-already-made-do-not-re-litigate) first, record it
 as an ADR, and only then change code. The plan carries the full rationale for each.
 
-| #       | Decision                                                                                                                                                                                               |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **D1**  | **No user-data egress.** Nothing derived from a document leaves the device — no telemetry, no error reporting, no third party. [ADR-0009](docs/adr/0009-egress-data-rule-and-origin-allowlist.md)      |
-| **D1a** | **One input, one extraction mode:** the ΑΗΦΥ document, read through the pdf.js text layer. No OCR, no models, no off-device processing. [ADR-0013](docs/adr/0013-ahfy-documents-are-the-only-input.md) |
-| **D2**  | **Astro 5 static + one Preact island.** Cloudflare Pages, pure static assets, no SSR.                                                                                                                  |
-| **D3**  | **Extraction is local and deterministic.** An exact character stream, no probabilistic component. [ADR-0013](docs/adr/0013-ahfy-documents-are-the-only-input.md)                                       |
-| **D4**  | **One observation shape.** The adapter emits positioned `TextItem`s, which converge into an `ExtractionResult` before review. [ADR-0004](docs/adr/0004-extraction-observation-seam.md)                 |
-| **D5**  | **Marker-anchored parsing is the only pass.** Column roles come from the validated header, so there is no layout-discovery step.                                                                       |
-| **D5a** | **The marker registry is the product's core asset**, versioned, corpus-tested and scored.                                                                                                              |
-| **D6**  | **Mandatory transactional review.** One batch, one session, one atomic Confirm; one document is one Report. [ADR-0005](docs/adr/0005-transactional-review-and-identifier-gate.md)                      |
-| **D7**  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. [ADR-0005](docs/adr/0005-transactional-review-and-identifier-gate.md)                                    |
-| **D8**  | **Plaintext IndexedDB, one anonymous local Profile.** Appending requires explicit same-person confirmation. [ADR-0006](docs/adr/0006-plaintext-local-profile-storage.md)                               |
-| **D9**  | **Plaintext, versioned `.medigraph` JSON.** Import previews Cancel/Replace/Merge and never silently overwrites. [ADR-0007](docs/adr/0007-plaintext-medigraph-files.md)                                 |
-| **D10** | **No LOINC codes in v1.** Our own stable string ids.                                                                                                                                                   |
-| **D11** | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                |
-| **D12** | **No dual-axis charts, ever.** Different units are never overlaid on one y-scale.                                                                                                                      |
-| **D13** | **Display only.** No severity language, clinical inference, trend direction or delta badge, in any view or copy. [ADR-0010](docs/adr/0010-display-only-positioning.md)                                 |
-| **D14** | **Document validation, not template recognition.** Accept or reject, then bind column roles, date and identifier positions. [ADR-0013](docs/adr/0013-ahfy-documents-are-the-only-input.md)             |
-| **D15** | **Measurements are numeric or categorical.** A categorical result has no unit, is never converted and is never ranked. [ADR-0014](docs/adr/0014-categorical-measurements.md)                           |
+| #       | Decision                                                                                                                                                                                                                                                                                            |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **D1**  | **No user-data egress.** Nothing derived from a document leaves the device, and no user data is stored on any server we operate — no telemetry, no error reporting, no third party. Network access is otherwise ordinary. [ADR-0015](docs/adr/0015-ordinary-network-freedom-under-the-data-rule.md) |
+| **D1a** | **One input, one extraction mode:** the ΑΗΦΥ document, read through the pdf.js text layer. No OCR, no models, no off-device processing. [ADR-0013](docs/adr/0013-ahfy-documents-are-the-only-input.md)                                                                                              |
+| **D2**  | **Astro 5 static + one Preact island.** Cloudflare Pages, pure static assets, no SSR.                                                                                                                                                                                                               |
+| **D3**  | **Extraction is local and deterministic.** An exact character stream, no probabilistic component. [ADR-0013](docs/adr/0013-ahfy-documents-are-the-only-input.md)                                                                                                                                    |
+| **D4**  | **One observation shape.** The adapter emits positioned `TextItem`s, which converge into an `ExtractionResult` before review. [ADR-0004](docs/adr/0004-extraction-observation-seam.md)                                                                                                              |
+| **D5**  | **Marker-anchored parsing is the only pass.** Column roles come from the validated header, so there is no layout-discovery step.                                                                                                                                                                    |
+| **D5a** | **The marker registry is the product's core asset**, versioned, corpus-tested and scored.                                                                                                                                                                                                           |
+| **D6**  | **Mandatory transactional review.** One batch, one session, one atomic Confirm; one document is one Report. [ADR-0005](docs/adr/0005-transactional-review-and-identifier-gate.md)                                                                                                                   |
+| **D7**  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. [ADR-0005](docs/adr/0005-transactional-review-and-identifier-gate.md)                                                                                                                                 |
+| **D8**  | **Plaintext IndexedDB, one anonymous local Profile.** Appending requires explicit same-person confirmation. [ADR-0006](docs/adr/0006-plaintext-local-profile-storage.md)                                                                                                                            |
+| **D9**  | **Plaintext, versioned `.medigraph` JSON.** Import previews Cancel/Replace/Merge and never silently overwrites. [ADR-0007](docs/adr/0007-plaintext-medigraph-files.md)                                                                                                                              |
+| **D10** | **No LOINC codes in v1.** Our own stable string ids.                                                                                                                                                                                                                                                |
+| **D11** | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                                                                                                             |
+| **D12** | **No dual-axis charts, ever.** Different units are never overlaid on one y-scale.                                                                                                                                                                                                                   |
+| **D13** | **Display only.** No severity language, clinical inference, trend direction or delta badge, in any view or copy. [ADR-0010](docs/adr/0010-display-only-positioning.md)                                                                                                                              |
+| **D14** | **Document validation, not template recognition.** Accept or reject, then bind column roles, date and identifier positions. [ADR-0013](docs/adr/0013-ahfy-documents-are-the-only-input.md)                                                                                                          |
+| **D15** | **Measurements are numeric or categorical.** A categorical result has no unit, is never converted and is never ranked. [ADR-0014](docs/adr/0014-categorical-measurements.md)                                                                                                                        |
 
 D13 keeps Medigraph outside MDR Rule 11, and its failure mode is gradual — one "trending
 low" badge, one marketing sentence promising insight. Every user-facing string, in both
@@ -296,17 +301,19 @@ runnable as its wave lands.
 | `pnpm verify:static`   | ESLint → `prettier --check` → `astro check && tsc --noEmit`. CI never rewrites files.                                                                                                                                                  |
 | `pnpm test`            | Vitest: pure domain tables, validator boundaries, merge transactions, file-format negative paths                                                                                                                                       |
 | `pnpm corpus:score`    | Document validation on every corpus document and every negative fixture, then parser floors: aggregate marker recall ≥95%, value+comparator precision ≥99%, unit ≥95%, range ≥95%; every issuing laboratory independently ≥90% / ≥98%. |
-| `pnpm playwright test` | E2E happy path, the egress regression and the safety/lifecycle suite, against the exact static build under production headers                                                                                                          |
+| `pnpm playwright test` | E2E happy path, the canary egress regression and the safety/lifecycle suite, against the exact static build under production headers                                                                                                   |
 
 The CI `lint` job gates `test` and `build`, so a formatting or lint failure stops the
 pipeline before Vitest and Playwright run.
 
-**What the privacy evidence proves, and what it does not.** The egress regression test
-asserts that every request targets a declared origin, that non-`self` requests carry no
-query, body or app-set header, and that the banned outbound APIs are never used. That is
-exercised behaviour of the built app. It cannot prove that malicious same-origin code
-with memory access is safe — pinned dependencies, lockfile review, CSP, no raw HTML and
-text-only rendering are part of the same control, not claims delegated to Playwright.
+**What the privacy evidence proves, and what it does not.** The egress regression seeds
+canary values into a fixture document — a marker value, an identifier, a date — and
+asserts that no outgoing request carries any of them in its URL, headers or body. It
+tests the rule that binds: not which origins are contacted, but whether anything derived
+from your document goes out. That is exercised behaviour of the built app. It cannot
+prove that malicious same-origin code with memory access is safe — pinned dependencies,
+lockfile review, the strict CSP, no raw HTML and text-only rendering are part of the same
+control, not claims delegated to Playwright.
 
 ---
 
