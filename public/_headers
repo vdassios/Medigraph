@@ -1,0 +1,51 @@
+# Cloudflare Pages response headers (D2: static output, no Workers, no SSR).
+#
+# Task 0.4 — static security foundation. This file is the whole policy: a
+# committed static string. There is no generated asset manifest and no
+# generated CSP hash list. Task 5.3 asserts the served CSP is byte-identical
+# to this one.
+#
+# The CSP is XSS containment for the plaintext Profile in IndexedDB, not egress
+# policy (ADR-0015). `connect-src` is the load-bearing directive — it is what
+# denies an injected script anywhere to post the Profile to. It names the
+# origins the app actually uses, 'self' alone while every browser byte is
+# self-hosted under public/, which is the v1 default rather than an obligation.
+# Adding an origin edits that one line and needs no decision record.
+#
+# `script-src 'unsafe-inline'` is deliberate (ADR-0016). Astro delivers a client
+# island through two inline <script> blocks — the client:* runtime and the
+# <astro-island> definition — so a policy without it blocks hydration outright.
+# The alternatives all cost more than the token is worth: a generated hash list
+# (fragile against any Astro upgrade), an experimental <meta> policy that cannot
+# carry frame-ancestors, or abandoning hydration directives for a hand-rolled
+# mount. Injection needs an HTML sink, and this app has none; if one is ever
+# introduced, that change is the security event, not this line.
+# `'wasm-unsafe-eval'` covers pdf.js image-codec WebAssembly and permits no
+# inline or eval'd JavaScript.
+#
+# `style-src-attr 'unsafe-inline'` is the scoped exception recorded in ADR-0008,
+# and the style directives are not relaxed further. Per ADR-0008, Task 0.4
+# records which browsers honour the split. From MDN browser-compat-data
+# (verified 2026-09-02), `style-src-attr` is supported by Chrome/Edge 75+,
+# Firefox 108+ and Safari 15.4+, the mobile engines mirroring their desktop
+# counterparts — Baseline widely available since December 2022. Older engines
+# ignore the directive and fall back to `style-src`, where a style attribute
+# stays blocked. That is why a style attribute or `define:vars` must never carry
+# load-bearing layout or anything a page cannot be read without. `style-src-elem`
+# has the same support floor, except that Safari 15.4-26.1 parsed it without
+# effect; harmless here, since `style-src` and `style-src-elem` carry the
+# identical value 'self'.
+#
+# There is deliberately no Cross-Origin-Embedder-Policy. Its only beneficiary was
+# Task 3.3's WASM threads, which ADR-0013 deleted along with E1; nothing uses
+# SharedArrayBuffer, and require-corp would break cross-origin subresources for
+# no gain (ADR-0016).
+
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Referrer-Policy: no-referrer
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()

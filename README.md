@@ -240,7 +240,11 @@ D13 keeps Medigraph outside MDR Rule 11, and its failure mode is gradual — one
 low" badge, one marketing sentence promising insight. Every user-facing string, in both
 languages, is reviewed against it.
 [ADR-0008](docs/adr/0008-csp-style-attribute-amendment.md) scopes the CSP style
-directives.
+directives, and
+[ADR-0016](docs/adr/0016-inline-scripts-and-the-withdrawn-isolation-headers.md)
+permits Astro's inline island scripts and withdraws cross-origin isolation:
+`connect-src` is the directive the plaintext `Profile` actually leans on, and it is
+not relaxed.
 
 ---
 

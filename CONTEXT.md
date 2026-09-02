@@ -88,6 +88,8 @@ the product accepts, and several earlier records only make sense after it.
 - `docs/adr/0006-plaintext-local-profile-storage.md` — plaintext IndexedDB Profile
 - `docs/adr/0007-plaintext-medigraph-files.md` — plaintext `.medigraph` files
 - `docs/adr/0008-csp-style-attribute-amendment.md` — CSP style directives
+- `docs/adr/0016-inline-scripts-and-the-withdrawn-isolation-headers.md` — inline
+  scripts are permitted; COEP withdrawn
 - `docs/adr/0015-ordinary-network-freedom-under-the-data-rule.md` — the egress rule (D1)
 - `docs/adr/0010-display-only-positioning.md` — Medigraph never interprets
 - `docs/adr/0013-ahfy-documents-are-the-only-input.md` — the accepted input class
