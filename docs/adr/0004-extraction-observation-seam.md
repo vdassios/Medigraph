@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-08-29
 - **Decision:** D4
+- **Amended by:** [ADR-0013](0013-ahfy-documents-are-the-only-input.md)
 
 ## Context
 

@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-08-29
 - **Decision:** D8
+- **Amended by:** [ADR-0012](0012-template-recognition-assists-review.md), itself superseded by [ADR-0013](0013-ahfy-documents-are-the-only-input.md); D8 stands unamended
 
 ## Context
 

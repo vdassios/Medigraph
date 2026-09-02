@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-08-29
 - **Decision:** D1a
+- **Amended by:** [ADR-0011](0011-no-vision-language-model-for-v1.md), [ADR-0013](0013-ahfy-documents-are-the-only-input.md)
 
 ## Context
 

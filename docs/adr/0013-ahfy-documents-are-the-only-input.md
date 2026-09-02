@@ -3,8 +3,8 @@
 - **Status:** Accepted
 - **Date:** 2026-09-02
 - **Decisions:** D1a (rewritten), D3, D4, D5, D6, D14 (rewritten)
-- **Amends:** [ADR-0002](0002-local-extraction-tiers.md), [ADR-0004](0004-extraction-observation-seam.md), [ADR-0012](0012-template-recognition-assists-review.md)
-- **Supersedes:** [ADR-0003](0003-gated-local-ocr.md)
+- **Amends:** [ADR-0002](0002-local-extraction-tiers.md), [ADR-0004](0004-extraction-observation-seam.md)
+- **Supersedes:** [ADR-0003](0003-gated-local-ocr.md), [ADR-0012](0012-template-recognition-assists-review.md)
 
 ## Context
 

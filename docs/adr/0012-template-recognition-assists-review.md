@@ -1,9 +1,17 @@
 # ADR-0012: Template recognition assists review; it never replaces it
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0013](0013-ahfy-documents-are-the-only-input.md)
 - **Date:** 2026-09-01
 - **Decisions:** D14, D8 (amended)
 - **Amends:** [ADR-0006](0006-plaintext-local-profile-storage.md)
+
+> **Superseded on 2026-09-02.** Template recognition collapses into a single document
+> validator: there is no fingerprint, no similarity score, no shipped or learned profile
+> store and no persisted template object. This ADR's amendment to D8 is withdrawn with
+> it — IndexedDB holds one `Profile` and nothing else. What survives is the principle,
+> restated in ADR-0013: a pre-resolution may lower review's cost but never its
+> authority, it fails closed, and it never discharges a gate on the user's behalf. Read
+> ADR-0013 for the current decision.
 
 ## Context
 

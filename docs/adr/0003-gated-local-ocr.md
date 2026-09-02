@@ -1,8 +1,15 @@
 # ADR-0003: Gate the local Greek OCR engine on evidence
 
-- **Status:** Accepted; concrete engine selection pending Task 0.7 evidence
+- **Status:** Superseded by [ADR-0013](0013-ahfy-documents-are-the-only-input.md)
 - **Date:** 2026-08-29
 - **Decision:** D3
+
+> **Superseded on 2026-09-02.** No OCR ships. The only accepted input is the ΑΗΦΥ
+> document, which always carries a text layer, so recognition is designed out rather
+> than gated on evidence: no engine, model, dictionary or WASM is a dependency, and the
+> Task 0.7 engine-selection evidence this ADR waited for is never gathered. What still
+> holds is the reasoning it records — that a recognition step must be earned by
+> evidence, never assumed. Read ADR-0013 for the current decision.
 
 ## Context
 
