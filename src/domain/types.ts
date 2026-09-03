@@ -14,7 +14,7 @@ import { z } from 'zod';
 export type Confidence = 'high' | 'medium' | 'low';
 export type Comparator = '<' | '<=' | '>' | '>=';
 export type ParseStatus = 'value' | 'categorical' | 'missing';
-export type ParseSource = 'anchor' | 'layout' | 'adapter';
+export type ParseSource = 'anchor';
 export type ParseFlag =
   | 'ambiguous-thousands'
   | 'ambiguous-role'
@@ -81,11 +81,9 @@ export interface Column {
   xMin: number;
   xMax: number;
 }
-export interface ColumnModel {
-  page: number;
-  yMin: number;
-  yMax: number;
-  columns: Column[];
+export interface TemplateZone {
+  rect: Rect; // page-normalised, as TextItem
+  resolution: 'redacted' | 'false-positive';
 }
 
 export interface ParsedNumber {
@@ -103,8 +101,10 @@ export interface ParsedRow {
   status: ParseStatus;
   value: number | null;
   comparator: Comparator | null;
+  textValue: string | null; // status 'categorical' only
   unit: string | null;
   referenceRange: ReferenceRange | null;
+  categoricalReference: string | null; // status 'categorical' only
   confidence: Confidence;
   source: ParseSource;
   section: string | null;
@@ -120,8 +120,6 @@ export interface DateCandidate {
   time: string | null; // HH:mm, local civil time
   precision: 'day' | 'minute';
   ambiguous: boolean;
-  kind: 'collection' | 'report' | 'print' | 'birth' | 'unknown';
-  score: number;
   sourceRef?: SourceRef;
 }
 
@@ -162,7 +160,6 @@ export type IdentifierResolution = 'redacted' | 'deleted-row' | 'false-positive'
 export interface ReviewReportDraft {
   id: string; // ephemeral; never persisted as the Report id
   sourceIds: string[];
-  groupingConfirmed: boolean;
   targetReportId: string | null; // explicit “add to existing report”, never inferred
   collectedAt: CollectedAt | null;
   dateConfirmed: boolean;
@@ -206,7 +203,9 @@ export interface SeriesPoint {
   status: ParseStatus;
   value: number | null; // converted to Series.unit when possible
   comparator: Comparator | null;
+  textValue: string | null; // status 'categorical' only; never converted
   referenceRange: ReferenceRange | null; // converted by the same factor
+  categoricalReference: string | null; // status 'categorical' only
   nativeValue: number | null;
   nativeUnit: string | null;
   nativeReferenceRange: ReferenceRange | null;

@@ -119,7 +119,7 @@ decision. The decisions all live in this document.
 | D5a | **The marker registry is the product's core asset, not a lookup table.** Its Greek alias coverage determines extraction quality more than any other single factor, and it is versioned, corpus-tested and scored.                                                                                                                                                                                                                                                                                                                                                                                                        | Direct consequence of D5: if the parser is marker-driven, registry coverage _is_ parser quality.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | D6  | **Mandatory transactional review, without grouping.** One attach batch produces one review session. Nothing is charted or persisted until every identifier candidate is resolved, every duplicate-marker conflict is resolved, every unknown marker is approved and the user confirms the batch. **Source grouping is removed**: one document is exactly one Report, so `proposeReportGroups`/`regroupSources` and the grouping gate do not exist. The collection date is read from `Ημερομηνία Λήψης Δείγματος` and is **presented for confirmation**, not disambiguated.                                               | Grouping existed because one visit arrived as several departmental files. The repository consolidates a visit into one document, so the flow has no referent. Date confirmation is retained deliberately: the parse is near-certain, but confirmation is what keeps the user the author of their own record, and it now costs one tap rather than a disambiguation.                                                                                                                                                                                                                                                                                                                                                    |
 | D7  | **Identifier scrub is a hard persistence gate.** The persisted schema has no identity fields. Every identifier candidate must be redacted, have its row deleted, or be explicitly dismissed as a false positive before Confirm enables. Unknown labels are always included in the scrub surface. All references to source files, object URLs, bitmaps, raw text and crops are released on confirm/cancel and never enter IndexedDB, Cache Storage or export.                                                                                                                                                             | Merely displaying PII candidates does not enforce the promise. The residual free-text path is an approved unknown-marker label, so it needs both review and a final safety validator.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| D8  | **Plaintext IndexedDB for one anonymous local Profile.** The app persists only confirmed `Profile` data as medical data. Before appending to a non-empty Profile, the user must confirm that the new reports belong to the same person; no patient identity is stored. **Amended by D14 (ADR-0012):** locally learned template profiles persist in a separate bounded store as hashes and geometry only — no document text, no values, no dates, no identifiers — cleared by `clearAll` and excluded from `.medigraph`. Medical data remains Profile-only.                                                               | This provides useful returning-user history without implying at-rest protection. The privacy page must disclose shared-device, XSS, backup/sync and browser-eviction risks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| D8  | **Plaintext IndexedDB for one anonymous local Profile.** The app persists only confirmed `Profile` data as medical data. Before appending to a non-empty Profile, the user must confirm that the new reports belong to the same person; no patient identity is stored. IndexedDB holds one `Profile` and nothing else: D14 withdrew the template-profile store this row once carried.                                                                                                                                                                                                                                    | This provides useful returning-user history without implying at-rest protection. The privacy page must disclose shared-device, XSS, backup/sync and browser-eviction risks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | D9  | **Plaintext, versioned `.medigraph` JSON; no encryption or decryption.** Export is a transparent JSON envelope around one validated `Profile`, with explicit sensitivity warnings and size limits. Import offers previewed Cancel/Replace/Merge semantics and never silently overwrites local data.                                                                                                                                                                                                                                                                                                                      | Passphrases and recovery complexity are unnecessary for v1. Plaintext is an intentional usability trade-off, not a security feature; users must be told to store the file as they would the original lab reports.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | D10 | **No LOINC codes in v1.** Canonical marker registry uses our own stable string IDs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | LOINC codes are a hallucination magnet for builder models and buy nothing at this stage.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | D11 | **Charts are hand-written SVG Preact components.** No charting library.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Only two chart forms are needed, both simple; a library costs more bundle than it saves, and hand-rolled SVG gives us the accessibility and touch behaviour the spec below requires.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -149,23 +149,21 @@ authorise sending anything to it.
 
 ## Glossary (use these exact terms in code, tests, issues and UI)
 
-| Term                 | Meaning                                                                                                                                                                                                                                                                     |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Source file**      | One ΑΗΦΥ document the user attaches. It is transient and is never split or merged.                                                                                                                                                                                          |
-| **TextItem**         | One positioned text observation with stable `id`, text, rectangle and optional adapter confidence. Coordinates are page-normalised: top-left origin, y increasing downward, all values in `[0,1]`.                                                                          |
-| **Row**              | TextItems clustered by vertical overlap.                                                                                                                                                                                                                                    |
-| **ParsedRow**        | One ephemeral measurement candidate with a complete parse status, confidence, flags and optional source reference. It is not a persisted Measurement.                                                                                                                       |
-| **ExtractionResult** | One source file's ephemeral review draft: ParsedRows plus date and identifier candidates and optional evidence pages.                                                                                                                                                       |
-| **Review session**   | The transactional draft for one attach batch. It groups sources into proposed Reports and must be fully resolved before Confirm.                                                                                                                                            |
-| **Marker**           | A biological quantity measured over time (e.g. ferritin). Identified by a **marker key**.                                                                                                                                                                                   |
-| **Marker key**       | Stable string id. Canonical (`ferritin`) when the registry recognises the label, else derived (`x:<normalised-label>`).                                                                                                                                                     |
-| **Report**           | The confirmed measurements from one collection event. It has a stable opaque id and a user-confirmed local civil date, optionally a minute-precision time. Equal calendar dates do not imply equal Reports.                                                                 |
-| **Measurement**      | One confirmed marker result within one Report, stored in the lab's native value, unit and range. A Report contains at most one Measurement per marker key.                                                                                                                  |
-| **Series**           | One marker's measurements across all Reports, ordered by date.                                                                                                                                                                                                              |
-| **Profile**          | One anonymous person's complete local dataset. It is the only medical-data object persisted or exported.                                                                                                                                                                    |
-| **Reference range**  | The lab's normal interval for a marker, as printed on that report. Belongs to the Measurement, not the Marker — it varies by lab and by year.                                                                                                                               |
-| **Template profile** | A versioned, non-identifying description of one report template: chrome-token hashes, title and header-row hashes, a column x-band signature, column roles, the collection-date label, identifier zones and standing false positives. It is matched, never trusted blindly. |
-| **Template match**   | The per-page result of fingerprinting a source page and structurally verifying it against a template profile. A match pre-resolves review questions; it never confirms them.                                                                                                |
+| Term                 | Meaning                                                                                                                                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Source file**      | One ΑΗΦΥ document the user attaches. It is transient and is never split or merged.                                                                                                                          |
+| **TextItem**         | One positioned text observation with stable `id`, text, rectangle and optional adapter confidence. Coordinates are page-normalised: top-left origin, y increasing downward, all values in `[0,1]`.          |
+| **Row**              | TextItems clustered by vertical overlap.                                                                                                                                                                    |
+| **ParsedRow**        | One ephemeral measurement candidate with a complete parse status, confidence, flags and optional source reference. It is not a persisted Measurement.                                                       |
+| **ExtractionResult** | One source file's ephemeral review draft: ParsedRows plus date and identifier candidates and optional evidence pages.                                                                                       |
+| **Review session**   | The transactional draft for one attach batch. It groups sources into proposed Reports and must be fully resolved before Confirm.                                                                            |
+| **Marker**           | A biological quantity measured over time (e.g. ferritin). Identified by a **marker key**.                                                                                                                   |
+| **Marker key**       | Stable string id. Canonical (`ferritin`) when the registry recognises the label, else derived (`x:<normalised-label>`).                                                                                     |
+| **Report**           | The confirmed measurements from one collection event. It has a stable opaque id and a user-confirmed local civil date, optionally a minute-precision time. Equal calendar dates do not imply equal Reports. |
+| **Measurement**      | One confirmed marker result within one Report, stored in the lab's native value, unit and range. A Report contains at most one Measurement per marker key.                                                  |
+| **Series**           | One marker's measurements across all Reports, ordered by date.                                                                                                                                              |
+| **Profile**          | One anonymous person's complete local dataset. It is the only medical-data object persisted or exported.                                                                                                    |
+| **Reference range**  | The lab's normal interval for a marker, as printed on that report. Belongs to the Measurement, not the Marker — it varies by lab and by year.                                                               |
 
 ### Field-level contracts
 
@@ -245,45 +243,11 @@ interface Column {
   xMin: number;
   xMax: number;
 }
-interface ColumnModel {
-  page: number;
-  yMin: number;
-  yMax: number;
-  columns: Column[];
-}
 
-type TemplateProvenance = 'seed' | 'learned';
-type TemplateComponent = 'chrome' | 'title' | 'header' | 'bands';
-interface TemplateFingerprint {
-  chromeHashes: string[]; // sorted, deduplicated token hashes
-  titleHashes: string[]; // every section title on the page; may be empty
-  headerHashes: string[];
-  bandStarts: number[]; // quantised x-band starts, ascending
-  bandCount: number;
-}
 interface TemplateZone {
   rect: Rect; // page-normalised, as TextItem
   resolution: 'redacted' | 'false-positive';
 }
-interface TemplateProfile {
-  id: string;
-  version: number;
-  provenance: TemplateProvenance;
-  confirmations: number; // seed profiles apply at 0; learned apply at >= 2
-  fingerprint: TemplateFingerprint;
-  columnRoles: Column[]; // pinned roles, one per expected band
-  collectionDateLabelHash: string | null;
-  identifierZones: TemplateZone[];
-  panelHints: string[]; // may hold several panels or none
-}
-interface TemplateMatch {
-  profileId: string;
-  provenance: TemplateProvenance;
-  confirmations: number;
-  page: number;
-  scores: Record<TemplateComponent, number>;
-}
-
 interface ParsedNumber {
   value: number;
   comparator: Comparator | null;
@@ -321,8 +285,6 @@ interface DateCandidate {
   time: string | null; // HH:mm, local civil time
   precision: 'day' | 'minute';
   ambiguous: boolean;
-  kind: 'collection' | 'report' | 'print' | 'birth' | 'unknown';
-  score: number;
   sourceRef?: SourceRef;
 }
 
@@ -389,7 +351,6 @@ type IdentifierResolution = 'redacted' | 'deleted-row' | 'false-positive';
 interface ReviewReportDraft {
   id: string; // ephemeral; never persisted as the Report id
   sourceIds: string[];
-  groupingConfirmed: boolean;
   targetReportId: string | null; // explicit “add to existing report”, never inferred
   collectedAt: CollectedAt | null;
   dateConfirmed: boolean;
@@ -513,7 +474,7 @@ export function clusterRows(
   pages: readonly (readonly TextItem[])[],
 ): Row[];
 
-// anchors.ts / readout.ts / columns.ts / grammar.ts / extract.ts
+// anchors.ts / readout.ts / extract.ts
 export function findAnchors(rows: readonly Row[]): Anchor[];
 export function readAnchor(
   anchor: Anchor,
@@ -521,56 +482,19 @@ export function readAnchor(
   allRows: readonly Row[],
   anchors: readonly Anchor[],
 ): ParsedRow;
-export function inferColumns(rows: readonly Row[]): ColumnModel[];
-export function parseLayoutRow(row: Row, model: ColumnModel | null): ParsedRow | null;
 export interface TextExtractionInput {
   sourceId: string;
   adapterId: string;
   tier: 'E0';
   pages: TextItem[][];
-  templateProfiles?: readonly TemplateProfile[]; // Pass T; absent means Pass T does not run
 }
 export function extract(input: TextExtractionInput): ExtractionResult;
-
-// templates.ts
-export function fingerprintPage(
-  page: number,
-  rows: readonly Row[],
-  models: readonly ColumnModel[],
-): TemplateFingerprint;
-export function matchTemplate(
-  fingerprint: TemplateFingerprint,
-  profiles: readonly TemplateProfile[],
-): TemplateMatch | null;
-export function verifyTemplateMatch(
-  match: TemplateMatch,
-  fingerprint: TemplateFingerprint,
-  profile: TemplateProfile,
-): boolean;
-export function learnTemplateProfile(
-  fingerprint: TemplateFingerprint,
-  applied: TemplateProfile | null,
-  corrections: TemplateCorrections,
-): TemplateProfile;
-export interface TemplateCorrections {
-  columnRoles: Column[] | null;
-  collectionDateLabelHash: string | null;
-  identifierZones: TemplateZone[] | null;
-}
 
 // identifiers.ts / profile.ts / series.ts
 export function findIdentifierCandidates(
   sourceId: string,
   pages: readonly (readonly TextItem[])[],
 ): IdentifierCandidate[];
-export function proposeReportGroups(
-  results: readonly ExtractionResult[],
-): ReviewReportDraft[];
-export function regroupSources(
-  session: ReviewSession,
-  groups: readonly (readonly string[])[],
-): ReviewSession;
-export function confirmGrouping(session: ReviewSession, draftId: string): ReviewSession;
 export function setReportDate(
   session: ReviewSession,
   draftId: string,
@@ -2443,8 +2367,8 @@ date/source ordering. No Series contains more than one normalised unit.
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 3.1 | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip; self-host the packaged worker under `public/pdf/`                                                                                                                                                                     | 0.1–0.4           | Test against the synthetic PDFs, including text order and page dimensions.                                                                                                                                                                                                                                                                                                                                                           |
 | 3.4 | `fileRouter.ts` — accept PDFs only, enforce 20 files, 100 total pages and 50 MiB per source with MIME/signature checks before decode, then run Pass V per source. A source failing validation is a source-scoped `RouteFailure` naming the accepted document class; successful siblings remain in `results`. | 2.5a, 3.1         | Replaces the undefined `<5 rows` heuristic and handles hybrid PDFs/garbage text layers. Enforce 20 files, 100 total pages, 50 MiB per source and supported MIME/signature checks before decode. Return batch-scoped limit/cancel failures and source-scoped type/size/decode/OCR failures exactly as `RouteFailure`; successful siblings remain in `results`. Attach the Pass T template match, or its absence, to each routed page. |
-| 3.5 | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan                                                                                                                                                                      | 0.2, 2.6          | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI. Template profiles are excluded from the envelope on both export and import; a test asserts a round-trip carries none.                                                                      |
-| 3.6 | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result                                                                                                                                                     | 0.1, 0.2          | Store exactly one Profile and no drafts/evidence, plus the separate template profile store of Task 3.6a and nothing else. `clearAll` removes the database — template profile store included — and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps.                                                                                                                                       |
+| 3.5 | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan                                                                                                                                                                      | 0.2, 2.6          | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI.                                                                                                                                                                                            |
+| 3.6 | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result                                                                                                                                                     | 0.1, 0.2          | Store exactly one Profile and no drafts/evidence, and nothing else. `clearAll` removes the database and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps.                                                                                                                                                                                                                                 |
 | 3.7 | `sw.js` — versioned cache of an explicit, committed app asset list only; cache-first exact-path lookup after first visit                                                                                                                                                                                     | 0.4               | Never cache navigations with user data, blob/data URLs, source files or arbitrary request URLs. No push, background/periodic sync or dynamic `importScripts`. Scope to the app; upgrades remove old asset caches. E1 remains usable offline after assets were first fetched.                                                                                                                                                         |
 | 3.8 | **E0 walking slice + contract freeze.** Through the minimal `MedigraphApp` shell, run one synthetic ΑΗΦΥ document and one rejected non-ΑΗΦΥ PDF from attach → ExtractionResult → source-aware review → explicit Confirm → Profile/Series → IndexedDB → panel/trend primitive → plaintext export/import.      | 2.5c–2.7, 3.1–3.7 | Both slices pass under production CSP and with no test-only adapters. Assert `registryVersion` in every ExtractionResult and fixture. Resolve any contract mismatch in this plan, then mark `types.ts` frozen. Do this before broad UI component work.                                                                                                                                                                               |
 
