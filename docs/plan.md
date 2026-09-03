@@ -1703,8 +1703,15 @@ max:n}`. Symbolic one-sided ranges preserve their printed strictness exactly.
   lone comparator group satisfies neither the value nor range rule, preserve it as a
   value, add `ambiguous-role`, force low confidence and require review rather than
   silently choosing either meaning.
-- The **unit** is the glued or immediately following token accepted by `units.ts`
-  after unit normalisation; raw-script characters never gate the attempt.
+- The **unit** is the glued suffix or the immediately following token, put through
+  `normaliseUnit`; raw-script characters never gate the attempt. A printed unit may
+  span whitespace-separated tokens (`x10^3 / μL`), so the read-out offers the longest
+  adjacent run of up to three tokens that `isKnownUnit` accepts and falls back to the
+  single token otherwise. **Acceptance is not a precondition for storing it**: an
+  unrecognised unit is stored as its normalised text, flagged `unrecognised-unit` and
+  demoted to `medium`. Acceptance gates one thing only — stripping a trailing unit from
+  a range cell, per the rule above, because `parseRange` rejects any trailing token it
+  cannot account for.
 
 **Stop conditions — critical, to prevent bleeding into the next marker's data:**
 
@@ -1875,10 +1882,11 @@ There is deliberately no one-size-fits-all `normalise` function:
   parentheses, then case-stably folds only these abbreviation confusables to Latin:
   `α→a, β→b, ε→e, ζ→z, η→h, ι→i, κ→k, μ→m, ν→n, ο→o, ρ→p, τ→t, υ→y, χ→x`.
   Golden tests cover `Lp (α)→lp(a)` and `(Να)→(na)`.
-- `normaliseUnit(s)` owns unit-specific folding. It maps micro sign `µ` and lowercase
-  Greek mu `μ` to canonical `µ`; Greek **capital** mu `Μ` immediately before `/` to
-  count prefix `M`; and Greek kappa `Κ/κ` immediately before `/` to `K`. Lowercase
-  `μ/…` is never guessed to mean million. Matching then uses the explicit allowlist.
+- `normaliseUnit(s)` owns unit-specific folding and is specified in full under
+  [Units](#units-unitsts) — micro-sign and mu canonicalisation, positional count
+  prefixes, the trailing litre, and exact-match tables. It is stated once there rather
+  than summarised here, because a unit is case-bearing and a partial restatement of the
+  rules is how `M/µL` and `m/µL` end up folded together.
 
 Homoglyph folding is never applied to an entire marker phrase. This avoids the
 case-asymmetric and cross-language collisions caused by partial transliteration.
@@ -1998,14 +2006,116 @@ score. No LOINC (D10).
 
 ### Units (`units.ts`)
 
-`normaliseUnit(s)` always returns trimmed normalized text, including for an unknown
-unit, so review never loses the printed evidence. `isKnownUnit` checks the explicit
-allowlist after normalization; an unknown is retained and flagged. Known mappings:
-`u/l ≡ U/L`, `μg/dl ≡ µg/dL`, `ng/ml ≡ ng/mL`, `pg/ml ≡ pg/mL`, `μIU/ml ≡ mIU/L`,
-`K/µl ≡ 10^3/µL`, `M/µl ≡ 10^6/µL`, `fl ≡ fL`, `g/dl ≡ g/dL`, `mmol/l ≡ mmol/L`.
+`normaliseUnit(s)` always returns trimmed normalised text, including for an unknown
+unit, so review never loses the printed evidence. `isKnownUnit` checks the allowlist
+below after normalisation. An unknown unit is **retained, not dropped**: it is stored
+as its normalised text, flagged `unrecognised-unit` and demoted to `medium`.
 
-`convert(value, from, to, markerKey)` supports **only** this enumerated table; any
-other pair returns `null` and the caller must not convert:
+#### The fold
+
+`normaliseUnit` applies these steps in order and nothing else. It is deliberately not
+`normaliseLabel`: a unit is case-bearing — `M/µL` is a million and `m/µL` would be a
+milli — so the label normaliser's lowercase step would destroy the one distinction
+units turn on. **NFKC is barred** for the same reason in the other direction: it folds
+U+00B5 MICRO SIGN to U+03BC GREEK SMALL LETTER MU, the opposite of the canonical
+direction required here.
+
+1. Trim, then delete every internal whitespace run. A lab prints both `x10^3 / μL` and
+   `x10^3/μL` for one quantity, and a unit never contains a meaningful space.
+2. Map micro sign `µ` (U+00B5) and Greek small mu `μ` (U+03BC) to canonical `µ`
+   (U+00B5). Every canonical spelling in this document uses U+00B5.
+3. **Immediately before `/` only**, map Greek capital mu `Μ` (U+039C) to Latin `M`, and
+   Greek kappa `Κ`/`κ` (U+039A/U+03BA) and Latin `k` to Latin `K`. The rule is
+   positional because a count prefix is the only place where creating an uppercase
+   letter is safe.
+4. A trailing `l` becomes `L`. This is the only case change applied to the body of a
+   unit, and it is positional for the same reason: it reaches the litre in `u/l`,
+   `mmol/l`, `fl` and `g/dl` without reaching the `l` inside `mmol` or the `m` in
+   `mg/dL`. A trailing `l` that is not a litre is uppercased too; such a unit is
+   outside the allowlist either way, and review shows it beside its source row.
+
+**Lowercase `μ` before `/` is never read as million.** `μ/l` is micro-per-litre or it
+is nothing; it never becomes `M/L`. Rule 3 is the whole of the count-prefix folding and
+it does not reach lowercase mu.
+
+Matching is then **exact string equality against the tables below** — never a
+case-insensitive comparison. A blanket case fold would equate `m/µL` with `M/µL`, a
+thousand-fold error in a haematology count, so every case variant a laboratory actually
+prints is either reached by rule 4 or written out as its own row.
+
+#### Allowlist — the canonical units
+
+These seventeen, and nothing else:
+
+| Canonical | Source                                         |
+| --------- | ---------------------------------------------- |
+| `U/L`     | printed-form table                             |
+| `mmol/L`  | printed-form table; `convert` target           |
+| `mg/dL`   | `convert` source                               |
+| `µmol/L`  | `convert` target                               |
+| `g/dL`    | printed-form table; `convert` source           |
+| `g/L`     | `convert` target                               |
+| `µg/dL`   | printed-form table                             |
+| `µg/L`    | `convert` target                               |
+| `ng/mL`   | printed-form table; `convert` source           |
+| `ng/L`    | `convert` target                               |
+| `pg/mL`   | printed-form table; `convert` source           |
+| `nmol/L`  | `convert` target                               |
+| `mIU/L`   | printed-form table                             |
+| `10^3/µL` | printed-form table                             |
+| `10^6/µL` | printed-form table                             |
+| `fL`      | printed-form table                             |
+| `%`       | corpus: the differential rows in § A2 and § A3 |
+
+Every unit named in the `convert` table is a member, or `convert` would be defined over
+units `isKnownUnit` rejects. `%` is a member because the plan's own read-out examples
+require it: § A3 reads a bare `%` row under `ΛΕΥΚΗ ΣΕΙΡΑ` as a differential count, and
+§ A2's `(NEUT%)  48,1  %  40,0 - 75,0 %` repeats `%` inside the range cell, which
+`parseRange` rejects unless the read-out can strip it as a recognised unit.
+
+**How this list grows.** A unit joins it only when a corpus fixture prints it — one
+entry per observed printed form, canonical spelling chosen at the same time. This is
+registry alias rule 4 applied to units, for the same reason: an invented spelling never
+matches what a laboratory prints, so it adds risk and no recall. `mm/h`, `mEq/L`,
+`IU/mL` and an eGFR unit are all expected to appear, and none is admitted here on
+expectation. Task 0.5a's TextItem corpus is where they get observed. Adding a row to
+either table is an ordinary edit needing no decision record; changing a fold rule is not.
+
+#### Printed forms → canonical
+
+Rules 1–4 reach every case and script variant of the units below, so this table carries
+only the spellings a fold cannot produce:
+
+| Printed (after the fold) | Canonical | Why it is not mechanical                |
+| ------------------------ | --------- | --------------------------------------- |
+| `u/L`                    | `U/L`     | enzyme units are capitalised            |
+| `µIU/mL`                 | `mIU/L`   | equal quantities, different notation    |
+| `K/µL`                   | `10^3/µL` | count prefix expanded to a power of ten |
+| `M/µL`                   | `10^6/µL` | count prefix expanded to a power of ten |
+| `x10^3/µL`               | `10^3/µL` | multiplication sign written out         |
+| `x10^6/µL`               | `10^6/µL` | multiplication sign written out         |
+| `K/mL`                   | `10^3/µL` | see below                               |
+
+Worked examples of the fold feeding the table: `k/μl` → `K/µL` → `10^3/µL`;
+`Κ/μl` (Greek kappa) → `K/µL` → `10^3/µL`; `Μ/μl` (Greek capital mu, Greek small mu,
+Latin l) → `M/µL` → `10^6/µL`; `x10^3 / μL` → `x10^3/µL` → `10^3/µL`; `μg/dl` →
+`µg/dL`, already canonical.
+
+**`K/mL` folds to `10^3/µL`, and that reads past what the laboratory printed.** The
+corpus prints `k/ml` for the same quantity a second laboratory prints `k/μl` and a
+third prints `x10^3 / μL`; kilo-per-millilitre is not what the analyser measured. Every
+other row in the table above is notation, and this one is a semantic reading, so it is
+recorded rather than buried. It is admitted because omitting it costs more than the
+reading does: § A2 strips a trailing **recognised** unit before calling `parseRange`,
+and `parseRange` rejects any trailing token it cannot account for, so an unrecognised
+`k/ml` in `4,0 - 10,0 k/ml` loses the reference range as well as the unit. The cost of
+admitting it is that `ParsedRow.unit` and `Measurement.unit` hold `10^3/µL`, not the
+printed `k/ml` — true of `u/l` and every other folded form too, and the reason review
+displays the row against its source before anything is confirmed.
+
+`convert(value, from, to, markerKey)` takes `from` and `to` already normalised — it
+never folds, so a caller passes `normaliseUnit`'s output. It supports **only** this
+enumerated table; any other pair returns `null` and the caller must not convert:
 
 | Marker(s)             | From → To      | Factor    |
 | --------------------- | -------------- | --------- |
@@ -2020,11 +2130,12 @@ other pair returns `null` and the caller must not convert:
 | folate                | ng/mL → nmol/L | × 2.266   |
 | vitamin-d             | ng/mL → nmol/L | × 2.496   |
 
-Inverse direction = divide by the same factor. For a canonical marker, Series.unit is
-its registry `canonicalUnit`; convert each value **and its ReferenceRange bounds by
-the same positive factor**, preserving all native fields on SeriesPoint. Comparator
-direction is unchanged. For an unknown marker, no conversion is attempted; every
-distinct normalised native unit is a separate Series.
+Inverse direction = divide by the same factor. Every `MarkerDef.canonicalUnit` must be
+an allowlist member, so a registry entry can never name a unit `isKnownUnit` rejects.
+For a canonical marker, Series.unit is its registry `canonicalUnit`; convert each value
+**and its ReferenceRange bounds by the same positive factor**, preserving all native
+fields on SeriesPoint. Comparator direction is unchanged. For an unknown marker, no
+conversion is attempted; every distinct normalised native unit is a separate Series.
 
 If units differ and no conversion exists, split into one Series per normalised native
 unit (`none` is its own group), label each `Name (unit)`, and show a notice linking
@@ -2257,7 +2368,7 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 | 1.1       | `text.ts` — separate label/abbreviation normalisers (including final sigma), lexical tokens with UTF-16 parent offsets, and no pseudo geometry                                                                            | 0.2                 |
 | 1.2       | `numbers.ts` — comma/dot decimals, separated and glued comparators, shared ambiguous-thousands result                                                                                                                     | 0.2                 |
 | 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2, 1.1, 1.2       |
-| 1.4       | `units.ts` — normalisation + the enumerated conversion table                                                                                                                                                              | 0.2, 1.1            |
+| 1.4       | `units.ts` — the four fold rules, the enumerated allowlist and printed-form tables, and the enumerated conversion table                                                                                                   | 0.2, 1.1            |
 | 1.5       | `dates.ts` — parse, classify and score every candidate; ambiguity/time precision                                                                                                                                          | 0.2, 1.1            |
 | 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic                                                                                                                       | 0.2, 1.1            |
 | 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
