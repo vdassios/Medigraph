@@ -738,7 +738,7 @@ src/
     units.ts             unit normalisation + conversion table
     dates.ts             the ΑΗΦΥ dd-mm-yyyy date field -> ISO
     registry/            canonical marker registry, one file per panel (el/en aliases)
-    fuzzy.ts             bounded edit distance + abbreviation matching
+    fuzzy.ts             bounded edit distance
     markerKey.ts         label -> marker key
     anchors.ts           TextItem[] -> Anchor[]     (PASS A: marker detection)
     readout.ts           Anchor -> ParsedRow        (PASS A: spatial read-outward)
@@ -2281,7 +2281,7 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 | 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2, 1.1, 1.2       |
 | 1.4       | `units.ts` — the four fold rules, the enumerated allowlist and printed-form tables, and the enumerated conversion table                                                                                                   | 0.2, 1.1            |
 | 1.5       | `dates.ts` — `parseDocumentDate`: the ΑΗΦΥ `dd-mm-yyyy` field to an ISO date, rejecting any day the calendar does not have                                                                                                | 0.2, 1.1            |
-| 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic                                                                                                                       | 0.2, 1.1            |
+| 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein only; the tiers, abbreviation containment and sectionHint tie-breaking are 2.1's                                                                                                 | 0.2, 1.1            |
 | 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
 | 1.7       | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks                                                                                                                                           | 0.2, 1.1            |
 | 1.8       | `rows.ts` — vertical clustering (shared by document validation and Pass A; spec in B1)                                                                                                                                    | 0.2, 0.3            |
