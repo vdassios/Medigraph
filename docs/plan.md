@@ -278,16 +278,6 @@ interface ParsedRow {
   sourceRef?: SourceRef;
 }
 
-interface DateCandidate {
-  id: string;
-  raw: string;
-  date: string; // YYYY-MM-DD
-  time: string | null; // HH:mm, local civil time
-  precision: 'day' | 'minute';
-  ambiguous: boolean;
-  sourceRef?: SourceRef;
-}
-
 interface IdentifierCandidate {
   id: string;
   kind: 'name' | 'national-id' | 'patient-id' | 'phone' | 'email' | 'address' | 'other'; // AMKA is national-id
@@ -301,7 +291,8 @@ interface ExtractionResult {
   tier: 'E0';
   registryVersion: number;
   rows: ParsedRow[];
-  dateCandidates: DateCandidate[];
+  collectionDate: string; // YYYY-MM-DD, bound by Pass V; the user still confirms it
+  resultDate: string | null; // YYYY-MM-DD, displayed beside it and never confirmed
   identifierCandidates: IdentifierCandidate[];
   unrecognised: string[];
   evidenceAvailable: boolean;
@@ -460,10 +451,7 @@ export function convert(
   to: string,
   markerKey: string,
 ): number | null;
-export function findDateCandidates(
-  sourceId: string,
-  pages: readonly (readonly TextItem[])[],
-): DateCandidate[];
+export function parseDocumentDate(raw: string): string | null;
 
 // fuzzy.ts / markerKey.ts / rows.ts
 export function damerauLevenshtein(a: string, b: string, maxDistance: number): number;
@@ -748,7 +736,7 @@ src/
     numbers.ts           decimal parsing (comma/dot), comparators
     ranges.ts            reference-range parsing
     units.ts             unit normalisation + conversion table
-    dates.ts             date parsing, candidate classification + scoring
+    dates.ts             the ΑΗΦΥ dd-mm-yyyy date field -> ISO
     registry/            canonical marker registry, one file per panel (el/en aliases)
     fuzzy.ts             bounded edit distance + abbreviation matching
     markerKey.ts         label -> marker key
@@ -797,15 +785,7 @@ interface ExtractionAdapter {
   supports(file: File): boolean;
   extract(file: File, sourceId: string, signal: AbortSignal): Promise<AdapterOutput>;
 }
-type AdapterOutput =
-  | { kind: 'textItems'; pages: TextItem[][] }
-  | {
-      kind: 'parsedRows';
-      rows: ParsedRow[];
-      dateCandidates: DateCandidate[];
-      identifierCandidates: IdentifierCandidate[];
-      evidenceAvailable: boolean;
-    };
+type AdapterOutput = { kind: 'textItems'; pages: TextItem[][] };
 ```
 
 **Rules that keep the option open** (state these in every `io/` and `domain/` issue):
@@ -1730,10 +1710,16 @@ the first `low` row.
 ### Collection date (`dates.ts`)
 
 An ΑΗΦΥ document states its dates under fixed labels, so there is no candidate pass and
-no scoring. Read `Ημερομηνία Λήψης Δείγματος` as the collection date in `dd-mm-yyyy`;
-read `Ημερομηνία Αποτελέσματος` only to display alongside it. Day-first is unambiguous
-here because the field is a repository-formatted date, not printed prose, so the
-`ambiguous` flag does not arise.
+no scoring. `parseDocumentDate(raw)` converts one printed `dd-mm-yyyy` field to a
+`YYYY-MM-DD` civil date, returning `null` for anything the calendar does not have —
+`31-02-2025`, `29-02-2023`, a month above 12, or any other shape. Pass V calls it for
+`Ημερομηνία Λήψης Δείγματος`, whose failure is a `missing-date` rejection, and for
+`Ημερομηνία Αποτελέσματος`, which is displayed alongside and never confirmed.
+
+Day-first is unambiguous here because the field is repository-formatted, not printed
+prose, so no ambiguity flag arises and none is modelled. The parser yields a date and
+never a time: `precision: 'minute'` exists only to separate two Reports collected on one
+day, and that time comes from the user in review, never from the document.
 
 Review still **requires an explicit confirmation** of the resulting ISO date (D6). It is
 one tap on a pre-filled value rather than a choice among candidates, and the user may
@@ -1742,7 +1728,7 @@ rather than reaching review with no date.
 
 The candidate-scoring machinery this section previously specified — keyword classes,
 `birth → print → collection → report` precedence, first-page and top-third bonuses,
-multiple surviving proposals — is **removed**, along with `DateCandidate.kind`. It
+multiple surviving proposals — is **removed**, along with `DateCandidate` itself. It
 existed to choose among the several dates a lab prints in prose; the repository labels
 them.
 
@@ -2294,7 +2280,7 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 | 1.2       | `numbers.ts` — comma/dot decimals, separated and glued comparators, shared ambiguous-thousands result                                                                                                                     | 0.2                 |
 | 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2, 1.1, 1.2       |
 | 1.4       | `units.ts` — the four fold rules, the enumerated allowlist and printed-form tables, and the enumerated conversion table                                                                                                   | 0.2, 1.1            |
-| 1.5       | `dates.ts` — parse, classify and score every candidate; ambiguity/time precision                                                                                                                                          | 0.2, 1.1            |
+| 1.5       | `dates.ts` — `parseDocumentDate`: the ΑΗΦΥ `dd-mm-yyyy` field to an ISO date, rejecting any day the calendar does not have                                                                                                | 0.2, 1.1            |
 | 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein, abbreviation matching and sectionHint-or-reject tie logic                                                                                                                       | 0.2, 1.1            |
 | 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
 | 1.7       | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks                                                                                                                                           | 0.2, 1.1            |
@@ -2315,7 +2301,7 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                                  | 1.1, 1.6a, 1.6b-core, 1.8 |
 | 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions, stripping a recognised unit repeated inside a range cell, and range/value disambiguation                                                                                                                         | 2.1, 1.2–1.4              |
-| 2.5a | `extract.ts` core — date/identifier passes, Pass A, flags/confidence and `unrecognised[]`                                                                                                                                                                                                                                           | 2.8, 2.1, 1.5, 1.7        |
+| 2.5a | `extract.ts` core — identifier pass, Pass A, flags/confidence and `unrecognised[]`, carrying through the dates Pass V bound                                                                                                                                                                                                         | 2.8, 2.1, 1.5, 1.7        |
 | 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                    | 2.5a, 0.5a, 0.6           |
 | 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel.     | 1.6b-core, 0.5a, 2.5b     |
 | 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors                                                                                                                                                                                                                               | 2.5r                      |
@@ -2428,7 +2414,7 @@ including 4.2a and 4.4.
 | 5.2 | **D1 egress regression (canary).** Run 5.1 and a rejected non-ΑΗΦΥ source against a fixture seeded with canary values — a distinctive marker value, an identifier and a collection date. Capture every request the page makes and assert that no request URL, query string, header or body contains any canary, in any encoding the app could plausibly produce (raw, URL-encoded, base64, JSON-embedded). Assert no request body is sent to any origin at all during attach, review and confirm. Inspect IndexedDB (one Profile, nothing else) and Cache Storage (declared assets only). Origins are not asserted: contacting one is not a D1 violation, transmitting is. No cold/warm/offline matrix. This is regression evidence against accidental egress, not proof against malicious same-origin code. |
 | 5.3 | Bundle budget: initial app route ≤150 KB gzip JS; pdf.js bytes absent from the initial chunk and fetched only on their path. Assert the committed `_headers` CSP is byte-identical to the one the app is served under; there are no generated hashes and no manifest to enforce.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | 5.4 | Accessibility: full keyboard review/panel traversal, focus restoration, 44 px targets, visible labels independent of colour, forced-colours, reduced motion, SVG figure naming, meter text alternatives, trend-table parity, and axe pass in both themes/languages                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| 5.6 | Safety/lifecycle E2E: no-date and ambiguous-date blocks; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states                                                                                                                                                                                                                                                                                              |
+| 5.6 | Safety/lifecycle E2E: unconfirmed-date block and a `missing-date` Pass V rejection; same-date split with distinct times and duplicate-minute rejection; duplicate-marker conflict rebuilt after reassignment; unresolved PII/unknown label block and derived-field redaction; source disposal; one-sided/censored charts; converted range and incompatible-unit split; import into non-empty store for Cancel/Replace/Merge/id/precision conflict; interrupted transaction preserves old Profile; delete one/all and eviction empty states                                                                                                                                                                                                                                                                   |
 
 **Wave 5 dependencies.** Task 5.1 depends on 0.3, 3.8 and 4.6. Task 5.2 depends on
 0.4, 3.7 and 5.1. Task 5.3 depends on 0.4 and 4.6. Task 5.4 depends

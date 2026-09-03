@@ -113,16 +113,6 @@ export interface ParsedRow {
   sourceRef?: SourceRef;
 }
 
-export interface DateCandidate {
-  id: string;
-  raw: string;
-  date: string; // YYYY-MM-DD
-  time: string | null; // HH:mm, local civil time
-  precision: 'day' | 'minute';
-  ambiguous: boolean;
-  sourceRef?: SourceRef;
-}
-
 export interface IdentifierCandidate {
   id: string;
   kind: 'name' | 'national-id' | 'patient-id' | 'phone' | 'email' | 'address' | 'other'; // AMKA is national-id
@@ -133,10 +123,11 @@ export interface IdentifierCandidate {
 export interface ExtractionResult {
   sourceId: string;
   adapterId: string;
-  tier: 'E0' | 'E1' | 'E2';
+  tier: 'E0';
   registryVersion: number;
   rows: ParsedRow[];
-  dateCandidates: DateCandidate[];
+  collectionDate: string; // YYYY-MM-DD, bound by Pass V; the user still confirms it
+  resultDate: string | null; // YYYY-MM-DD, displayed beside it and never confirmed
   identifierCandidates: IdentifierCandidate[];
   unrecognised: string[];
   evidenceAvailable: boolean;
