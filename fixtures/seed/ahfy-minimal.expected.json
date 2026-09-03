@@ -1,0 +1,395 @@
+{
+  "sourceId": "ahfy-minimal",
+  "derivation": "poppler pdftotext -layout column reconstruction; independent of Medigraph's rows.ts, anchors.ts, numbers.ts and ranges.ts",
+  "collectionDate": "2024-07-08",
+  "resultDate": "2024-07-08",
+  "issuingLaboratory": "ΑΙΜΑΤΟΛΟΓΙΚO",
+  "sectionMarkers": [],
+  "rows": [
+    {
+      "page": 2,
+      "label": "WBC (WBC)",
+      "status": "value",
+      "value": 6.93,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.0,
+        "max": 11.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "RBC (RBC)",
+      "status": "value",
+      "value": 5.23,
+      "comparator": null,
+      "textValue": null,
+      "unit": "Μ/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.2,
+        "max": 6.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "HGB (HGB)",
+      "status": "value",
+      "value": 15.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "g/dl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 11.8,
+        "max": 17.8
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "HCT (HCT)",
+      "status": "value",
+      "value": 45.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 36.0,
+        "max": 52.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MCV (MCV)",
+      "status": "value",
+      "value": 87.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 79.0,
+        "max": 98.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MCH (MCH)",
+      "status": "value",
+      "value": 29.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "pg",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 26.0,
+        "max": 32.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MCHC (MCHC)",
+      "status": "value",
+      "value": 33.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "g/dl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 31.4,
+        "max": 38.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "PLT (PLT)",
+      "status": "value",
+      "value": 304.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 150.0,
+        "max": 400.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "NEUT% (NEUT%)",
+      "status": "value",
+      "value": 50.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 45.0,
+        "max": 85.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "LYMP% (LYMP%)",
+      "status": "value",
+      "value": 38.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 20.0,
+        "max": 45.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MONO% (MONO%)",
+      "status": "value",
+      "value": 6.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2.0,
+        "max": 10.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "EOSI% (EOSI%)",
+      "status": "value",
+      "value": 2.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2.0,
+        "max": 6.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "BASO% (BASO%)",
+      "status": "value",
+      "value": 1.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.0,
+        "max": 1.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "NEUT# (NEUT#)",
+      "status": "value",
+      "value": 3.53,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2.4,
+        "max": 9.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "LYMP# (LYMP#)",
+      "status": "value",
+      "value": 2.71,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.0,
+        "max": 4.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MONO# (MONO#)",
+      "status": "value",
+      "value": 0.49,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.1,
+        "max": 1.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "EOSI# (EOSI#)",
+      "status": "value",
+      "value": 0.22,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.1,
+        "max": 0.4
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "BASO# (BASO#)",
+      "status": "value",
+      "value": 0.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.0,
+        "max": 0.1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "RDWSD (RDWSD)",
+      "status": "value",
+      "value": 40.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 40.0,
+        "max": 75.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MPV (MPV)",
+      "status": "value",
+      "value": 9.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 7.0,
+        "max": 10.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-minimal",
+        "page": 2
+      }
+    }
+  ],
+  "coverage": {
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "rowsDerived": 20,
+    "rowsCorroborated": 20
+  }
+}

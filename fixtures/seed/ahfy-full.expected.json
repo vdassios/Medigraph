@@ -1,0 +1,653 @@
+{
+  "sourceId": "ahfy-full",
+  "derivation": "poppler pdftotext -layout column reconstruction; independent of Medigraph's rows.ts, anchors.ts, numbers.ts and ranges.ts",
+  "collectionDate": "2025-05-14",
+  "resultDate": "2025-05-15",
+  "issuingLaboratory": "ΒΙΟΙΑΤΡΙΚΗ - ΑΘΗΝΑ - ΠΛΑΤΕΙΑ ΑΜΕΡΙΚΗΣ",
+  "sectionMarkers": [
+    {
+      "page": 2,
+      "title": "ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ"
+    },
+    {
+      "page": 2,
+      "title": "(LABEL RBC)"
+    },
+    {
+      "page": 2,
+      "title": "ΛΕΥΚΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ (LABEL"
+    },
+    {
+      "page": 2,
+      "title": "WBC)"
+    },
+    {
+      "page": 2,
+      "title": "(LABELWBC TYPE)"
+    },
+    {
+      "page": 2,
+      "title": "ΑΙΜΟΠΕΤΑΛΙΑ (PLT) (LABEL"
+    },
+    {
+      "page": 2,
+      "title": "PLT)"
+    }
+  ],
+  "rows": [
+    {
+      "page": 2,
+      "label": "Ερυθρά Αιμοσφαίρια (RBC) (RBC)",
+      "status": "value",
+      "value": 5.29,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10^6 / μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.4,
+        "max": 6.3
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοσφαιρίνη (HGB) (HGB)",
+      "status": "value",
+      "value": 16.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "gr/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 13.0,
+        "max": 17.6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιματοκρίτης (HCT) (HCT)",
+      "status": "value",
+      "value": 47.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 40.0,
+        "max": 52.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λευκά Αιμοσφαίρια (WBC) (WBC)",
+      "status": "value",
+      "value": 5.03,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10^3 / μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.0,
+        "max": 10.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYM#)",
+      "status": "value",
+      "value": 1.74,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.0,
+        "max": 3.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοπύρηνα (MONO) % (MONO%)",
+      "status": "value",
+      "value": 10.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2.0,
+        "max": 10.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοπύρηνα (MONO#)",
+      "status": "value",
+      "value": 0.56,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.2,
+        "max": 0.8
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοπετάλια (PLT) (PLT)",
+      "status": "value",
+      "value": 329.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10^3 / μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 140.0,
+        "max": 450.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 2
+      }
+    },
+    {
+      "page": 5,
+      "label": "Γλυκόζη (GLUC) (GLUC)",
+      "status": "value",
+      "value": 89.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 74.0,
+        "max": 100.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Ουρία (UREA) (UREA)",
+      "status": "value",
+      "value": 35.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 10.0,
+        "max": 50.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Κρεατινίνη (CREA) (CREA)",
+      "status": "value",
+      "value": 1.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.6,
+        "max": 1.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Ουρικό οξύ (UA) (UA)",
+      "status": "value",
+      "value": 5.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 3.5,
+        "max": 7.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Ολική χοληστερόλη (TC) (CHOL)",
+      "status": "value",
+      "value": 233.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 5
+      }
+    },
+    {
+      "page": 6,
+      "label": "Τριγλυκερίδια (TRIG) (TRIG)",
+      "status": "value",
+      "value": 55.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 6
+      }
+    },
+    {
+      "page": 7,
+      "label": "Κρεατινική κινάση (CK) (CPK)",
+      "status": "value",
+      "value": 205.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "U/L",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 30.0,
+        "max": 200.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Μαγνήσιο (Mg) (Mg)",
+      "status": "value",
+      "value": 2.23,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.6,
+        "max": 2.6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Σίδηρος ορού (Fe) (FE)",
+      "status": "value",
+      "value": 138.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "μg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 65.0,
+        "max": 175.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Φερριτίνη (FERR)",
+      "status": "value",
+      "value": 45.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/mL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 30.0,
+        "max": 400.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 7
+      }
+    },
+    {
+      "page": 8,
+      "label": "Βιταμίνη Β12 (Vit-B12)",
+      "status": "value",
+      "value": 347.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "pg/mL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 188.0,
+        "max": 300.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 8
+      }
+    },
+    {
+      "page": 8,
+      "label": "Φυλλικό οξύ (Folate acid)",
+      "status": "value",
+      "value": 10.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/mL",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 8
+      }
+    },
+    {
+      "page": 9,
+      "label": "Ανοσοσφαιρίνη E (IGE) (IgE)",
+      "status": "value",
+      "value": 10.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "IU/mL",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "max": 100.0,
+        "comparator": "<"
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 9
+      }
+    },
+    {
+      "page": 10,
+      "label": "Τριιωδοθυρονίνη (T3) (T3)",
+      "status": "value",
+      "value": 110.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 35.0,
+        "max": 193.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 10
+      }
+    },
+    {
+      "page": 10,
+      "label": "Ελεύθερη θυροξίνη (FT4) (FT4)",
+      "status": "value",
+      "value": 1.19,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.7,
+        "max": 1.48
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 10
+      }
+    },
+    {
+      "page": 12,
+      "label": "Χροιά (Χροιά)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Ωχροκίτρινη",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Κίτρινη",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Όψη (Οψη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Διαυγής",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Διαυγής",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Ειδικό βάρος (Ειδικό βάρος)",
+      "status": "value",
+      "value": 1031.0,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1010.0,
+        "max": 1030.0
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Λεύκωμα (Λεύκωμα)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικό",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Σάκχαρο (Σάκχαρο)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικό",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικό",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Οξόνη (Οξόνη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητική",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητική",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Αιμοσφαιρίνη (Αιμοσφαιρίνη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητική",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητική",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Χολερυθρίνη (Χολερυθρίνη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητική",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητική",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Ουροχολινογόνο",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικό ή",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Νιτρικά (Νιτρικά)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικά",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικά",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Πυοσφαίρια (Πυοσφαίρια)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "0-2 κ.ο.π",
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Ερυθρά αιμοσφαίρια (Ερυθρά",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "0-1 κ.ο.π.",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "ahfy-full",
+        "page": 12
+      }
+    }
+  ],
+  "coverage": {
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "rowsDerived": 57,
+    "rowsCorroborated": 35
+  }
+}
