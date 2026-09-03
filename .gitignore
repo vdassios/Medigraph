@@ -14,3 +14,6 @@ playwright-report/
 
 # Sourced third-party specimen PDFs (see corpus/greek-labs/INDEX.md)
 corpus/
+
+# Real identity substrings for the Task 0.3 local leak check. Never commit.
+fixtures/seed/.identity-denylist.txt
