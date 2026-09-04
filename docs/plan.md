@@ -1733,6 +1733,63 @@ multiple surviving proposals — is **removed**, along with `DateCandidate` itse
 existed to choose among the several dates a lab prints in prose; the repository labels
 them.
 
+### Identifier candidates (`identifiers.ts`)
+
+`findIdentifierCandidates(sourceId, pages)` reads the text layer and returns what the
+D7 scrub panel must ask about. A candidate is a question, not a verdict: raising one
+costs a review tap, and missing one costs the promise, so the rules below detect what
+is **labelled** or **unmistakably shaped** and guess at nothing else.
+
+**Labelled fields.** A Greek surname is unreachable by any pattern — only its label
+says what it is — so eight of the twelve fixed metadata labels yield a candidate from
+their value, as does the `Κωδικός` header every page carries:
+
+| Label                                                     | Kind          |
+| --------------------------------------------------------- | ------------- |
+| `ΑΜΚΑ`, `ΑΜΚΑ Ιατρού`                                     | `national-id` |
+| `Επώνυμο`, `Όνομα`, `Επώνυμο Ιατρού`, `Όνομα Ιατρού`      | `name`        |
+| `Αρ. Υπόθεσης`, `Αριθμός Παραγγελίας`, per-page `Κωδικός` | `patient-id`  |
+
+The first six are the identifier positions listed under
+[The ΑΗΦΥ document](#the-αηφυ-document). The three opaque ids join them because each is
+a handle the issuing repository can resolve back to a person; the seed fixtures' own
+identity denylist redacts all three. The remaining four labelled fields raise nothing:
+both dates are data the user confirms rather than scrubs, `Ειδικότητα Ιατρού` is a
+medical specialty and names nobody, and `Επωνυμία Εργαστηρίου` is retained as the
+Report's laboratory label and is explicitly not an identifier.
+
+A label is matched **whole**, against everything before a line's first colon and after
+`normaliseLabel`, so `ΑΜΚΑ Ιατρού` is never read as `ΑΜΚΑ` and a printed
+`Φυσιολογική Τιμή: <150` matches nothing.
+
+**Scanned shapes.** Independently of any label, every line is scanned for the AMKA,
+email and Greek phone patterns. Those three regexes are declared in `identifiers.ts`
+and **imported** by `assertProfileSafe` rather than restated there: a detector and a
+final gate that disagreed about what an AMKA looks like would leave open the hole D7
+exists to close. Their word-boundary anchors are what keep them off medical numbers —
+the eleven-digit rule cannot fire on a specific gravity, nor _inside_ the twenty-six
+digit repository code, which its label catches instead.
+
+**Lines, not items.** Items sharing a vertical extent are joined with a single space
+before matching, so one pass reads both shapes the pipeline produces: the fragments
+pdf.js emits (`ΑΜΚΑ:` beside its digits, or a label split across `Αρ.` and
+`Υπόθεσης:`) and a whole-line reconstruction. The separator is a space rather than
+nothing on purpose — two adjacent digit fragments must never be read as one longer
+number.
+
+**One candidate per distinct kind and text**, the first occurrence keeping the
+`SourceRef`. Review's Redact removes the substring from every derived field, so a
+second prompt for the same string resolves nothing and only lengthens the gate; the
+`Κωδικός` heading all thirteen pages is one candidate, not thirteen. `SourceRef` names
+every item the match crosses and boxes their union, and carries a `textRange` only when
+one item holds the whole span, since those offsets index that item's own text.
+
+**It detects; it resolves nothing.** Pass V pre-resolves the six known positions as
+`redacted`, and those resolutions stay the user's to reverse. Putting approved unknown
+marker labels in the scrub surface is review's duty (Task 4.2) with `assertProfileSafe`
+as the final gate — this module never sees a marker label. Candidates are transient and
+never persisted.
+
 ### Report identity and conflicts (`profile.ts`)
 
 - **One document is exactly one Report.** A source is never split and never merged, so

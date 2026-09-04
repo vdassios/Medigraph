@@ -1,4 +1,8 @@
 import { z } from 'zod';
+// The AMKA, email and phone shapes are the D7 detector's, imported rather than
+// restated: a gate that disagreed with `findIdentifierCandidates` about what an
+// identifier looks like would leave open the hole D7 exists to close.
+import { AMKA_PATTERN, EMAIL_PATTERN, PHONE_PATTERN } from './identifiers';
 
 /**
  * Field-level contracts (docs/plan.md, "Field-level contracts") plus the two
@@ -497,11 +501,6 @@ export function validateProfile(value: unknown): Profile {
 // contain them. D7: a newline in a label could smuggle a second line of text.
 // eslint-disable-next-line no-control-regex -- intentional control-char class
 const CONTROL_CHARACTERS = /[\u0000-\u001F\u007F]/;
-/** Greek AMKA: 11 consecutive digits. */
-const AMKA_PATTERN = /\b\d{11}\b/;
-const EMAIL_PATTERN = /[^\s@]+@[^\s@]+\.[A-Za-z]{2,}/;
-/** Greek mobile/landline shapes, with or without +30, allowing spaces or dashes. */
-const PHONE_PATTERN = /(?:\+30[\s-]?)?\b(?:2\d|69)\d(?:[\s-]?\d){7}\b/;
 
 /**
  * Rejects a Profile whose free-text labels could carry identifying content.
