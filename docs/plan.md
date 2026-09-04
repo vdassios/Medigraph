@@ -453,9 +453,10 @@ export function convert(
 ): number | null;
 export function parseDocumentDate(raw: string): string | null;
 
-// fuzzy.ts / markerKey.ts / rows.ts
+// fuzzy.ts / registry/index.ts / markerKey.ts / rows.ts
 export function damerauLevenshtein(a: string, b: string, maxDistance: number): number;
 export const REGISTRY_VERSION: number;
+export const MARKERS: readonly MarkerDef[];
 export function markerKey(label: string): string;
 export function clusterRows(
   sourceId: string,
@@ -1804,9 +1805,11 @@ case-asymmetric and cross-language collisions caused by partial transliteration.
 
 ### Marker key (`markerKey.ts`)
 
-`markerKey(label)`: `normaliseLabel` → look up label-normalised registry aliases →
-return canonical id on hit; on miss retain Unicode letters/numbers, collapse every
-other run to `-`, trim dashes, and prefix `x:`.
+`markerKey(label)`: `normaliseLabel` → look up label-normalised registry aliases **and
+abbreviations** → return canonical id on hit; on miss retain Unicode letters/numbers,
+collapse every other run to `-`, trim dashes, and prefix `x:`. Matching is exact
+equality; containment, edit distance and `sectionHint` tie-breaking belong to the four
+tiers in `anchors.ts`, which have a row's geometry and section to reason with.
 Unknown markers are first-class: they chart fine, they just have no canonical name.
 
 ### Registry (`src/domain/registry/`) — the core asset (D5a)
@@ -1822,6 +1825,9 @@ Split one file per panel so tasks parallelise and diffs stay readable:
 `haematology.ts`, `biochemistry.ts`, `lipids.ts`, `hormones.ts`, `vitamins.ts`,
 `inflammation.ts`, `coagulation.ts`, `urinalysis.ts`, `index.ts`.
 
+`MarkerDef` is declared in `types.ts` with the other field-level contracts; the panel
+files below hold data only.
+
 ```ts
 interface MarkerDef {
   id: string; // stable: 'ferritin', never renamed once shipped
@@ -1829,11 +1835,16 @@ interface MarkerDef {
   el: string; // display name, Greek
   abbreviations: string[]; // T1 tier — lab- and language-invariant
   aliases: string[]; // T2/T3/T4 tier — Greek and English spellings
-  canonicalUnit: string;
+  canonicalUnit: string | null; // null only where the laboratory prints none
   plausibleRange?: [number, number]; // sanity bound, NOT a reference range
   sectionHint?: string; // unique T4 tie-break only
 }
 ```
+
+`canonicalUnit` is `null` for a marker printed without a unit — the urinalysis dipstick
+and sediment rows, the specific gravity, the urine pH. It is not a sentinel for "unit
+unknown": a numeric marker whose printed unit has not been observed does not enter the
+registry until it has been.
 
 **Alias authoring rules** (put these verbatim in every registry issue):
 
@@ -1956,7 +1967,7 @@ prints is either reached by rule 4 or written out as its own row.
 
 #### Allowlist — the canonical units
 
-These seventeen, and nothing else:
+These twenty-two, and nothing else:
 
 | Canonical | Source                                         |
 | --------- | ---------------------------------------------- |
@@ -1977,6 +1988,11 @@ These seventeen, and nothing else:
 | `10^6/µL` | printed-form table                             |
 | `fL`      | printed-form table                             |
 | `%`       | corpus: the differential rows in § A2 and § A3 |
+| `pg`      | seed fixtures: MCH on both fixture pages       |
+| `mg/L`    | seed fixture: CRP                              |
+| `mm`      | seed fixture: the sedimentation rate           |
+| `IU/mL`   | seed fixture: IgE, anti-Tg, anti-TPO           |
+| `ng/dL`   | seed fixture: T3, free T4                      |
 
 Every unit named in the `convert` table is a member, or `convert` would be defined over
 units `isKnownUnit` rejects. `%` is a member because the plan's own read-out examples
@@ -1987,9 +2003,12 @@ require it: § A3 reads a bare `%` row under `ΛΕΥΚΗ ΣΕΙΡΑ` as a differ
 **How this list grows.** A unit joins it only when a corpus fixture prints it — one
 entry per observed printed form, canonical spelling chosen at the same time. This is
 registry alias rule 4 applied to units, for the same reason: an invented spelling never
-matches what a laboratory prints, so it adds risk and no recall. `mm/h`, `mEq/L`,
-`IU/mL` and an eGFR unit are all expected to appear, and none is admitted here on
-expectation. Task 0.5a's TextItem corpus is where they get observed. Adding a row to
+matches what a laboratory prints, so it adds risk and no recall. `mm/h`, `mEq/L` and an
+eGFR unit are all expected to appear, and none is admitted here on expectation. Task
+0.5a's TextItem corpus is where they get observed. The five entries below `%` arrived
+that way: each is one printed form the Task 0.3 seed fixtures carry. An eGFR unit is
+still absent because the fixture wraps `mL/min/1.73m` and `^2` across a line break, so
+what it prints is not yet observable as one spelling. Adding a row to
 either table is an ordinary edit needing no decision record; changing a fold rule is not.
 
 #### Printed forms → canonical
@@ -2006,6 +2025,7 @@ only the spellings a fold cannot produce:
 | `x10^3/µL`               | `10^3/µL` | multiplication sign written out         |
 | `x10^6/µL`               | `10^6/µL` | multiplication sign written out         |
 | `K/mL`                   | `10^3/µL` | see below                               |
+| `gr/dL`                  | `g/dL`    | `gr` for the gram, printed by a fixture |
 
 Worked examples of the fold feeding the table: `k/μl` → `K/µL` → `10^3/µL`;
 `Κ/μl` (Greek kappa) → `K/µL` → `10^3/µL`; `Μ/μl` (Greek capital mu, Greek small mu,
@@ -2041,8 +2061,9 @@ enumerated table; any other pair returns `null` and the caller must not convert:
 | folate                | ng/mL → nmol/L | × 2.266   |
 | vitamin-d             | ng/mL → nmol/L | × 2.496   |
 
-Inverse direction = divide by the same factor. Every `MarkerDef.canonicalUnit` must be
-an allowlist member, so a registry entry can never name a unit `isKnownUnit` rejects.
+Inverse direction = divide by the same factor. Every non-null `MarkerDef.canonicalUnit`
+must be an allowlist member, so a registry entry can never name a unit `isKnownUnit`
+rejects; a `null` one belongs to a marker the laboratory prints without any unit.
 For a canonical marker, Series.unit is its registry `canonicalUnit`; convert each value
 **and its ReferenceRange bounds by the same positive factor**, preserving all native
 fields on SeriesPoint. Comparator direction is unchanged. For an unknown marker, no
@@ -2274,18 +2295,18 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 
 ### Wave 1 — pure domain (parallel only where dependencies permit)
 
-| #         | Task                                                                                                                                                                                                                      | Depends on          |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| 1.1       | `text.ts` — separate label/abbreviation normalisers (including final sigma), lexical tokens with UTF-16 parent offsets, and no pseudo geometry                                                                            | 0.2                 |
-| 1.2       | `numbers.ts` — comma/dot decimals, separated and glued comparators, shared ambiguous-thousands result                                                                                                                     | 0.2                 |
-| 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                        | 0.2, 1.1, 1.2       |
-| 1.4       | `units.ts` — the four fold rules, the enumerated allowlist and printed-form tables, and the enumerated conversion table                                                                                                   | 0.2, 1.1            |
-| 1.5       | `dates.ts` — `parseDocumentDate`: the ΑΗΦΥ `dd-mm-yyyy` field to an ISO date, rejecting any day the calendar does not have                                                                                                | 0.2, 1.1            |
-| 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein only; the tiers, abbreviation containment and sectionHint tie-breaking are 2.1's                                                                                                 | 0.2, 1.1            |
-| 1.6b-core | **`registry/` seed** — the ~40 markers appearing in the two fixture pages, authored strictly from the fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
-| 1.7       | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks                                                                                                                                           | 0.2, 1.1            |
-| 1.8       | `rows.ts` — vertical clustering (shared by document validation and Pass A; spec in B1)                                                                                                                                    | 0.2, 0.3            |
-| 1.9       | `review.ts` — immutable marker reassignment, identifier/conflict resolution and `canConfirm`; changing marker keys immediately rebuilds duplicate conflicts                                                               | 0.2, 1.6b-core, 1.7 |
+| #         | Task                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Depends on          |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| 1.1       | `text.ts` — separate label/abbreviation normalisers (including final sigma), lexical tokens with UTF-16 parent offsets, and no pseudo geometry                                                                                                                                                                                                                                                                                                                                                            | 0.2                 |
+| 1.2       | `numbers.ts` — comma/dot decimals, separated and glued comparators, shared ambiguous-thousands result                                                                                                                                                                                                                                                                                                                                                                                                     | 0.2                 |
+| 1.3       | `ranges.ts` — parse every range form in the corpus                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 0.2, 1.1, 1.2       |
+| 1.4       | `units.ts` — the four fold rules, the enumerated allowlist and printed-form tables, and the enumerated conversion table                                                                                                                                                                                                                                                                                                                                                                                   | 0.2, 1.1            |
+| 1.5       | `dates.ts` — `parseDocumentDate`: the ΑΗΦΥ `dd-mm-yyyy` field to an ISO date, rejecting any day the calendar does not have                                                                                                                                                                                                                                                                                                                                                                                | 0.2, 1.1            |
+| 1.6a      | `fuzzy.ts` — bounded Damerau–Levenshtein only; the tiers, abbreviation containment and sectionHint tie-breaking are 2.1's                                                                                                                                                                                                                                                                                                                                                                                 | 0.2, 1.1            |
+| 1.6b-core | **`registry/` seed** — the markers the two seed fixture documents print (63 at seed time), authored strictly from those fixtures and the Task 0.5c ΚΕΟΚΕΕ seed; export `REGISTRY_VERSION = 1`. A printed row is left out when its unit is not observable as one printed spelling (eGFR, PDW) or when it is narrative rather than a measurement (the red-cell morphology and crystal/cast sub-rows); each extracts as an unknown `x:` marker until Task 2.5r. Enough to unblock Wave 2 without the corpus. | 0.2, 1.1, 0.3, 0.5c |
+| 1.7       | `identifiers.ts` — PII candidates plus unknown-label `assertProfileSafe` checks                                                                                                                                                                                                                                                                                                                                                                                                                           | 0.2, 1.1            |
+| 1.8       | `rows.ts` — vertical clustering (shared by document validation and Pass A; spec in B1)                                                                                                                                                                                                                                                                                                                                                                                                                    | 0.2, 0.3            |
+| 1.9       | `review.ts` — immutable marker reassignment, identifier/conflict resolution and `canConfirm`; changing marker keys immediately rebuilds duplicate conflicts                                                                                                                                                                                                                                                                                                                                               | 0.2, 1.6b-core, 1.7 |
 
 Every one of these is a pure function with a table-driven test file. Supply each
 builder model with an explicit input→output table in the issue (e.g. for 1.3:

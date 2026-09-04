@@ -14,7 +14,7 @@ const KAPPA = '\u039A'; // GREEK CAPITAL LETTER KAPPA
 const THOUSAND_PER_MICROLITRE = `10^3/${MICRO}L`;
 const MILLION_PER_MICROLITRE = `10^6/${MICRO}L`;
 
-/** The seventeen canonical units, as the allowlist enumerates them. */
+/** The twenty-two canonical units, as the allowlist enumerates them. */
 const ALLOWLIST = [
   'U/L',
   'mmol/L',
@@ -33,6 +33,11 @@ const ALLOWLIST = [
   MILLION_PER_MICROLITRE,
   'fL',
   '%',
+  'pg',
+  'mg/L',
+  'mm',
+  'IU/mL',
+  'ng/dL',
 ];
 
 describe('normaliseUnit', () => {
@@ -47,6 +52,11 @@ describe('normaliseUnit', () => {
     ['fl', 'fL'],
     ['g/dl', 'g/dL'],
     ['mmol/l', 'mmol/L'],
+    ['gr/dL', 'g/dL'],
+    ['gr/dl', 'g/dL'],
+    ['IU/ml', 'IU/mL'],
+    ['ng/dl', 'ng/dL'],
+    ['mg/l', 'mg/L'],
   ])('applies the documented mapping %j', (printed, expected) => {
     expect(normaliseUnit(printed)).toBe(expected);
   });
@@ -108,7 +118,7 @@ describe('normaliseUnit', () => {
     expect(normaliseUnit(printed)).toBe(expected);
   });
 
-  it.each([['mm/h'], ['mEq/L'], ['IU/mL'], ['ratio'], ['\u03BA\u03AC\u03C4\u03B9']])(
+  it.each([['mm/h'], ['mEq/L'], ['ratio'], ['\u03BA\u03AC\u03C4\u03B9']])(
     'retains the unknown unit %j as normalised text',
     (printed) => {
       // Review must keep seeing what the laboratory printed, so an unknown is
@@ -134,7 +144,7 @@ describe('isKnownUnit', () => {
     expect(isKnownUnit('%')).toBe(true);
   });
 
-  it.each([['mm/h'], ['mEq/L'], ['IU/mL'], ['mol'], ['k/l'], [''], ['/'], ['mg']])(
+  it.each([['mm/h'], ['mEq/L'], ['mol'], ['k/l'], [''], ['/'], ['mg']])(
     'rejects %j, which the allowlist does not carry',
     (printed) => {
       expect(isKnownUnit(printed)).toBe(false);

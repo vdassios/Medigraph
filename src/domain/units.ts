@@ -62,6 +62,10 @@ const PRINTED_FORMS = new Map([
   // and an unrecognised unit here costs the reference range too: the read-out
   // only strips a *recognised* trailing unit before `parseRange`.
   ['K/mL', `10^3/${MICRO}L`],
+  // `gr` for the gram, printed by the ΑΗΦΥ seed fixture on haemoglobin and
+  // MCHC. Notation, not a reading: the same laboratory prints `mg/dL` two
+  // pages later.
+  ['gr/dL', 'g/dL'],
 ]);
 
 /** The canonical units, and nothing else. Grows only from corpus evidence. */
@@ -83,6 +87,14 @@ const ALLOWLIST = new Set([
   `10^6/${MICRO}L`,
   'fL',
   '%',
+  // Observed in the Task 0.3 seed fixtures, one entry per printed form: `pg`
+  // on MCH, `mg/L` on CRP, `mm` on the sedimentation rate, `IU/mL` on IgE and
+  // the thyroid antibodies, `ng/dL` on T3 and free T4.
+  'pg',
+  'mg/L',
+  'mm',
+  'IU/mL',
+  'ng/dL',
 ]);
 
 interface Conversion {

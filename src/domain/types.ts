@@ -64,6 +64,26 @@ export interface Row {
   h: number;
 }
 
+/**
+ * One registry marker. Versioned data, not a lookup row: alias coverage is
+ * what decides how much of a document Pass A recognises (D5a).
+ *
+ * `canonicalUnit` is `null` only for a marker the laboratory prints without a
+ * unit — the urinalysis strip results, the specific gravity, the urine pH.
+ * Every other value is an allowlist member, so a registry entry can never name
+ * a unit `isKnownUnit` rejects.
+ */
+export interface MarkerDef {
+  id: string; // stable: 'ferritin', never renamed once shipped
+  en: string; // display name, English
+  el: string; // display name, Greek
+  abbreviations: string[]; // T1 tier — lab- and language-invariant
+  aliases: string[]; // T2/T3/T4 tier — Greek and English spellings, as printed
+  canonicalUnit: string | null;
+  plausibleRange?: [number, number]; // sanity bound, NOT a reference range
+  sectionHint?: string; // unique T4 tie-break only
+}
+
 export type MatchTier = 'T1' | 'T2' | 'T3' | 'T4';
 export interface Anchor {
   id: string;
