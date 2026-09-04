@@ -99,7 +99,11 @@ export interface Anchor {
   sourceRef: SourceRef;
 }
 
-export type ColumnRole = 'label' | 'value' | 'unit' | 'range' | 'unknown';
+/**
+ * The five ΑΗΦΥ columns, bound by header position (D14). There is no `unknown`
+ * role: column inference died with Pass B (D5), so nothing can produce one.
+ */
+export type ColumnRole = 'label' | 'value' | 'unit' | 'range' | 'notes';
 export interface Column {
   role: ColumnRole;
   xMin: number;

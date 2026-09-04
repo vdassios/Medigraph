@@ -237,7 +237,7 @@ interface Anchor {
   sourceRef: SourceRef;
 }
 
-type ColumnRole = 'label' | 'value' | 'unit' | 'range' | 'unknown';
+type ColumnRole = 'label' | 'value' | 'unit' | 'range' | 'notes';
 interface Column {
   role: ColumnRole;
   xMin: number;
@@ -463,6 +463,9 @@ export function clusterRows(
   sourceId: string,
   pages: readonly (readonly TextItem[])[],
 ): Row[];
+
+// ahfyDocument.ts
+export function validateAhfyDocument(pages: readonly TextItem[][]): AhfyValidation;
 
 // anchors.ts / readout.ts / extract.ts
 export function findAnchors(rows: readonly Row[]): Anchor[];
@@ -1535,6 +1538,54 @@ structural rows inside the table — `ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ 
 `(LABELWBC TYPE)`, `Φυσικά χαρακτηριστικά (Φυσικά χαρακτηρ)`. A row whose value, unit
 and range cells are all empty is a section marker: record it as the current
 `sectionHint` and emit no `ParsedRow`. Never infer a measurement from a label alone.
+
+**V5. What it is given, and what it returns.**
+
+```ts
+interface AhfyDocument {
+  columns: Record<ColumnRole, Column>;
+  collectionDate: string; // ISO, from Ημερομηνία Λήψης Δείγματος
+  resultDate: string | null; // from Ημερομηνία Αποτελέσματος
+  issuingLaboratory: string; // from Επωνυμία Εργαστηρίου; not an identifier
+  identifierZones: readonly TemplateZone[];
+  sectionTitles: readonly { page: number; y: number; title: string }[];
+}
+type AhfyValidation =
+  | { ok: true; document: AhfyDocument }
+  | {
+      ok: false;
+      reason: 'missing-title' | 'missing-metadata' | 'missing-table' | 'missing-date';
+    };
+```
+
+**It takes the adapter's positioned items**, one array per page, as `pdfText.ts` emits
+them. Column roles are bound from the header's x positions, so a page collapsed into one
+whole-line item per printed line carries no position to bind from and is rejected
+`missing-table`. That is fail-closed behaviour working as specified — a source whose
+columns cannot be bound is a source nothing may be read from — but it is a real shape
+requirement on the caller, and the whole-line reading belongs to § A2's lexical
+read-out rather than here.
+
+**Binding the columns.** Each column runs from its heading's x to the next heading's x,
+and the last to the page edge. A heading is found as the leftmost header item opening
+with its first word, so `Μονάδα Μέτρησης` binds whether a laboratory prints it as one
+item or as two stacked at the same x. Header detection matches all five headings as
+whole phrases in the row's text, which works because `rows.ts` orders a row's items by
+x and breaks ties by y — the stacked second words land beside their own first words.
+
+**Identifier zones are the six positions, not the nine candidates.** The case number,
+the order number and the per-page `Κωδικός` are identifier candidates that
+`identifiers.ts` raises, and the template does not pre-resolve them, so they reach the
+user unanswered. Each zone boxes the _value_ of its field, taken from the items after
+the label's colon.
+
+**One section marker per row.** What counts as a row is `rows.ts`'s question, already
+answered: a title the laboratory wrapped across two printed lines arrives here as two
+markers rather than being re-clustered under a second, looser threshold. A hint that
+matches no registry `sectionHint` only fails to break a T4 tie; it never produces a
+wrong reading. Two rows need no special case and get none: a spaced banner heading
+fills the value column, so it is not a marker, and the per-page `Κωδικός` header is
+excluded by its label.
 
 ---
 
