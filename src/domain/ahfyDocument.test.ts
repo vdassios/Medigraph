@@ -244,6 +244,17 @@ describe('validateAhfyDocument', () => {
       expect(document.sectionTitles).toEqual([]);
     });
 
+    it('records the panel heading that opens a table', () => {
+      // V2's "panel headings between tables". A heading may be long enough to
+      // overflow into the value column — `Χοληστερόλη υψηλής πυκνότητας
+      // λιποπρωτεϊνών (ΗDL-C)` does — so its position above a header is what
+      // identifies it, not its cells.
+      const titles = accept(fixture('ahfy-full')).sectionTitles;
+
+      expect(titles.some((section) => section.title.startsWith('Γλυκόζη (GLU)'))).toBe(true);
+      expect(titles.some((section) => section.title.includes('(ΗDL-C)'))).toBe(true);
+    });
+
     it('takes one title per row, leaving a wrapped title as two', () => {
       // What counts as a row is rows.ts's question, already answered. Pass V
       // classifies rows; it does not re-cluster them under a looser rule.
@@ -302,10 +313,10 @@ describe('validateAhfyDocument', () => {
       });
     });
 
-    it('finds every section marker ahfy-full prints', () => {
+    it('finds every heading and structural row ahfy-full prints', () => {
       const titles = accept(fixture('ahfy-full')).sectionTitles;
 
-      expect(titles).toHaveLength(73);
+      expect(titles).toHaveLength(80);
       expect(titles.every((section) => section.page >= 2)).toBe(true);
     });
 

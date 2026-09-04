@@ -80,13 +80,20 @@ const PAGE_HEADER_LABEL = 'Κωδικός';
 /** The right edge of the last column, in page-normalised coordinates. */
 const PAGE_RIGHT_EDGE = 1;
 
+/** A heading in force from where it is printed until the next one. */
+export interface SectionTitle {
+  page: number;
+  y: number;
+  title: string;
+}
+
 export interface AhfyDocument {
   columns: Record<ColumnRole, Column>;
   collectionDate: string; // ISO, from Ημερομηνία Λήψης Δείγματος
   resultDate: string | null; // from Ημερομηνία Αποτελέσματος
   issuingLaboratory: string; // from Επωνυμία Εργαστηρίου; not an identifier
   identifierZones: readonly TemplateZone[];
-  sectionTitles: readonly { page: number; y: number; title: string }[];
+  sectionTitles: readonly SectionTitle[];
 }
 
 export type AhfyValidation =
@@ -148,6 +155,11 @@ function boundingBox(items: readonly TextItem[]): Rect {
   }
 
   return { x, y, w: right - x, h: bottom - y };
+}
+
+/** Whether a row exists and opens a table. */
+function heads(row: Row | undefined): boolean {
+  return row !== undefined && isTableHeader(row);
 }
 
 /** Whether one row carries all five column headings, in any arrangement. */
@@ -272,12 +284,16 @@ export function validateAhfyDocument(pages: readonly TextItem[][]): AhfyValidati
 
   const afterHeader = rows.slice(rows.indexOf(header));
   const sectionTitles = afterHeader
-    .filter(
-      (row) =>
-        !isTableHeader(row) &&
-        labelledField(row)?.label !== normaliseLabel(PAGE_HEADER_LABEL) &&
-        isSectionMarker(row, columns),
-    )
+    .filter((row, index) => {
+      if (isTableHeader(row) || labelledField(row)?.label === normaliseLabel(PAGE_HEADER_LABEL)) {
+        return false;
+      }
+      // V2's panel heading between tables, and V4's structural row inside one.
+      // The heading may be long enough to overflow into the value column —
+      // `Χοληστερόλη υψηλής πυκνότητας λιποπρωτεϊνών (ΗDL-C)` does — so its
+      // position is what identifies it, not its cells.
+      return heads(afterHeader[index + 1]) || isSectionMarker(row, columns);
+    })
     .map((row) => ({ page: row.page, y: row.y, title: rowText(row) }));
 
   return {

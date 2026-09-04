@@ -468,7 +468,10 @@ export function clusterRows(
 export function validateAhfyDocument(pages: readonly TextItem[][]): AhfyValidation;
 
 // anchors.ts / readout.ts / extract.ts
-export function findAnchors(rows: readonly Row[]): Anchor[];
+export function findAnchors(
+  rows: readonly Row[],
+  sectionTitles: readonly SectionTitle[],
+): Anchor[];
 export function readAnchor(
   anchor: Anchor,
   row: Row,
@@ -1579,6 +1582,13 @@ the order number and the per-page `Κωδικός` are identifier candidates tha
 user unanswered. Each zone boxes the _value_ of its field, taken from the items after
 the label's colon.
 
+**A panel heading is recorded by its position.** V2's "headings between tables" are
+found as the row immediately above a table header, and V4's structural rows by their
+empty value, unit and range cells. Position is needed as well as cells because a heading
+may be long enough to overflow into the value column —
+`Χοληστερόλη υψηλής πυκνότητας λιποπρωτεϊνών (ΗDL-C)` does — and a heading Pass A does
+not know about is a heading Pass A reads as a measurement.
+
 **One section marker per row.** What counts as a row is `rows.ts`'s question, already
 answered: a title the laboratory wrapped across two printed lines arrives here as two
 markers rather than being re-clustered under a second, looser threshold. A hint that
@@ -1627,6 +1637,46 @@ shared infrastructure built in Wave 1 (Task 1.8), not Pass-B-only code.
 
 Overlapping anchors: better tier wins, then the **longest matched span**, then the
 leftmost source order. Never emit two anchors covering the same source characters.
+
+**Selecting between hits in the winning tier.** Three rules, applied in order.
+
+1. **A parenthesised abbreviation outranks a bare one, at T1 only.** The `Περιγραφή`
+   cell prints `<name> (<laboratory code>)`, so a parenthesised abbreviation names the
+   row's marker while a bare one may belong to the prose naming it.
+   `Μέση Περιεκτικότης HGB (MCH) (MCH)` is mean corpuscular haemoglobin, and reading
+   its `HGB` as haemoglobin charts a measurement the laboratory never reported.
+2. Longest matched span, then leftmost source order.
+3. **One anchor per marker per row.** The label cell prints its abbreviation twice —
+   `Ερυθρά Αιμοσφαίρια (RBC) (RBC)`, `WBC (WBC)` — and both occurrences hit without
+   overlapping. Emitting both would turn one measurement into a duplicate conflict.
+
+**A section marker anchors nothing.** V4 says such a row emits no `ParsedRow`, so Pass A
+skips any row whose position matches one of Pass V's section titles. Without this a
+panel heading printing `Γλυκόζη (GLU)` is read as a glucose measurement, duplicating the
+table it introduces.
+
+`findAnchors(rows, sectionTitles)` takes Pass V's titles because A3's nearest-heading
+tracking and the T4 tie-break both need them, and Pass V has already computed them
+exactly. An empty list leaves every `section` null and rejects every T4 tie.
+
+**Measured on the seed fixtures.** Every row of the Latin-code dialect anchors at T1
+(20 of 20); the Greek dialect anchors 59 rows, 34 of the 35 independently derived
+expectations, the exception being the fixture's own truncated wrapped label. Four gaps
+are recorded in `anchors.test.ts` rather than hidden, and none is a defect in the tier
+rules:
+
+- `ast` and `alt` print `(SGOT/AST)` and `(SGPT/ALT)`, the reverse of the ΚΕΟΚΕΕ pair
+  order the registry holds. A slash-joined pair is neither a standalone token nor
+  parenthesised on its own, so two fixture-sourced abbreviations in Task 2.5r close it.
+- `vitamin-d` and `urine-erythrocytes` have labels that wrap. A wrapped label's two
+  lines start at the same x, so the row orders them interleaved with the cells between
+  and the alias stops being a contiguous token run; T1 rescues such a row only when an
+  abbreviation sits beside the value. `vitamin-d` also prints `[25(ΟΗ)D]` in square
+  brackets, which the parenthesised rule does not cover.
+- `rbc` anchors twice, the second on page 3's `Εμπύρηνα RBC (ΕμπύρηναRBC)` — nucleated
+  red cells, absent from the seed registry. The row does contain a standalone `RBC`, so
+  T1 matches as specified, and the duplicate reaches review as a conflict rather than
+  becoming a silent wrong reading.
 
 #### A2. Reading outward (`readout.ts`)
 
