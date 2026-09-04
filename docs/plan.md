@@ -436,6 +436,7 @@ domain types; no Zod schema or error type is part of the exported API.
 // types.ts
 export function validateProfile(value: unknown): Profile;
 export function assertProfileSafe(profile: Profile): void;
+export function isValidCollectedAt(value: CollectedAt): boolean;
 
 // text.ts / numbers.ts / ranges.ts / units.ts / dates.ts
 export function normaliseLabel(value: string): string;
@@ -1869,6 +1870,49 @@ Profile satisfies same-day precision. `buildProfileChange` then creates UUIDs on
 additions and emits complete existing Report replacements in `updates`;
 `applyProfileChange` validates and applies both arrays in the one IndexedDB transaction
 owned by `MedigraphApp`.
+
+### Review edits and gates (`review.ts`)
+
+Every edit is immutable and **total**: it returns a new session, leaves the one it was
+given untouched down to the drafts and rows it did not need to change, and returns the
+session unchanged when it names a row, candidate or conflict the session does not hold.
+A review screen races against its own state, and a stale click is not an exception.
+
+**Reassignment carries approval.** `reassignMarker` to a derived `x:` key approves that
+unknown — the key is derived from the label, so naming the label the user accepts is the
+same act as accepting it — and `approvedUnknownLabel` replaces the printed label when
+supplied. Reassignment to a canonical key withdraws any approval the row held and
+ignores `approvedUnknownLabel`, because a canonical Measurement carries no label.
+`approveUnknownMarker` remains for accepting a row the parser already keyed as unknown;
+it refuses a canonical row and rebuilds no conflicts, since approval moves no row
+between marker keys.
+
+**Rebuilding conflicts.** Reassignment and deletion recompute the draft's conflicts from
+its current rows: one per marker key held by more than one row, ordered by the row that
+first mentions it. A conflict that survives keeps its id, so a rebuild never renames a
+question the UI is showing; a new one is named `<draftId>:conflict:<markerKey>`, unique
+within the draft by construction. A resolution is carried across a rebuild **only when
+the candidate set is unchanged** — a different set is a different question, and keeping
+the old answer could leave a `choose` pointing at a row that is no longer a candidate.
+`resolveConflict` likewise refuses a `choose` naming a row outside the candidate set,
+which would otherwise satisfy the gate with an answer no Report can be built from.
+
+**Redaction reaches the rows.** `resolveIdentifier` records the answer, and `redacted`
+also removes the candidate's text from every draft row's free text — the printed label,
+a categorical `textValue` and the `categoricalReference` printed beside it. An approved
+unknown label is the one path source text takes into a Profile, so an identifier the
+user has just called real must not survive inside one. `deleted-row` and
+`false-positive` change no row: deleting is `deleteRow`'s job, and a false positive was
+never an identifier.
+
+**`canConfirm` refuses a session that proposes nothing.** Every gate is vacuously
+satisfied when there are no drafts, and enabling the product's one irreversible action
+to do nothing is worse than leaving it disabled. It validates every `CollectedAt` that
+would enter the proposed Profile, staged updates included, through the same
+`isValidCollectedAt` the persisted schema backs. For same-day precision it counts the
+Reports already in the Profile — each under its staged update where review has staged
+one — plus one per draft that targets no existing Report; a draft with a
+`targetReportId` adds Measurements to that Report and proposes no second identity.
 
 ---
 

@@ -479,6 +479,18 @@ function formatProfilePath(path: PropertyKey[]): string {
 }
 
 /**
+ * Whether a `CollectedAt` names a real civil date and, at minute precision, a
+ * real time of day.
+ *
+ * Exposed so the review gates can ask the question the persisted schema
+ * already answers, rather than restating the calendar. `canConfirm` needs it
+ * before a Profile exists to validate.
+ */
+export function isValidCollectedAt(value: CollectedAt): boolean {
+  return collectedAtSchema.safeParse(value).success;
+}
+
+/**
  * Structural and semantic validation of an untrusted `Profile`.
  *
  * Throws on the first violation. Enforces finite medical numbers, valid Gregorian
