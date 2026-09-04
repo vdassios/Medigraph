@@ -1659,11 +1659,46 @@ one tied marker's hint matches the nearest heading; all remaining ties are rejec
 
 ### Rows (`rows.ts`)
 
-Cluster TextItems into rows by vertical overlap, shared by validation and Pass A. A
-label may wrap across lines while its value sits on the second line
-(`Πολυμορφοπύρηνα (NEUT%)` / `(NEUT%)  48,1  %  40,0 - 75,0 %`), so a row is the set of
-items overlapping the _value_ band, and a label is the concatenation of the label-column
-items that overlap it. This is the one place the ΑΗΦΥ table is not naively rectangular.
+`clusterRows(sourceId, pages)` clusters TextItems into Rows, shared by validation and
+Pass A. This is the one place the ΑΗΦΥ table is not naively rectangular.
+
+**The sharing rule.** Two items share a row when their vertical centres differ by less
+than **0.6× the smaller height**. Centres rather than edges, because a tall item — a
+banner title, a section heading — overlaps bands it has no part in; the smaller height,
+so a tall item cannot drag in a short one it merely covers.
+
+**Why a wrapped label needs it.** A label too long for its cell wraps, and the
+laboratory centres the single-line value against the two-line label, so the value band
+sits _between_ the label's lines rather than beside either:
+
+```text
+  Μέσος Όγκος Ερυθρών (ΜCV)
+                             90.4   fl   77 - 100
+  (MCV)
+```
+
+Measured on `ahfy-full` page 2: line height 0.0141, the two gaps inside that row 0.0065
+each, and consecutive printed rows 0.020 apart. The threshold of 0.0085 therefore sits
+between the two populations with roughly 25% clearance on each side — the factor is
+measured, not chosen. A pair landing exactly on the bound is decided by floating-point
+rounding rather than by the rule, and nothing real lands there.
+
+**The rule is applied transitively.** An item joins the open cluster when it shares a
+row with _any_ item already in it. The second label line is 0.0131 from the first,
+further than the threshold allows, and reaches the row only through the value band
+between them. Clustering against the item that opened the row instead would strand it.
+
+**What a Row holds.** `items` are the adapter's own observations — never copied, never
+adjusted, so every downstream box and crop is measured against what pdf.js reported
+(D13) — ordered **x-ascending, ties broken by y**. `y` and `h` are the band the row's
+items span, and a lone item's band is its own measurements exactly. Ids are
+`<sourceId>:row:<n>`, numbered through the document rather than per page.
+
+**Left to right is the row's order, not its label's.** A wrapped label's two lines start
+at the same x, so ordering by x interleaves them with the cells between
+(`Μέσος (MCV) Όγκος Ερυθρών (ΜCV) 90.4 fl 77 - 100`). Reassembling that label belongs to
+a caller holding the column roles Pass V bound: it selects the label column and reads it
+top to bottom. `rows.ts` has no column model and invents none.
 
 **Pass B (layout discovery) is removed** — see D5. `columns.ts` and `grammar.ts` are not
 built: column roles come from the validated header, so there is no column model to infer
