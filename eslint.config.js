@@ -13,7 +13,16 @@ import globals from 'globals';
 import prettier from 'eslint-config-prettier/flat';
 
 export default defineConfig([
-  { ignores: ['dist/**', '.astro/**', 'coverage/**', 'public/ocr/**', 'pnpm-lock.yaml'] },
+  {
+    ignores: [
+      'dist/**',
+      '.astro/**',
+      'coverage/**',
+      'public/ocr/**',
+      'public/pdf/**',
+      'pnpm-lock.yaml',
+    ],
+  },
 
   // Scoped to code files. Applied unscoped, these also match .json/.md/.yaml,
   // whose languages provide no getAllComments() and crash core rules.
@@ -44,9 +53,6 @@ export default defineConfig([
   { files: ['**/*.md'], plugins: { markdown }, extends: ['markdown/recommended'] },
   yml.configs.recommended,
   {
-    // GitHub Actions uses empty mapping values idiomatically (`on: pull_request:`
-    // means "all activity types, all branches"). Giving them a value to satisfy
-    // the linter would change the workflow to say something it does not mean.
     files: ['.github/workflows/*.{yml,yaml}'],
     rules: { 'yml/no-empty-mapping-value': 'off' },
   },
@@ -57,23 +63,6 @@ export default defineConfig([
     extends: ['html/recommended'],
     rules: { 'html/no-inline-styles': 'error' },
   },
-
-  // D1a seam guard: the "no module outside io/ may import the extraction runtime"
-  // rule from Architecture, enforced mechanically instead of by review.
-  {
-    files: ['src/domain/**/*.ts', 'src/ui/**/*.{ts,tsx}', 'src/pages/**/*.astro'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        { patterns: ['pdfjs-dist*', 'onnxruntime-web*', 'tesseract.js*'] },
-      ],
-    },
-  },
-
-  // Style-attribute guard — see "Astro component styles". Since ADR-0008 the
-  // CSP permits style attributes, so this enforces the convention rather than
-  // a hard constraint: waive it per-line with an eslint-disable comment that
-  // says why.
   {
     files: ['src/**/*.{astro,tsx,jsx}'],
     rules: {

@@ -1499,6 +1499,25 @@ lexical tokens carrying their parent `TextItem.id` and character offsets, and on
 parent boxes participate in page geometry. The whole-line geometry mode is gone with
 E1: an ΑΗΦΥ text layer is always fragmented.
 
+**Rejoining is the allowed direction.** pdf.js splits a run wherever the font changes,
+and this document changes font inside a word constantly: `Κωδικός` and `:` are two
+fonts, so are `k/`, `μ` and `l`, and so is the issuing laboratory `ΑΙΜΑΤΟΛΟΓΙΚO` —
+eleven Greek letters and a Latin `O`, which this plan names as a string the parser must
+see whole. `pdfText.ts` therefore rejoins two fragments that share a baseline when the
+second starts where the first ended, and the union of two measured boxes is still
+measured. Only the reverse — cutting a fragment apart — fabricates geometry. The gap
+bound is half an unscaled PDF unit, against a printed space of roughly 2.5 at body size,
+so `ΓΕΝΙΚΗ ΑΙΜΑΤΟΣ` stays the two items it is printed as.
+
+**A `TextItem`'s height is the printed line, not the em.** pdf.js reports `height` as
+the font size and the font's ascent and descent separately, in
+`getTextContent().styles`; the box a reader sees runs ascender to descender, about 28%
+taller. Every vertical threshold downstream is measured in printed lines — `rows.ts`'s
+in particular has roughly 25% clearance on each side of a measured line height of
+0.0141 — and reporting the em instead moves that threshold onto the very gap it exists
+to straddle, at which point a wrapped label stops clustering with its own value. Two of
+the seed document's rows split that way before this was corrected.
+
 A cell's content may still need token-level work — `6.0 Όξινη` is one fragment holding a
 number and a word — and that is lexical, not geometric.
 
@@ -2711,7 +2730,7 @@ an unconvertible unit exercises the same rule.
 
 | #   | Task                                                                                                                                                                                                                                                                                                         | Depends on        | Notes                                                                                                                                                                                                                                                                                                                                                                |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 3.1 | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip; self-host the packaged worker under `public/pdf/`                                                                                                                                                                     | 0.1–0.4           | Test against the synthetic PDFs, including text order and page dimensions.                                                                                                                                                                                                                                                                                           |
+| 3.1 | `pdfText.ts` — pdf.js → page TextItems, stable ids and source boxes, including y-flip and the ascent/descent line height; rejoin the fragments a font change split; self-host the packaged worker under `public/pdf/`, kept in step with the pin by `pnpm sync:pdf-worker`                                   | 0.1–0.4           | Test against the synthetic PDFs, including text order and page dimensions.                                                                                                                                                                                                                                                                                           |
 | 3.4 | `fileRouter.ts` — accept PDFs only, enforce 20 files, 100 total pages and 50 MiB per source with MIME/signature checks before decode, then run Pass V per source. A source failing validation is a source-scoped `RouteFailure` naming the accepted document class; successful siblings remain in `results`. | 2.5a, 3.1         | Replaces the undefined `<5 rows` heuristic and handles hybrid PDFs/garbage text layers. Enforce 20 files, 100 total pages, 50 MiB per source and supported MIME/signature checks before decode. Return batch-scoped limit/cancel failures and source-scoped type/size/decode/validation failures exactly as `RouteFailure`; successful siblings remain in `results`. |
 | 3.5 | `fileFormat.ts` — plaintext UTF-8 envelope, migrations, bounds, `validateProfile`, `assertProfileSafe`, preview and id-based merge plan                                                                                                                                                                      | 0.2, 2.6          | Golden serialized file, round-trip, malformed JSON, size/cardinality boundaries, unsupported version, duplicate/conflicting Report ids, and same-day precision resolution tests. No `crypto.ts`, WebCrypto, compression or passphrase UI.                                                                                                                            |
 | 3.6 | `storage.ts` — plaintext IndexedDB `saveProfile`, `loadProfile`, atomic `replaceProfile`, `clearAll` and first-save `navigator.storage.persist()` result                                                                                                                                                     | 0.1, 0.2          | Store exactly one Profile and no drafts/evidence, and nothing else. `clearAll` removes the database and every Medigraph Cache Storage entry; app state separately disposes live object URLs/bitmaps.                                                                                                                                                                 |
