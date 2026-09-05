@@ -2773,8 +2773,20 @@ matched pair with the field absent on both sides is excluded. Unit precision com
 normalised units. Range precision requires the same range kind, the same one-sided
 comparator and every bound within tolerance. Missing rows match only
 `status:'missing'`, `value:null` and `comparator:null`; any retained range is scored
-normally. Scores print integer numerator/denominator as well as percentages so small
-labs cannot hide behind rounding.
+normally. A **categorical** row compares on its printed string, normalised, which is
+D15's own equality rule — the string is the whole of what was measured, so a scorer
+that compared only `ParseStatus` would report a urine panel as perfect while the parser
+printed the wrong word. Scores print integer numerator/denominator as well as
+percentages so small labs cannot hide behind rounding.
+
+**Fixture-schema validation lives inside `score`.** It is the only exported surface, so
+that is where a table is checked before it is counted: a non-empty marker key, a known
+status, a finite-or-null value, and the status/value/comparator/`textValue` consistency
+that comparison depends on. A row failing any of them throws rather than scoring as
+wrong, because a malformed table is a broken fixture or a broken caller and reporting it
+as a parser failure sends someone hunting in the wrong place. This is not a restatement
+of the persisted schema — `validateProfile` owns that, and nothing the scorer reads is
+persisted.
 
 **Parser gate.** `pnpm corpus:score` runs the hand-checked TextItem corpus at the 2.5c
 aggregate and per-laboratory floors. The first blind holdout result is recorded before
