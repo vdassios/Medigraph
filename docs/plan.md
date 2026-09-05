@@ -1985,17 +1985,26 @@ never persisted.
 - **One document is exactly one Report.** A source is never split and never merged, so
   `proposeReportGroups`, `regroupSources`, `confirmGrouping` and `groupingConfirmed` do
   not exist. Attaching three documents proposes three Reports.
-- A confirmed Report gets a UUID and stores the issuing laboratory from
-  `Επωνυμία Εργαστηρίου` as a display label. That is a property of the Report, not of
-  the person, and carries no identity.
+- A confirmed Report gets a UUID. It should also store the issuing laboratory from
+  `Επωνυμία Εργαστηρίου` as a display label — a property of the Report, not of the
+  person, carrying no identity — but **no contract carries it yet**: Pass V yields it,
+  `ExtractionResult` drops it, and `Report` has only `id`, `collectedAt` and
+  `measurements`. Threading it through needs a field on both, which moves
+  `reportSchema` and the `.medigraph` format with it, so it belongs to the Task 3.8
+  contract freeze rather than to 2.6.
 - **Equal dates never auto-merge.** Two documents sharing a collection date are two
   Reports; if the user genuinely re-tested that day, both stand. Two distinct Reports
   may share a date only when all Reports on that date have distinct minute-precision
   times, and review stages any needed time update in `existingReportDateUpdates`. Times
   are local civil values — no timezone conversion.
 - A later attach is a new Report even on the same date unless the user explicitly
-  selects "add to existing report"; that selection stores `targetReportId` and rebuilds
-  conflicts against its Measurements.
+  selects "add to existing report"; that selection stores `targetReportId`. A draft
+  aimed at a Report may not bring a marker key that Report already carries, and this is
+  a **`canConfirm` gate rather than a `Conflict`**: a `Conflict` names its candidates by
+  row id, and an already-persisted `Measurement` has none, so the question cannot be
+  posed in the shape review answers questions in. The user clears it with the tools
+  review already has — delete the row, or reassign it — which is the only reading that
+  never overwrites a value they previously confirmed into their record.
 - Within one document, duplicate marker keys produce a `Conflict`. Review must choose
   one candidate or edit one replacement Measurement. "Keep both" is not a v1 resolution.
   Confirm requires exactly one Measurement per marker key. This survives the pivot: a
@@ -2011,16 +2020,23 @@ never persisted.
   content blocks Merge. Distinct Reports sharing a date create a resolvable precision
   conflict whenever either is day-precision.
 
-`setReportDate` sets the local civil value and marks it confirmed; later editing resets
-confirmation. A current `x:*` row is persistence-eligible only when its id is in
+`setReportDate` sets the local civil value and marks it confirmed — setting _is_ the
+confirmation, since D6 makes this one tap on a pre-filled value rather than a choice
+among candidates, and there is no domain path that stores a date the user has not
+looked at. Re-editing simply sets and confirms again; the "editing resets confirmation"
+affordance is the review screen's (Task 4.2), between taps, and has no function here.
+The value is stored as given, valid or not, because `canConfirm` owns the calendar
+question and a field that silently refused what the user typed would leave them nothing
+to correct. A current `x:*` row is persistence-eligible only when its id is in
 `approvedUnknownRowIds`; reassignment to a canonical key or deletion removes stale
 approval and rebuilds conflicts.
 
 `canConfirm` returns true only when every successful source has a confirmed valid date,
 every current conflict has one choose/edit resolution, every `IdentifierCandidate` has a
 resolution, every surviving `x:*` row is explicitly approved, same-person confirmation
-is true when the Profile is non-empty, all `targetReportId`s exist, and the proposed
-Profile satisfies same-day precision. `buildProfileChange` then creates UUIDs only for
+is true when the Profile is non-empty, all `targetReportId`s exist, no targeted draft
+repeats a marker its target Report already holds, and the proposed Profile satisfies
+same-day precision. `buildProfileChange` then creates UUIDs only for
 additions and emits complete existing Report replacements in `updates`;
 `applyProfileChange` validates and applies both arrays in the one IndexedDB transaction
 owned by `MedigraphApp`.

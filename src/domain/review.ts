@@ -348,6 +348,22 @@ export function canConfirm(session: ReviewSession, existing: Profile | null): bo
       (existing?.reports ?? []).some((report) => report.id === draft.targetReportId),
   );
 
+  // A draft added to an existing Report may not bring a marker that Report
+  // already carries: one Report holds one Measurement per marker key, and
+  // there is no answer to "which of these two" that this module may give on
+  // the user's behalf. They clear it by deleting the row or reassigning it,
+  // which is the only reading that never overwrites a value they already
+  // confirmed into their record.
+  const targetsUncontested = session.reportDrafts.every((draft) => {
+    const target = (existing?.reports ?? []).find((report) => report.id === draft.targetReportId);
+    if (target === undefined) {
+      return true;
+    }
+
+    const held = new Set(target.measurements.map((measurement) => measurement.markerKey));
+    return draft.rows.every((row) => !held.has(row.markerKey));
+  });
+
   // D8: appending to someone's existing history is an explicit, unverified
   // question. The document's ΑΜΚΑ could answer it and is deliberately not used.
   const samePersonSettled =
@@ -363,6 +379,7 @@ export function canConfirm(session: ReviewSession, existing: Profile | null): bo
     identifiersResolved &&
     unknownsApproved &&
     targetsExist &&
+    targetsUncontested &&
     samePersonSettled &&
     stagedDatesValid &&
     satisfiesSameDayPrecision(proposedDates(session, existing))
