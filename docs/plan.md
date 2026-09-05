@@ -968,10 +968,13 @@ fixtures/**/expected.json
 fixtures/**/textitems.json
 ```
 
-Golden fixtures are compared as committed bytes by Tasks 0.3, 0.6 and 3.5 — the
-`fileFormat.ts` golden serialized file in particular asserts an exact serialization.
-A formatter reaching into those files silently invalidates the test it is supposed to
-protect.
+Golden fixtures are compared as committed bytes by Tasks 0.3 and 3.5 —
+`fixtures/file-format/v1.medigraph` in particular asserts an exact serialization, down
+to key order, indentation and the trailing newline, because the format is a promise to
+the user and to any other implementation. Task 0.6's scorer is _not_ on this list: its
+goldens are hand-written `ParsedRow` tables inside the test, since what it locks down is
+a metric definition rather than a byte sequence. A formatter reaching into the byte
+fixtures silently invalidates the test it is supposed to protect.
 
 ### Linter — ESLint 10, flat config
 

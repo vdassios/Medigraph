@@ -1,0 +1,83 @@
+{
+  "format": "medigraph",
+  "v": 1,
+  "profile": {
+    "schemaVersion": 1,
+    "id": "11111111-2222-4333-8444-555555555555",
+    "reports": [
+      {
+        "id": "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
+        "collectedAt": {
+          "date": "2024-07-08",
+          "time": null,
+          "precision": "day"
+        },
+        "measurements": [
+          {
+            "markerKey": "wbc",
+            "status": "value",
+            "value": 6.93,
+            "comparator": null,
+            "textValue": null,
+            "unit": "10^3/µL",
+            "referenceRange": {
+              "kind": "closed",
+              "min": 4,
+              "max": 11
+            },
+            "categoricalReference": null,
+            "sourceOrder": 0
+          }
+        ]
+      },
+      {
+        "id": "ffffffff-0000-4111-8222-333333333333",
+        "collectedAt": {
+          "date": "2025-05-14",
+          "time": "09:30",
+          "precision": "minute"
+        },
+        "measurements": [
+          {
+            "markerKey": "crp",
+            "status": "value",
+            "value": 1.03,
+            "comparator": "<",
+            "textValue": null,
+            "unit": "mg/L",
+            "referenceRange": {
+              "kind": "maxOnly",
+              "max": 5,
+              "comparator": "<"
+            },
+            "categoricalReference": null,
+            "sourceOrder": 0
+          },
+          {
+            "markerKey": "urine-glucose",
+            "status": "categorical",
+            "value": null,
+            "comparator": null,
+            "textValue": "Αρνητικό",
+            "unit": null,
+            "referenceRange": null,
+            "categoricalReference": "Αρνητικό",
+            "sourceOrder": 1
+          },
+          {
+            "markerKey": "x:νεοδεικτησ-nd",
+            "label": "Νεοδείκτης (ND)",
+            "status": "missing",
+            "value": null,
+            "comparator": null,
+            "textValue": null,
+            "unit": "%",
+            "referenceRange": null,
+            "categoricalReference": null,
+            "sourceOrder": 2
+          }
+        ]
+      }
+    ]
+  }
+}
