@@ -9,7 +9,7 @@
     "node": ">=24.20.0 <25"
   },
   "scripts": {
-    "build": "astro build",
+    "build": "astro build && node scripts/app-assets.mjs",
     "prepare": "husky",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

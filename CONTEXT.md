@@ -94,6 +94,8 @@ the product accepts, and several earlier records only make sense after it.
 - `docs/adr/0010-display-only-positioning.md` — Medigraph never interprets
 - `docs/adr/0013-ahfy-documents-are-the-only-input.md` — the accepted input class
 - `docs/adr/0014-categorical-measurements.md` — numeric and categorical measurements
+- `docs/adr/0017-the-service-worker-asset-list-is-generated.md` — the precache list is
+  generated and the cache name derived; the worker itself stays hand-written
 
 **Historical** — kept as the record of why, not as current rules. Everything in them that
 still binds is restated in the invariants above and in the records in force; nothing in

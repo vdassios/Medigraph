@@ -36,6 +36,19 @@ export default defineConfig([
     },
   },
 
+  // Build-time scripts run in Node, not the browser.
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: globals.nodeBuiltin, sourceType: 'module' },
+  },
+
+  // The service worker runs in its own global scope, not the window's: `self`,
+  // `caches`, `clients` and `skipWaiting` exist there and nowhere else.
+  {
+    files: ['public/sw.js'],
+    languageOptions: { globals: globals.serviceworker, sourceType: 'script' },
+  },
+
   // Preact island only.
   { files: ['src/ui/**/*.tsx'], extends: [reactHooks.configs.flat.recommended] },
   { files: ['src/ui/**/*.tsx'], extends: [jsxA11y.flatConfigs.recommended] },
