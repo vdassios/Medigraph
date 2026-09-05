@@ -1731,6 +1731,26 @@ status: 'missing'` — do **not** widen the search. This is what correctly reads
   `Βασεόφιλα %` (blank result cell) and `Δικτυοερυθροκύτταρα (ΔΕΚ%)` (range, no
   value) in the fixtures, instead of stealing a neighbour's number.
 
+A **direction is a boundary.** The three searches above are three different claims
+about where a cell is, so a token reached by one never continues a token reached by
+another: a unit is looked for only in the direction the value came from, and a range
+cell's repeated unit is only the token printed beside it in that same direction. Read
+across directions, the label to the anchor's left becomes the unit of the value to its
+right, which is a wrong reading no stop condition catches.
+
+**A result printed as words is categorical, not missing (D15).** When the
+neighbourhood holds no numeric group at all but does hold text, the row is
+`status: 'categorical'`: the first cell reached is `textValue` and the rest of that
+direction is `categoricalReference`, verbatim — `Χροιά: Ωχροκίτρινη` against `Κίτρινη`,
+`Λεύκωμα: Αρνητικό` against `Αρνητικό(<=10 mg/dl)`. `value`, `comparator`, `unit` and
+`referenceRange` are all null, and the tier's confidence stands: the urine panel is
+read confidently, not doubtfully. `status: 'missing'` is for a neighbourhood that is
+_empty_ — the blank result cell — because modelling a whole printed panel as missing
+would silently discard it, which is the failure D15 exists to prevent. A cell holding
+both a number and a word stays numeric, per D15; the word is then the token following
+the value, so § A2's unit rule stores it as an unrecognised unit and demotes the row
+rather than dropping it unseen.
+
 The shared number parser applies the ambiguous-thousands rule in **both** modes and
 both passes. It preserves the decimal interpretation for review but adds
 `ambiguous-thousands` and forces low confidence; no Pass-A exemption exists. The rule
@@ -2558,7 +2578,7 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 | #    | Task                                                                                                                                                                                                                                                                                                                                | Depends on                |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                                  | 1.1, 1.6a, 1.6b-core, 1.8 |
-| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions, stripping a recognised unit repeated inside a range cell, and range/value disambiguation                                                                                                                         | 2.1, 1.2–1.4              |
+| 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions, stripping a recognised unit repeated inside a range cell, range/value disambiguation and the categorical results of D15                                                                                          | 2.1, 1.2–1.4              |
 | 2.5a | `extract.ts` core — identifier pass, Pass A, flags/confidence and `unrecognised[]`, carrying through the dates Pass V bound                                                                                                                                                                                                         | 2.8, 2.1, 1.5, 1.7        |
 | 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                    | 2.5a, 0.5a, 0.6           |
 | 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel.     | 1.6b-core, 0.5a, 2.5b     |
@@ -2577,16 +2597,29 @@ version coordination are human/capable-model work and use `ready-for-human`.
 Task 2.8 (Pass V) gates every parsing task, because no row may be read from a source
 that has not been validated. It is independent of the 2.5r registry chain.
 
-**Acceptance for 2.2 (Pass A alone, no layout analysis):** on
-`fixtures/seed/biochemistry.textitems.json`, all 25 markers with `D-Dimers` as
-`{value: 0.10, comparator: '<'}` and `Βιταμίνη Β12` at 530 (not 12). On
-`fixtures/seed/haematology.textitems.json`—the harder, multi-region page—`Βασεόφιλα %`
-as `value: null, status: 'missing'`, `Δικτυοερυθροκύτταρα (ΔΕΚ%)` as
-`value:null, status:'missing'` with its ReferenceRange retained,
-`Μ/μl` and `Κ/μl` folded, and `Αριθμός λευκών (WBC)` read correctly despite its label
-sitting in the left gutter column while its value sits in the middle column. **Pass A
-must achieve this with Pass B disabled** — that is the proof that the parser is
-marker-driven rather than layout-driven.
+**Acceptance for 2.2 (Pass A alone, no layout analysis).** The Task 0.3 seed
+fixtures are the surface: this paragraph previously named `biochemistry` and
+`haematology` fixture files that the ΑΗΦΥ consolidation replaced, and the cases it
+listed have counterparts in the two documents that exist. On
+`fixtures/seed/ahfy-minimal.textitems.json`, all 20 markers of the bare-abbreviation
+laboratory, with `Μ/μl` and `k/μl` folded and comma decimals and `4,0-11,0` read
+identically to their period-and-spaces spellings. On
+`fixtures/seed/ahfy-full.textitems.json` — the harder, multi-panel document — every one
+of its 35 independently derived expectations except the two recorded in
+`readout.test.ts`: `C-Αντιδρώσα πρωτεϊνη` as `{value: 1.03, comparator: '<'}` against a
+`< 5` reference, `Βιταμίνη Β12` at 347.3 (not 12), `Ειδικό βάρος` with a range and no
+unit rather than the range's lower bound read as one, `x10^6 / μL` folded from three
+printed tokens, and the urine panel read as categorical results rather than discarded.
+`Πυοσφαίρια (Πυοσφαίρια)` is `value: null, status: 'missing'` — its result cell prints
+an interval, not a measurement. **Pass A must achieve this with Pass B disabled** —
+that is the proof that the parser is marker-driven rather than layout-driven.
+
+A wrapped label the laboratory centred against its value is still the read-out's
+hardest shape. Two of ahfy-full's expectations are unmet and both trace to it:
+`Ερυθρά αιμοσφαίρια (Ερυθρά αιμοσφ.)` raises no anchor at all, one of the four gaps
+§ A1 already measures, and `Ουροχολινογόνο` reads its reference in the row's x order
+(`Αρνητικό ίχνη ή`) rather than the printed line order. Reassembling a wrapped cell
+needs the column roles Pass V bound, which `readAnchor` is not given.
 
 **Acceptance for 2.5c:** on all parser fixtures, aggregate marker recall ≥95%,
 value+comparator precision ≥99%, unit precision ≥95% and range precision ≥95%; every
