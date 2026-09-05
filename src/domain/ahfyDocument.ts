@@ -87,6 +87,20 @@ export interface SectionTitle {
   title: string;
 }
 
+/**
+ * Where one results table's five-column header row is printed.
+ *
+ * The document repeats the header before every panel, so these positions are
+ * what separate table content from the page's own chrome: the title block and
+ * the twelve metadata fields are printed above the first of them, and each
+ * header row is itself not a measurement. Pass A needs to know both, and Pass
+ * V has already found every header in order to bind the columns.
+ */
+export interface TableHeader {
+  page: number;
+  y: number;
+}
+
 export interface AhfyDocument {
   columns: Record<ColumnRole, Column>;
   collectionDate: string; // ISO, from Ημερομηνία Λήψης Δείγματος
@@ -94,6 +108,7 @@ export interface AhfyDocument {
   issuingLaboratory: string; // from Επωνυμία Εργαστηρίου; not an identifier
   identifierZones: readonly TemplateZone[];
   sectionTitles: readonly SectionTitle[];
+  tableHeaders: readonly TableHeader[];
 }
 
 export type AhfyValidation =
@@ -305,6 +320,9 @@ export function validateAhfyDocument(pages: readonly TextItem[][]): AhfyValidati
       issuingLaboratory: fields.get(normaliseLabel(LABORATORY_LABEL))?.value ?? '',
       identifierZones,
       sectionTitles,
+      tableHeaders: rows
+        .filter((row) => isTableHeader(row))
+        .map((row) => ({ page: row.page, y: row.y })),
     },
   };
 }

@@ -172,6 +172,25 @@ describe('validateAhfyDocument', () => {
       });
     });
 
+    it('yields the position of every repeated table header', () => {
+      // Pass A needs them to tell a table row from the page's own chrome: the
+      // title block and the twelve metadata fields are printed above the first
+      // of them, and a header row is itself not a measurement.
+      const document = accept([metadataPage(), tablePage([])]);
+
+      expect(document.tableHeaders).toEqual([{ page: 2, y: expect.any(Number) as number }]);
+    });
+
+    it('yields one header position per printed table', () => {
+      // The document repeats the header before every panel, so the seed
+      // document carries far more of them than it does pages.
+      const headers = accept(fixture('ahfy-full')).tableHeaders;
+
+      expect(headers.length).toBeGreaterThan(10);
+      expect(headers.every((header) => header.page >= 2)).toBe(true);
+      expect([...headers].sort((a, b) => a.page - b.page || a.y - b.y)).toEqual([...headers]);
+    });
+
     it('binds a heading the laboratory prints as two stacked items', () => {
       const pages = [metadataPage(), fixture('ahfy-full')[1] ?? []];
 

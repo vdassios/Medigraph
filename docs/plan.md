@@ -1529,6 +1529,7 @@ document.
 | Identifier positions | Patient `ΑΜΚΑ`, `Επώνυμο`, `Όνομα` and the doctor's `Επώνυμο Ιατρού`, `Όνομα Ιατρού`, `ΑΜΚΑ Ιατρού`, each pre-resolved as `redacted`. |
 | Issuing laboratory   | `Επωνυμία Εργαστηρίου`, retained as the Report's lab label. It is not an identifier and is not redacted.                              |
 | Section titles       | The panel headings between tables, used as `sectionHint` for T4 tie resolution.                                                       |
+| Table headers        | The position of every repeated five-column header row, so Pass A can tell table content from the page's title block and metadata.     |
 
 **V3. What it never does.** It creates, alters and suppresses nothing: no value, no
 `ParseFlag`, no `Confidence`. It does not confirm the date, does not discharge the D7
@@ -1552,6 +1553,7 @@ interface AhfyDocument {
   issuingLaboratory: string; // from Επωνυμία Εργαστηρίου; not an identifier
   identifierZones: readonly TemplateZone[];
   sectionTitles: readonly { page: number; y: number; title: string }[];
+  tableHeaders: readonly { page: number; y: number }[];
 }
 type AhfyValidation =
   | { ok: true; document: AhfyDocument }
@@ -1832,20 +1834,51 @@ as an unknown marker.
 
 ### Reconciliation and confidence (`extract.ts`)
 
-**Reconciliation.** Pass A wins every conflict. A Pass-B row is discarded if any of
-its TextItems is already consumed by a Pass-A anchor or its read-out. Surviving
-Pass-B rows are emitted with `source: 'layout'` and `markerKey` of the form
-`x:<normalised-label>`.
+**Reconciliation.** Pass A wins every conflict, and with Pass B gone (D5) there is no
+second pass to reconcile it against: a row Pass A anchored is read by `readout.ts` and
+no other reading of it is produced. What remains is the row Pass A could _not_ anchor,
+which D5 keeps rather than discards — its cells are already bound by the template, so
+it is **read by column** and emitted with `source: 'anchor'` (the only `ParseSource`
+there is) and a `markerKey` from `markerKey()`, canonical when the reassembled label
+matches the registry and `x:<normalised-label>` when it does not.
 
-**Registry-gap reporting.** Every surviving Pass-B label is also written to
-`ExtractionResult.unrecognised[]`. Task 2.5b wires this into `pnpm corpus:score` so
-registry gaps (Task 2.5r) are measured, not guessed at.
+Reading by column is not the outward search, and the difference is the point. The label
+is read **top to bottom** within the label column, which reassembles a label the
+laboratory wrapped — the one shape § A1 cannot anchor, because a wrapped label's two
+lines start at the same x and the row interleaves them with the cells between. On the
+seed document this recovers `alt` and `vitamin-d` as canonical markers, closing two of
+Pass A's four measured gaps, and surfaces eGFR, PDW, the `(SGOT/AST)` pair and the six
+white-cell morphology sub-rows as unknown markers. A positionally read row carries
+`confidence: 'low'` and cannot be promoted: it has no matching tier behind it, only a
+column.
+
+**Which rows are table rows.** Three kinds of text are printed in the same five x-bands
+and are not measurements, and Pass V already knows where each is. The title block and
+the twelve metadata fields sit above the first table header; the header row is repeated
+before every panel; and the panel headings are recorded by position. Pass V therefore
+yields `tableHeaders` alongside `sectionTitles`, and the read skips all three. What
+survives must still **read as a measurement** — a number, an interval, or a unit the
+allowlist accepts — because a letter-spaced banner heading spans the page and so fills
+the value column without putting a value in it, which is the same reason § V5 gives for
+it not being a marker.
+
+That last rule is deliberately fail-closed and has a cost: a table row whose result is
+purely categorical _and_ whose marker the registry does not know is not surfaced,
+because nothing distinguishes it from display type by position alone. Registry coverage
+is the fix (D5a, Task 2.5r), and under-reporting a row is the safer failure than
+flooding the D6 approval gate with the page's own furniture.
+
+**Registry-gap reporting.** Every label that stayed unknown is written to
+`ExtractionResult.unrecognised[]`; a positionally read row that resolved to a canonical
+marker is a row, not a gap, and is not reported. Task 2.5b wires this into
+`pnpm corpus:score` so registry gaps (Task 2.5r) are measured, not guessed at.
 
 **Confidence** is `'high' | 'medium' | 'low'`, computed deterministically. Start from
 the matching tier (T1/T2/T3 → `high`, T4 → `medium`, Pass B → `low`), then demote.
 Demotion always takes the worse of current and target (`high` → `medium` → `low`);
 no rule can promote a `low` row to `medium`:
 
+- Start a positionally read row at `low`; it has no tier.
 - Demote to `low` if: the value is `missing`; the read-out hit a stop condition
   before finding a unit _and_ a range; a shared number parse is
   `ambiguous-thousands`; or the value is outside the MarkerDef's `plausibleRange`.
@@ -2579,7 +2612,7 @@ builder model with an explicit input→output table in the issue (e.g. for 1.3:
 | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | 2.1  | `anchors.ts` — **Pass A** deterministic candidate enumeration, four tiers, overlap resolution and section tracking                                                                                                                                                                                                                  | 1.1, 1.6a, 1.6b-core, 1.8 |
 | 2.2  | `readout.ts` — **Pass A** fragmented spatial and whole-line lexical read-out, comparator joining, stop conditions, stripping a recognised unit repeated inside a range cell, range/value disambiguation and the categorical results of D15                                                                                          | 2.1, 1.2–1.4              |
-| 2.5a | `extract.ts` core — identifier pass, Pass A, flags/confidence and `unrecognised[]`, carrying through the dates Pass V bound                                                                                                                                                                                                         | 2.8, 2.1, 1.5, 1.7        |
+| 2.5a | `extract.ts` core — identifier pass, Pass A, the positional read of a row Pass A could not anchor, flags/confidence and `unrecognised[]`, carrying through the dates Pass V bound. Extends Pass V with `tableHeaders`, without which a positional read cannot tell a table row from the page's own chrome                           | 2.8, 2.1, 1.5, 1.7        |
 | 2.5b | Wire `pnpm corpus:score` to `extract` and report training-lab, per-lab and Pass-A-only metrics; no threshold tuning from holdout                                                                                                                                                                                                    | 2.5a, 0.5a, 0.6           |
 | 2.5r | **Registry corpus expansion—one issue per panel file.** Author only from 0.5a training labs and the Task 0.5c ΚΕΟΚΕΕ seed; never inspect the holdout to add aliases. `haematology.ts` is corpus-only — ΚΕΟΚΕΕ carries no CBC indices. Increment `REGISTRY_VERSION` once per merged registry change set and re-score each panel.     | 1.6b-core, 0.5a, 2.5b     |
 | 2.5c | Run and commit the parser release baseline after 2.5r, including the sealed holdout; enable CI floors                                                                                                                                                                                                                               | 2.5r                      |
