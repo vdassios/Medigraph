@@ -2376,8 +2376,23 @@ fields on SeriesPoint. Comparator direction is unchanged. For an unknown marker,
 conversion is attempted; every distinct normalised native unit is a separate Series.
 
 If units differ and no conversion exists, split into one Series per normalised native
-unit (`none` is its own group), label each `Name (unit)`, and show a notice linking
+unit (`none` is its own group), render each as `Name (unit)`, and show a notice linking
 the split rows. Never plot mismatched units on one axis (D12).
+
+**Splitting needs a unit to reconcile.** A Measurement carrying no value — a `missing`
+result cell, or a categorical one — has nothing to convert, so it never splits its
+marker off into a unitless Series of its own. Splitting on absence would strand the gap
+in a Series by itself, and the gap is the fact the point exists to record. The rule
+bites only on a present native unit that neither matches the canonical one nor converts
+to it. `none` remains its own group for an **unknown** marker, which has no canonical
+unit to fall back to.
+
+**`Series.label` is the undecorated name**, not `Name (unit)`: `Series.unit` sits beside
+it, and the UI resolves `el`/`en` from the marker key, so baking a language and a unit
+into the label would leave the renderer unable to produce either. A canonical marker
+takes the registry's name — the printed label is deliberately not persisted for it
+(D7), so the registry is the only name there is — and an unknown marker takes the label
+the user approved.
 
 ---
 
@@ -2683,10 +2698,14 @@ splitting yields two only after distinct times are confirmed when dates are equa
 Duplicate markers block Confirm until choose/edit leaves exactly one; adding a
 distinct same-date Report never auto-merges.
 
-**Acceptance for 2.7:** fixtures cover glucose conversion with range co-conversion,
-native-field preservation, Lp(a) incompatible-unit splitting, one-sided ranges,
-comparator preservation, explicit missing gaps, same-day minute ordering and stable
-date/source ordering. No Series contains more than one normalised unit.
+**Acceptance for 2.7:** tables cover glucose conversion with range co-conversion,
+native-field preservation, incompatible-unit splitting, one-sided ranges, comparator
+preservation, explicit missing gaps, same-day minute ordering and stable date/source
+ordering. No Series contains more than one normalised unit — asserted on the two seed
+documents as well as on the tables, since the seed laboratories print the shared CBC in
+different unit spellings and are the real test of the rule. `Lp(a)` names the split case
+here but is not a seed-registry marker until Task 2.5r; any canonical marker measured in
+an unconvertible unit exercises the same rule.
 
 ### Wave 3 — I/O adapters
 
