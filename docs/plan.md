@@ -1657,22 +1657,40 @@ alias**, not the full 1–5-token context used to find it. Anchor geometry/sourc
 that exact span's parent box (and `textRange` in line mode), so choosing a longer
 context cannot swallow a neighbouring value or marker.
 
-| Tier                       | Rule                                                                                                                                                                                                                                                                                                                                            | Confidence |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| **T1 — Abbreviation**      | The candidate contains a registry abbreviation as a standalone token or parenthesised: `RBC`, `HCT`, `HGB`/`HGb`, `MCV`, `MCH`, `MCHC`, `RDW`, `PLT`, `PDW`, `MPV`, `WBC`, `HDL`, `LDL`, `SGOT`/`AST`, `SGPT`/`ALT`, `γ-GT`/`GGT`, `ALP`, `CPK`/`CK`, `TSH`, `FT4`, `FT3`, `PSA`, `CRP`, `ESR`, `HbA1c`, `eGFR`, `Lp(a)`, `INR`, `PT`, `APTT` … | `high`     |
-| **T2 — Exact normalised**  | `normaliseLabel(candidate)` equals a label-normalised registry alias exactly                                                                                                                                                                                                                                                                    | `high`     |
-| **T3 — Alias containment** | A registry alias is a whole-word substring of the normalised candidate (catches `Τρανσαμινάσες SGOT`, `Fe ΣΙΔΗΡΟΣ ΟΡΟΥ`, `Βιταμίνη D3 -25-(OH)`)                                                                                                                                                                                                | `high`     |
-| **T4 — Bounded fuzzy**     | Damerau–Levenshtein on label-normalised strings: max distance 0 for length < 5, 1 for 5–7, 2 for ≥ 8. If nearest markers tie, a unique matching `sectionHint` may break the tie; otherwise reject it.                                                                                                                                           | `medium`   |
+| Tier                       | Rule                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Confidence |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **T1 — Abbreviation**      | The candidate contains a registry abbreviation as a standalone token or parenthesised: `RBC`, `HCT`, `HGB`/`HGb`, `MCV`, `MCH`, `MCHC`, `RDW`, `PLT`, `PDW`, `MPV`, `WBC`, `HDL`, `LDL`, `SGOT`/`AST`, `SGPT`/`ALT`, `γ-GT`/`GGT`, `ALP`, `CPK`/`CK`, `TSH`, `FT4`, `FT3`, `PSA`, `CRP`, `ESR`, `HbA1c`, `eGFR`, `Lp(a)`, `INR`, `PT`, `APTT` … A **bare** abbreviation is rejected when the item it sits in prints its own bracketed code, because there it is prose | `high`     |
+| **T2 — Exact normalised**  | `normaliseLabel(candidate)` equals a label-normalised registry alias exactly                                                                                                                                                                                                                                                                                                                                                                                          | `high`     |
+| **T3 — Alias containment** | A registry alias is a whole-word substring of the normalised candidate (catches `Τρανσαμινάσες SGOT`, `Fe ΣΙΔΗΡΟΣ ΟΡΟΥ`, `Βιταμίνη D3 -25-(OH)`)                                                                                                                                                                                                                                                                                                                      | `high`     |
+| **T4 — Bounded fuzzy**     | Damerau–Levenshtein on label-normalised strings: max distance 0 for length < 5, 1 for 5–7, 2 for ≥ 8. An alias is skipped outright when it and the candidate disagree about `%` versus `#`. If nearest markers tie, a unique matching `sectionHint` may break the tie; otherwise reject it.                                                                                                                                                                           | `medium`   |
 
 Abbreviations (T1) are deliberately first: they are lab-invariant _and_
 language-invariant, so they are the single most reliable signal on a Greek report.
 `Αριθμός ερυθρών (RBC)`, `Ερυθρά αιμοσφαίρια (RBC)` and `RBC` all resolve identically.
+
+**A bare abbreviation beside a printed code is prose.** `Non - HDL - C (Non - HDL - C)`
+measures non-HDL cholesterol and contains `HDL`; `Εμπύρηνα RBC (ΕμπύρηναRBC)` counts
+nucleated red cells and contains `RBC`. Reading either at T1 charts a measurement the
+laboratory never reported under that name. The parenthesis rule below cannot reach them,
+because it ranks hits and here the printed code is no registry abbreviation and never
+hits at all — so the rejection belongs to the tier, not to the selection. The check is
+scoped to the candidate's own printed item, so a bracket somewhere else on the row
+cannot silence a bare abbreviation that is genuinely the marker.
 
 T1 matching uses `normaliseAbbreviation`, while aliases use `normaliseLabel`; only
 the abbreviation path performs Greek/Latin confusable folding. The biochemistry sample prints
 `Lp (α)` — Greek alpha, and a space before the parenthesis — and `(Να)` — Greek
 Nu + alpha. `Lp(a)` must match the former, so abbreviation matching must fold
 homoglyphs and tolerate a space between the abbreviation and its parenthesis.
+
+**`%` and `#` are never fuzzed across.** A differential prints each population twice and
+those two characters are the whole of what separates the rows. `MON%` and `MONO#` are
+one edit apart on a bound of two, so an unguarded T4 reads a percentage as an absolute
+count — a wrong number under a right-looking name. A candidate carrying `%` may not
+match an alias carrying `#`, or the reverse; silence on one side is not disagreement, so
+a bare `(MON)` beside a `(MON%)` row still reaches the count. A laboratory whose codes
+the registry does not hold then raises no anchor at all, which is the honest outcome and
+Task 2.5r's worklist.
 
 Row grouping for the "within a row" candidate runs uses `rows.ts` (B1) — it is
 shared infrastructure built in Wave 1 (Task 1.8), not Pass-B-only code.

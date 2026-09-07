@@ -89,6 +89,8 @@ interface Candidate {
    * the candidate is the whole token run, which is every other case.
    */
   within?: { start: number; end: number };
+  /** The printed item this candidate came from also prints a bracketed code. */
+  codeBeside: boolean;
 }
 
 interface Hit {
@@ -137,22 +139,43 @@ function candidatesOf(tokens: readonly PlacedToken[]): Candidate[] {
         text,
         label: normaliseLabel(text),
         abbreviation: normaliseAbbreviation(text),
+        codeBeside: false,
       });
     }
 
     const glued = glue(tokens[start]?.token.text ?? '');
     if (glued !== undefined) {
-      candidates.push({ start, end: start + 1, ...glued });
+      candidates.push({ start, end: start + 1, codeBeside: false, ...glued });
     }
   }
 
-  return candidates;
+  const printsCode = new Set<string>();
+  for (const candidate of candidates) {
+    if (isParenthesised(candidate.abbreviation)) {
+      for (const placed of tokens.slice(candidate.start, candidate.end)) {
+        printsCode.add(placed.item.id);
+      }
+    }
+  }
+
+  return candidates.map((candidate) => ({
+    ...candidate,
+    codeBeside: tokens
+      .slice(candidate.start, candidate.end)
+      .some((placed) => printsCode.has(placed.item.id)),
+  }));
+}
+
+function isParenthesised(abbreviation: string): boolean {
+  return abbreviation.startsWith('(') && abbreviation.endsWith(')');
 }
 
 /** The bracketed tail of a glued token, as its own candidate. */
 function glue(
   text: string,
-): (Omit<Candidate, 'start' | 'end'> & { within: { start: number; end: number } }) | undefined {
+):
+  | (Omit<Candidate, 'start' | 'end' | 'codeBeside'> & { within: { start: number; end: number } })
+  | undefined {
   const found = GLUED_CODE.exec(text);
   const [, prefix, code] = found ?? [];
   if (prefix === undefined || code === undefined) {
@@ -177,12 +200,20 @@ function glue(
  */
 function abbreviationHit(candidate: Candidate): string | undefined {
   const { abbreviation } = candidate;
-  const bare =
-    abbreviation.startsWith('(') && abbreviation.endsWith(')')
-      ? abbreviation.slice(1, -1)
-      : abbreviation;
 
-  return BY_ABBREVIATION.get(bare);
+  // A bare abbreviation inside a cell that prints its own bracketed code is
+  // prose, not the row's marker. `Non - HDL - C (Non - HDL - C)` measures
+  // non-HDL cholesterol and contains `HDL`; reading it as HDL charts a number
+  // the laboratory never reported under that name. `preferParenthesised`
+  // cannot reach this, because it ranks hits and here the bracketed code —
+  // `(Non - HDL - C)` — is no registry abbreviation and never hits at all.
+  if (!isParenthesised(abbreviation) && candidate.codeBeside) {
+    return undefined;
+  }
+
+  return BY_ABBREVIATION.get(
+    isParenthesised(abbreviation) ? abbreviation.slice(1, -1) : abbreviation,
+  );
 }
 
 /** T3 — a registry alias sits whole-word inside the candidate. */
@@ -212,6 +243,9 @@ function fuzzyHit(candidate: Candidate, section: string | null): string | undefi
   let nearest = new Set<string>();
 
   for (const alias of ALIASES) {
+    if (conflicts(candidate.label, alias.text)) {
+      continue;
+    }
     const distance = damerauLevenshtein(candidate.label, alias.text, bound);
     if (distance > bound || distance > best) {
       continue;
@@ -232,6 +266,25 @@ function fuzzyHit(candidate: Candidate, section: string | null): string | undefi
 
   const hinted = [...nearest].filter((markerKey) => SECTION_HINTS.get(markerKey) === section);
   return hinted.length === 1 ? hinted[0] : undefined;
+}
+
+/**
+ * Whether two printed forms disagree about percentage versus count.
+ *
+ * A differential prints each population twice, and `%` against `#` is the
+ * whole of what separates the two rows: `MON%` and `MONO#` are one edit apart
+ * on a bound of two, so the fuzzy tier will happily read a percentage as an
+ * absolute count. One character carrying that much meaning is not a typo to be
+ * forgiven. Silence on one side is not disagreement — a laboratory printing a
+ * bare `(MON)` beside its `(MON%)` means the count, and may still reach it.
+ */
+function conflicts(candidate: string, alias: string): boolean {
+  const of = (text: string): string | null =>
+    text.includes('%') ? '%' : text.includes('#') ? '#' : null;
+  const here = of(candidate);
+  const there = of(alias);
+
+  return here !== null && there !== null && here !== there;
 }
 
 /**
@@ -263,7 +316,7 @@ function firstTierHits(
         {
           candidate,
           markerKey,
-          parenthesised: abbreviation.startsWith('(') && abbreviation.endsWith(')'),
+          parenthesised: isParenthesised(abbreviation),
         },
       ];
     });

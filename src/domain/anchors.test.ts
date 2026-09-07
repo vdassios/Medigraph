@@ -67,6 +67,40 @@ describe('findAnchors', () => {
       expect(anchor(texts)).toMatchObject({ markerKey, tier: 'T1', confidence: 'high' });
     });
 
+    it.each([['Non - HDL - C (Non - HDL - C)'], ['Εμπύρηνα RBC (ΕμπύρηναRBC)']])(
+      'reads a bare abbreviation in %s as prose, not the row it names',
+      (text) => {
+        // The cell prints its own bracketed code, so a registry abbreviation
+        // loose in the prose beside it names something else: non-HDL cholesterol
+        // is not HDL, and nucleated red cells are not the red cell count.
+        // `preferParenthesised` cannot reach either — the bracketed code is no
+        // registry abbreviation, so it never becomes a hit to be preferred.
+        expect(anchor([text])).toBeUndefined();
+      },
+    );
+
+    it('still reads a bare abbreviation when the cell prints no code', () => {
+      expect(anchor(['Χοληστερίνη HDL (HDL)'])).toMatchObject({ markerKey: 'hdl', tier: 'T1' });
+      expect(anchor(['RDW'])).toMatchObject({ markerKey: 'rdw', tier: 'T1' });
+    });
+
+    it('never fuzzes a percentage into a count', () => {
+      // `MON%` and `MONO#` are one edit apart on a bound of two, and that one
+      // character is the whole difference between the two rows a differential
+      // prints. ΙΑΤΡΟΚΟΣΜΟΣ prints `MON%`, which the registry does not hold —
+      // an honest gap beats reading it as the absolute count.
+      expect(anchor(['Μονοπύρηνα (MON%) (MON%)'])).toBeUndefined();
+    });
+
+    it('still reaches the count from a label that names neither', () => {
+      // Silence about `%` or `#` is not disagreement: `(MON)` beside a `(MON%)`
+      // row means the count, and T4 may still reach it.
+      expect(anchor(['Μονοπύρηνα (MON) (ΜΟΝΟ)'])).toMatchObject({
+        markerKey: 'monocytes-absolute',
+        tier: 'T4',
+      });
+    });
+
     it('points at the glued code alone, not at the label it is stuck to', () => {
       const found = anchor(['Μονοκύτταρα(ΜΟΝΟ%)']);
 
