@@ -1,0 +1,448 @@
+{
+  "sourceId": "iaso-thessalias-aimatologiko",
+  "derivation": "poppler pdftotext -bbox-layout column reconstruction, corroborated against the committed TextItems; independent of Medigraph’s rows.ts, anchors.ts, numbers.ts and ranges.ts",
+  "collectionDate": "2025-01-21",
+  "resultDate": "2025-01-21",
+  "issuingLaboratory": "ΙΑΣΩ ΘΕΣΣΑΛΙΑΣ Α.Ε. - ΑΙΜΑΤΟΛΟΓΙΚΟ",
+  "sectionMarkers": [],
+  "rows": [
+    {
+      "page": 2,
+      "label": "Λευκά αιμοσφαίρια (WBC)",
+      "status": "value",
+      "value": 6.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 3.9,
+        "max": 10.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμ. Ουδετερόφιλα(NEU%)",
+      "status": "value",
+      "value": 73.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 42,
+        "max": 77
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYM%)",
+      "status": "value",
+      "value": 13.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 20,
+        "max": 44
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοκύτταρα(ΜΟΝΟ%)",
+      "status": "value",
+      "value": 10.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2,
+        "max": 10
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμ. Ηωσινόφιλα (EOS%)",
+      "status": "value",
+      "value": 0.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "comparator": "<",
+        "max": 5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμ. Βασεόφιλα (BASO%)",
+      "status": "value",
+      "value": 0.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "comparator": "<",
+        "max": 2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμ. Ουδετερόφιλα(NEU#)",
+      "status": "value",
+      "value": 5.08,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.5,
+        "max": 7.7
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYM#)",
+      "status": "value",
+      "value": 0.91,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.1,
+        "max": 4
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοκύτταρα (MONO#)",
+      "status": "value",
+      "value": 0.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.1,
+        "max": 0.9
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμ. Ηωσινόφιλα (EOS#)",
+      "status": "value",
+      "value": 0.06,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.02,
+        "max": 0.75
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμ. Βασεόφιλα (BASO#)",
+      "status": "value",
+      "value": 0.05,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "comparator": "<",
+        "max": 0.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ερυθρά αιμοσφαίρια(RBC)",
+      "status": "value",
+      "value": 5.37,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4,
+        "max": 5.7
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοσφαιρίνη (HGB)",
+      "status": "value",
+      "value": 13.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "g/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 13,
+        "max": 17.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιματοκρίτης (HCT)",
+      "status": "value",
+      "value": 41.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 38.5,
+        "max": 51
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέσος όγκος Ερυθρών (MCV)",
+      "status": "value",
+      "value": 77.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 80,
+        "max": 98
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέση περιεκ. Αιμοσφαιρίνης (MCH)",
+      "status": "value",
+      "value": 25.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "pg/cell",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 27,
+        "max": 34
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέση πυκν. Αιμοσφαιρίνης (MCHC)",
+      "status": "value",
+      "value": 32.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "g/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 31.5,
+        "max": 36
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "RDW",
+      "status": "value",
+      "value": 14,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 11.5,
+        "max": 14.7
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοπετάλια (PLT)",
+      "status": "value",
+      "value": 168,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10³/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 140,
+        "max": 370
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Εύρος καταν. αιμ. (PDW)",
+      "status": "value",
+      "value": 52.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 25,
+        "max": 65
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέσος όγκος αιμ. (MPV)",
+      "status": "value",
+      "value": 7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 7.2,
+        "max": 11.1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοπεταλιοκρίτης (PCT)",
+      "status": "value",
+      "value": 0.12,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.12,
+        "max": 0.36
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Εμπύρηνα Ερυθρά (NRBC%)",
+      "status": "value",
+      "value": 0,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iaso-thessalias-aimatologiko",
+        "page": 2
+      }
+    }
+  ],
+  "coverage": {
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "rowsDerived": 23,
+    "rowsCorroborated": 23
+  }
+}

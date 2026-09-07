@@ -2632,10 +2632,12 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
 - **Diversity now means issuing laboratories, not layouts.** The template is constant;
   what varies is each laboratory's cell content. Target coverage of the observed
   dialects — Greek-name labels, bare Latin-code labels, comma and period decimals,
-  units inside the range column, `(LABEL …)` structural rows, and the qualitative urine
-  panel — rather than a count of documents.
-- **Floor: at least three issuing laboratories**, with one held out blind. This is what
-  the supplied documents currently provide. It is a floor, not a target: every further
+  units inside the range column, units in their own column, `(LABEL …)` structural rows,
+  the qualitative urine panel, an abbreviation glued to its label with no space, a Greek
+  homoglyph inside a Latin-looking abbreviation, and a one-sided reference printed as
+  `<5` — rather than a count of documents.
+- **Floor: at least three issuing laboratories**, with one held out blind. Four are
+  currently supplied, three of them training. It is a floor, not a target: every further
   laboratory is a new content dialect and raises registry and unit coverage, which is
   now the only axis on which extraction quality varies. Raise it as documents arrive.
 - Registry authors may inspect training fixtures only. After the first release score,

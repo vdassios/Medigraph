@@ -187,6 +187,14 @@ describe('the corpus covers the observed content dialects', () => {
     [/^\d+\.\d+$/u, 'period decimals'],
     [/\d\s*-\s*\d[\d,.\s]*[A-Za-zμ%]/u, 'a unit inside the range column'],
     [/κ\.ο\.π/u, 'the qualitative urine panel'],
+    // ΙΑΣΩ ΘΕΣΣΑΛΙΑΣ prints all three: an abbreviation with no space before its
+    // bracket, which defeats a label-then-abbreviation split; ΜΟΝΟ spelled in
+    // Greek capitals inside a bracket that every other laboratory fills with
+    // Latin ones; and a reference the laboratory printed as a bound rather than
+    // an interval.
+    [/[Α-Ωα-ω]\([A-ZΑ-Ω]/u, 'an abbreviation glued to its label'],
+    [/\(ΜΟΝΟ%\)/u, 'a Greek homoglyph inside a Latin-looking abbreviation'],
+    [/^<\s*\d/u, 'a one-sided printed reference'],
   ])('states %s (%s)', (pattern) => {
     expect(everyText.some((text) => pattern.test(text))).toBe(true);
   });
