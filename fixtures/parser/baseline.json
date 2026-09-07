@@ -1,0 +1,204 @@
+{
+  "note": "The parser release baseline (Task 2.5c): the score fixtures/parser produced at the registry version below, committed so a change that moves it has to say so. The floors CI enforces live in scripts/corpus-score.ts; this file is the record, not the gate.",
+  "registryVersion": 2,
+  "laboratories": [
+    {
+      "split": "training",
+      "lab": "bioiatriki-athina-plateia-amerikis",
+      "all": {
+        "markerRecall": {
+          "correct": 76,
+          "total": 76
+        },
+        "valuePrecision": {
+          "correct": 76,
+          "total": 76
+        },
+        "unitPrecision": {
+          "correct": 49,
+          "total": 49
+        },
+        "rangePrecision": {
+          "correct": 41,
+          "total": 41
+        }
+      },
+      "passA": {
+        "markerRecall": {
+          "correct": 76,
+          "total": 76
+        },
+        "valuePrecision": {
+          "correct": 76,
+          "total": 76
+        },
+        "unitPrecision": {
+          "correct": 49,
+          "total": 49
+        },
+        "rangePrecision": {
+          "correct": 41,
+          "total": 41
+        }
+      }
+    },
+    {
+      "split": "training",
+      "lab": "iaso-thessalias-aimatologiko",
+      "all": {
+        "markerRecall": {
+          "correct": 23,
+          "total": 23
+        },
+        "valuePrecision": {
+          "correct": 23,
+          "total": 23
+        },
+        "unitPrecision": {
+          "correct": 23,
+          "total": 23
+        },
+        "rangePrecision": {
+          "correct": 22,
+          "total": 22
+        }
+      },
+      "passA": {
+        "markerRecall": {
+          "correct": 23,
+          "total": 23
+        },
+        "valuePrecision": {
+          "correct": 23,
+          "total": 23
+        },
+        "unitPrecision": {
+          "correct": 23,
+          "total": 23
+        },
+        "rangePrecision": {
+          "correct": 22,
+          "total": 22
+        }
+      }
+    },
+    {
+      "split": "training",
+      "lab": "iatrokosmos-athinon",
+      "all": {
+        "markerRecall": {
+          "correct": 40,
+          "total": 40
+        },
+        "valuePrecision": {
+          "correct": 40,
+          "total": 40
+        },
+        "unitPrecision": {
+          "correct": 14,
+          "total": 14
+        },
+        "rangePrecision": {
+          "correct": 23,
+          "total": 25
+        }
+      },
+      "passA": {
+        "markerRecall": {
+          "correct": 40,
+          "total": 40
+        },
+        "valuePrecision": {
+          "correct": 40,
+          "total": 40
+        },
+        "unitPrecision": {
+          "correct": 14,
+          "total": 14
+        },
+        "rangePrecision": {
+          "correct": 23,
+          "total": 25
+        }
+      }
+    },
+    {
+      "split": "holdout",
+      "lab": "aimatologiko",
+      "all": {
+        "markerRecall": {
+          "correct": 20,
+          "total": 20
+        },
+        "valuePrecision": {
+          "correct": 20,
+          "total": 20
+        },
+        "unitPrecision": {
+          "correct": 20,
+          "total": 20
+        },
+        "rangePrecision": {
+          "correct": 20,
+          "total": 20
+        }
+      },
+      "passA": {
+        "markerRecall": {
+          "correct": 20,
+          "total": 20
+        },
+        "valuePrecision": {
+          "correct": 20,
+          "total": 20
+        },
+        "unitPrecision": {
+          "correct": 20,
+          "total": 20
+        },
+        "rangePrecision": {
+          "correct": 20,
+          "total": 20
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "all": {
+      "markerRecall": {
+        "correct": 159,
+        "total": 159
+      },
+      "valuePrecision": {
+        "correct": 159,
+        "total": 159
+      },
+      "unitPrecision": {
+        "correct": 106,
+        "total": 106
+      },
+      "rangePrecision": {
+        "correct": 106,
+        "total": 108
+      }
+    },
+    "passA": {
+      "markerRecall": {
+        "correct": 159,
+        "total": 159
+      },
+      "valuePrecision": {
+        "correct": 159,
+        "total": 159
+      },
+      "unitPrecision": {
+        "correct": 106,
+        "total": 106
+      },
+      "rangePrecision": {
+        "correct": 106,
+        "total": 108
+      }
+    }
+  }
+}

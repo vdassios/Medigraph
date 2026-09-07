@@ -2674,7 +2674,9 @@ pure scorer; `src/domain/scorer.ts` never imports `extract.ts`.
   now the only axis on which extraction quality varies. Raise it as documents arrive.
 - Registry authors may inspect training fixtures only. After the first release score,
   freeze the holdout as regression data and add a new unseen laboratory before the next
-  tuning cycle.
+  tuning cycle. **That score has been taken** — ΑΙΜΑΤΟΛΟΓΙΚΟ met every per-laboratory
+  floor blind, at 20/20 on all four metrics, and is now frozen. Nothing in the registry
+  was authored from it; the next laboratory to arrive takes its place as the blind one.
 - Parser fixtures use
   `fixtures/parser/{training,holdout}/<lab>/{textitems.json,expected.json}`, where
   `<lab>` is a stable content-based slug of the issuing laboratory. Each laboratory is
@@ -2773,6 +2775,14 @@ lab independently has recall ≥90% and value precision ≥98%. The previously s
 holdout must independently meet the same per-lab floors before it is unsealed and
 frozen as regression data. Pass A alone has aggregate recall ≥90% and value precision
 ≥99%. Precision is load-bearing: a missed marker is visible, a wrong value may not be.
+
+**Met at registry version 2**, with margin on every floor: aggregate recall 159/159,
+value precision 159/159, unit precision 106/106, range precision 106/108; every
+laboratory 100% on recall and on value precision, the holdout included.
+**ΑΙΜΑΤΟΛΟΓΙΚΟ is therefore unsealed and frozen as regression data**, and the corpus now
+has no blind laboratory: a new unseen one is required before the next tuning cycle, and
+until it arrives the four committed documents measure regression rather than
+generalisation.
 
 **Acceptance for 2.6:** the two seed sources produce a one-Report proposal, but no
 Report exists before confirmation. Confirming the proposed group yields one Report;
@@ -2936,7 +2946,13 @@ of the persisted schema — `validateProfile` owns that, and nothing the scorer 
 persisted.
 
 **Parser gate.** `pnpm corpus:score` runs the hand-checked TextItem corpus at the 2.5c
-aggregate and per-laboratory floors. The first blind holdout result is recorded before
+aggregate and per-laboratory floors and **exits non-zero below any of them**; the CI
+`corpus` job is that command and nothing else. `fixtures/parser/baseline.json` is the
+committed record of what the release actually scored, per laboratory and in aggregate,
+over every emitted row and over Pass A alone. It is not the gate — the floors are — but
+`parserBaseline.test.ts` holds it to the current score, so a change that moves the
+corpus by a row updates the record in the same commit rather than drifting quietly
+somewhere above the floor. The first blind holdout result is recorded before
 anyone examines misses or adds aliases. Per-laboratory scoring is now the load-bearing
 axis: the template is constant, so a score that varies between laboratories is telling
 you about registry and unit coverage, which is exactly what needs improving. CI

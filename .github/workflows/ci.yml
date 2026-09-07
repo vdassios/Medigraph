@@ -42,6 +42,20 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run
 
+  # Task 2.5c's release floors. `pnpm corpus:score` exits non-zero below any of
+  # them, and the floors are never lowered to make a run pass.
+  corpus:
+    name: Parser corpus floors
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6.0.10
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm corpus:score
+
   build:
     needs: lint
     runs-on: ubuntu-latest

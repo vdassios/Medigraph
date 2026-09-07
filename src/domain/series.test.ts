@@ -460,20 +460,18 @@ describe('the seed documents', () => {
     );
 
     expect(urine.some((series) => series.points[0]?.status === 'categorical')).toBe(true);
-    expect(urine.filter((series) => series.unit !== null).map((series) => series.id)).toEqual([
-      `urine-ph@${normaliseUnit('Όξινη')}`,
-    ]);
+    expect(urine.filter((series) => series.unit !== null)).toEqual([]);
   });
 
-  it('carries the pH gloss through as a unit, where review can still see it', () => {
-    // `Αντίδραση PH` prints `6.3 Όξινη`. D15 takes the number and § A2 reads
-    // the token after it as the unit, so the laboratory's gloss is stored,
-    // flagged `unrecognised-unit` and demoted — and it surfaces here as the
-    // series' unit rather than disappearing. Task 2.5r's registry work is what
-    // closes it; nothing downstream should quietly drop it in the meantime.
+  it('no longer carries the pH gloss as a unit', () => {
+    // `Αντίδραση PH` prints `6.3 Όξινη`. D15 takes the number and discards the
+    // gloss; the read-out used to store it as the unit because the outward
+    // search read the token after the number, and it surfaced here. Reading
+    // the unit from the column Pass V bound closes it — the urine pH row
+    // prints nothing in that column, so the series has no unit at all.
     const ph = buildSeries(seedProfile()).find((series) => series.markerKey === 'urine-ph');
 
-    expect(ph).toMatchObject({ unit: normaliseUnit('Όξινη') });
-    expect(ph?.points[0]).toMatchObject({ value: 6.3, nativeUnit: normaliseUnit('Όξινη') });
+    expect(ph).toMatchObject({ unit: null });
+    expect(ph?.points[0]).toMatchObject({ value: 6.3, nativeUnit: null });
   });
 });

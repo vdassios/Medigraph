@@ -237,20 +237,22 @@ function neighbourhood(
   const box = anchor.sourceRef.box;
   const parent = row.items.find((item) => owned.has(item.id));
 
-  const tail = lexicalTail(anchor, parent).flatMap<Candidate>((token) =>
-    split(token.text).map((text) => ({ text, item: null, region: 0 })),
-  );
+  // An item that ends inside the label column holds no cells, whatever it still
+  // has to say, so its tail is not offered as one: `Βλάστες (Βιβλιογραφία)`
+  // names blasts and then prints a word that is no result of theirs.
+  const tail = insideLabelColumn(parent, columns)
+    ? []
+    : lexicalTail(anchor, parent).flatMap<Candidate>((token) =>
+        split(token.text).map((text) => ({ text, item: null, region: 0 })),
+      );
 
   // Lexical mode. An anchor whose own item carries on past the matched span is
   // sitting in a whole printed line, and § A2 forbids looking at another line
   // for its value — a narrow column, where each cell is its own item, is a
-  // different shape and keeps the spatial search below.
-  //
-  // Which of the two it is cannot be told from the tail alone. A label cell
-  // that names its marker twice leaves a tail exactly as a whole line does,
-  // and the template settles it: an item that ends inside the label column
-  // holds no cells, whatever it still has to say.
-  if (box === undefined || (tail.length > 0 && !insideLabelColumn(parent, columns))) {
+  // different shape and keeps the spatial search below. Which of the two it is
+  // cannot be told from the tail alone, and the template settles it: the tail
+  // above is empty for every label cell.
+  if (box === undefined || tail.length > 0) {
     return { candidates: tail, stopped: false };
   }
 
@@ -613,7 +615,8 @@ export function readAnchor(
   const groups = groupsOf(found.candidates);
   const reading = assign(groups, found.candidates);
 
-  const unit = unitOf(reading.unitTokens, reading.unitAt) ?? printedUnit(row, columns);
+  const unit =
+    columns === null ? unitOf(reading.unitTokens, reading.unitAt) : printedUnit(row, columns);
   const categorical = groups.length === 0 ? categoricalOf(found.candidates, columns) : null;
 
   const { confidence, flags } = grade(anchor, reading, unit, found.stopped, categorical !== null);
@@ -687,30 +690,31 @@ function unitOf(tokens: readonly string[], from: number): Unit | undefined {
 }
 
 /**
- * The unit column's own contents, for a row the outward search read nothing
- * from.
+ * The unit, read from the column Pass V bound for it.
  *
- * A differential sub-row prints `%` and leaves its result cell empty. There is
- * no number for the search to walk out from, so it collects nothing and the
- * printed unit is lost — a row reported as `missing` with no unit says less
- * than the laboratory did. Only consulted when the search found no unit, and
- * only for a unit the allowlist recognises: an unrecognised token sitting in
- * that column is not evidence of anything.
+ * Where a template is bound this is the whole answer, and the outward search
+ * is not consulted: the unit column is where the unit is, whether or not the
+ * allowlist recognises what it says. Deciding otherwise cost real rows — the
+ * gloss `Όξινη` beside a urine pH read as a unit, `κίνδυνος:` lifted out of a
+ * risk-tier sentence, `mg %` truncated to `mg`, and a differential sub-row
+ * with an empty result losing the `%` it printed, because the search had no
+ * number to walk out from.
+ *
+ * An empty column means this row has no unit, which is why the caller chooses
+ * between this and the outward search on whether a template was bound at all,
+ * rather than on what this returns.
  */
-function printedUnit(row: Row, columns: Columns): Unit | undefined {
-  if (columns === null) {
-    return undefined;
-  }
-
+function printedUnit(row: Row, columns: Exclude<Columns, null>): Unit | undefined {
   const printed = row.items
     .filter((item) => inColumn(item, columns.unit))
+    .sort((a, b) => a.y - b.y || a.x - b.x)
     .map((item) => item.text)
     .join(' ')
     .trim();
 
-  return printed !== '' && isKnownUnit(printed)
-    ? { text: normaliseUnit(printed), recognised: true, read: [] }
-    : undefined;
+  return printed === ''
+    ? undefined
+    : { text: normaliseUnit(printed), recognised: isKnownUnit(printed), read: [] };
 }
 
 /** `-` is how a laboratory prints the absence of a result, not a result. */

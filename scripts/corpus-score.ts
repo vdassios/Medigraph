@@ -222,6 +222,65 @@ function aggregate(scores: readonly CorpusScore[]): CorpusScore {
 }
 
 // ---------------------------------------------------------------------------
+// The release floors (Task 2.5c)
+// ---------------------------------------------------------------------------
+
+/**
+ * The plan's acceptance for Task 2.5c, as percentages.
+ *
+ * These are floors, not targets, and they are never lowered to make a run
+ * pass: a floor moved to fit the parser measures nothing. A regression below
+ * one is a release blocker, which is why this script exits non-zero on it.
+ *
+ * Precision is the load-bearing half. A missed marker is visible to whoever
+ * attached the document; a wrong value may not be.
+ */
+const FLOORS = {
+  aggregate: { markerRecall: 95, valuePrecision: 99, unitPrecision: 95, rangePrecision: 95 },
+  laboratory: { markerRecall: 90, valuePrecision: 98 },
+  passA: { markerRecall: 90, valuePrecision: 99 },
+} as const;
+
+interface Breach {
+  scope: string;
+  metric: string;
+  count: MetricCount;
+  floor: number;
+}
+
+/**
+ * A metric with no denominator meets every floor.
+ *
+ * Unit and range precision count field opportunities, so a corpus that never
+ * printed a unit has not scored badly — it was not asked the question, and
+ * failing a release on it would be a floor about the corpus rather than the
+ * parser.
+ */
+function meets(count: MetricCount, floor: number): boolean {
+  return count.total === 0 || (100 * count.correct) / count.total >= floor;
+}
+
+function breaches(scored: readonly Scored[]): Breach[] {
+  const found: Breach[] = [];
+  const check = (scope: string, floors: Partial<Record<string, number>>, score: CorpusScore) => {
+    for (const metric of METRICS) {
+      const floor = floors[metric];
+      if (floor !== undefined && !meets(score[metric], floor)) {
+        found.push({ scope, metric, count: score[metric], floor });
+      }
+    }
+  };
+
+  check('aggregate', FLOORS.aggregate, aggregate(scored.map((each) => each.all)));
+  check('aggregate, Pass A only', FLOORS.passA, aggregate(scored.map((each) => each.passA)));
+  for (const each of scored) {
+    check(each.fixture.lab, FLOORS.laboratory, each.all);
+  }
+
+  return found;
+}
+
+// ---------------------------------------------------------------------------
 // Reporting
 // ---------------------------------------------------------------------------
 
@@ -349,3 +408,22 @@ table('PASS A ONLY — rows anchored to a registry marker', scored, (each) => ea
 gaps(scored);
 
 console.log('T = training · H = holdout (scored blind; never tune against it)');
+
+// ---------------------------------------------------------------------------
+
+const failed = breaches(scored);
+
+console.log('');
+if (failed.length === 0) {
+  console.log('RELEASE FLOORS — every floor met');
+} else {
+  console.log('RELEASE FLOORS — BREACHED');
+  for (const breach of failed) {
+    const reached = ((100 * breach.count.correct) / breach.count.total).toFixed(1);
+    console.log(
+      `  ${breach.scope} ${breach.metric}: ${String(breach.count.correct)}/` +
+        `${String(breach.count.total)} = ${reached}%, floor ${String(breach.floor)}%`,
+    );
+  }
+  process.exitCode = 1;
+}
