@@ -9,6 +9,7 @@
     {
       "page": 2,
       "label": "Λευκά αιμοσφαίρια (WBC)",
+      "markerKey": "wbc",
       "status": "value",
       "value": 6.9,
       "comparator": null,
@@ -28,6 +29,7 @@
     {
       "page": 2,
       "label": "Πολυμ. Ουδετερόφιλα(NEU%)",
+      "markerKey": "neutrophils-percent",
       "status": "value",
       "value": 73.6,
       "comparator": null,
@@ -47,6 +49,7 @@
     {
       "page": 2,
       "label": "Λεμφοκύτταρα (LYM%)",
+      "markerKey": "lymphocytes-percent",
       "status": "value",
       "value": 13.2,
       "comparator": null,
@@ -66,6 +69,7 @@
     {
       "page": 2,
       "label": "Μονοκύτταρα(ΜΟΝΟ%)",
+      "markerKey": "monocytes-percent",
       "status": "value",
       "value": 10.2,
       "comparator": null,
@@ -85,6 +89,7 @@
     {
       "page": 2,
       "label": "Πολυμ. Ηωσινόφιλα (EOS%)",
+      "markerKey": "eosinophils-percent",
       "status": "value",
       "value": 0.9,
       "comparator": null,
@@ -104,6 +109,7 @@
     {
       "page": 2,
       "label": "Πολυμ. Βασεόφιλα (BASO%)",
+      "markerKey": "basophils-percent",
       "status": "value",
       "value": 0.7,
       "comparator": null,
@@ -123,6 +129,7 @@
     {
       "page": 2,
       "label": "Πολυμ. Ουδετερόφιλα(NEU#)",
+      "markerKey": "neutrophils-absolute",
       "status": "value",
       "value": 5.08,
       "comparator": null,
@@ -142,6 +149,7 @@
     {
       "page": 2,
       "label": "Λεμφοκύτταρα (LYM#)",
+      "markerKey": "lymphocytes-absolute",
       "status": "value",
       "value": 0.91,
       "comparator": null,
@@ -161,6 +169,7 @@
     {
       "page": 2,
       "label": "Μονοκύτταρα (MONO#)",
+      "markerKey": "monocytes-absolute",
       "status": "value",
       "value": 0.7,
       "comparator": null,
@@ -180,6 +189,7 @@
     {
       "page": 2,
       "label": "Πολυμ. Ηωσινόφιλα (EOS#)",
+      "markerKey": "eosinophils-absolute",
       "status": "value",
       "value": 0.06,
       "comparator": null,
@@ -199,6 +209,7 @@
     {
       "page": 2,
       "label": "Πολυμ. Βασεόφιλα (BASO#)",
+      "markerKey": "basophils-absolute",
       "status": "value",
       "value": 0.05,
       "comparator": null,
@@ -218,6 +229,7 @@
     {
       "page": 2,
       "label": "Ερυθρά αιμοσφαίρια(RBC)",
+      "markerKey": "rbc",
       "status": "value",
       "value": 5.37,
       "comparator": null,
@@ -237,6 +249,7 @@
     {
       "page": 2,
       "label": "Αιμοσφαιρίνη (HGB)",
+      "markerKey": "haemoglobin",
       "status": "value",
       "value": 13.6,
       "comparator": null,
@@ -256,6 +269,7 @@
     {
       "page": 2,
       "label": "Αιματοκρίτης (HCT)",
+      "markerKey": "hct",
       "status": "value",
       "value": 41.4,
       "comparator": null,
@@ -275,6 +289,7 @@
     {
       "page": 2,
       "label": "Μέσος όγκος Ερυθρών (MCV)",
+      "markerKey": "mcv",
       "status": "value",
       "value": 77.1,
       "comparator": null,
@@ -294,6 +309,7 @@
     {
       "page": 2,
       "label": "Μέση περιεκ. Αιμοσφαιρίνης (MCH)",
+      "markerKey": "mch",
       "status": "value",
       "value": 25.3,
       "comparator": null,
@@ -313,6 +329,7 @@
     {
       "page": 2,
       "label": "Μέση πυκν. Αιμοσφαιρίνης (MCHC)",
+      "markerKey": "mchc",
       "status": "value",
       "value": 32.8,
       "comparator": null,
@@ -332,6 +349,7 @@
     {
       "page": 2,
       "label": "RDW",
+      "markerKey": "rdw",
       "status": "value",
       "value": 14,
       "comparator": null,
@@ -351,6 +369,7 @@
     {
       "page": 2,
       "label": "Αιμοπετάλια (PLT)",
+      "markerKey": "plt",
       "status": "value",
       "value": 168,
       "comparator": null,
@@ -370,6 +389,7 @@
     {
       "page": 2,
       "label": "Εύρος καταν. αιμ. (PDW)",
+      "markerKey": "x:ευροσ-καταν-αιμ-pdw",
       "status": "value",
       "value": 52.5,
       "comparator": null,
@@ -389,6 +409,7 @@
     {
       "page": 2,
       "label": "Μέσος όγκος αιμ. (MPV)",
+      "markerKey": "mpv",
       "status": "value",
       "value": 7,
       "comparator": null,
@@ -408,6 +429,7 @@
     {
       "page": 2,
       "label": "Αιμοπεταλιοκρίτης (PCT)",
+      "markerKey": "pct",
       "status": "value",
       "value": 0.12,
       "comparator": null,
@@ -427,6 +449,7 @@
     {
       "page": 2,
       "label": "Εμπύρηνα Ερυθρά (NRBC%)",
+      "markerKey": "x:εμπυρηνα-ερυθρα-nrbc",
       "status": "value",
       "value": 0,
       "comparator": null,

@@ -14,6 +14,7 @@
     {
       "page": 2,
       "label": "Λευκά αιμοσφαίρια (WBC) (WBC)",
+      "markerKey": "wbc",
       "status": "value",
       "value": 5,
       "comparator": null,
@@ -33,6 +34,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα (NEUT%) (NEUT%)",
+      "markerKey": "neutrophils-percent",
       "status": "value",
       "value": 48.1,
       "comparator": null,
@@ -52,6 +54,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα (NEUT) (NEUT)",
+      "markerKey": "neutrophils-absolute",
       "status": "value",
       "value": 2.4,
       "comparator": null,
@@ -71,6 +74,7 @@
     {
       "page": 2,
       "label": "Λεμφοκύτταρα (LYM%) (LYM%)",
+      "markerKey": "lymphocytes-percent",
       "status": "value",
       "value": 37.3,
       "comparator": null,
@@ -90,6 +94,7 @@
     {
       "page": 2,
       "label": "Λεμφοκύτταρα (LYM) (LYM)",
+      "markerKey": "lymphocytes-absolute",
       "status": "value",
       "value": 1.9,
       "comparator": null,
@@ -109,6 +114,7 @@
     {
       "page": 2,
       "label": "Μονοπύρηνα (MON%) (MON%)",
+      "markerKey": "monocytes-percent",
       "status": "value",
       "value": 8.8,
       "comparator": null,
@@ -128,6 +134,7 @@
     {
       "page": 2,
       "label": "Μονοπύρηνα (MON) (ΜΟΝΟ)",
+      "markerKey": "monocytes-absolute",
       "status": "value",
       "value": 0.4,
       "comparator": null,
@@ -143,6 +150,7 @@
     {
       "page": 2,
       "label": "Ηωσινόφιλα (EOS%) (EOS%)",
+      "markerKey": "eosinophils-percent",
       "status": "value",
       "value": 4.6,
       "comparator": null,
@@ -162,6 +170,7 @@
     {
       "page": 2,
       "label": "Ηωσινόφιλα (EOS) (EOS)",
+      "markerKey": "eosinophils-absolute",
       "status": "value",
       "value": 0.2,
       "comparator": null,
@@ -181,6 +190,7 @@
     {
       "page": 2,
       "label": "Βασεόφιλα (BAS%) (BAS%)",
+      "markerKey": "basophils-percent",
       "status": "value",
       "value": 1.2,
       "comparator": null,
@@ -200,6 +210,7 @@
     {
       "page": 2,
       "label": "Βασεόφιλα (BAS) (BAS)",
+      "markerKey": "basophils-absolute",
       "status": "value",
       "value": 0.06,
       "comparator": null,
@@ -219,6 +230,7 @@
     {
       "page": 2,
       "label": "Ραβδοπύρηνα (ΡΑΒΔΟΠ)",
+      "markerKey": "x:ραβδοπυρηνα-ραβδοπ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -234,6 +246,7 @@
     {
       "page": 2,
       "label": "Ερυθρά αιμοσφαίρια (RBC) (RBC)",
+      "markerKey": "rbc",
       "status": "value",
       "value": 5.26,
       "comparator": null,
@@ -253,6 +266,7 @@
     {
       "page": 2,
       "label": "Αιμοσφαιρίνη (HGB) (HGB)",
+      "markerKey": "haemoglobin",
       "status": "value",
       "value": 15.4,
       "comparator": null,
@@ -272,6 +286,7 @@
     {
       "page": 2,
       "label": "Αιματοκρίτης (HCT) (HCT)",
+      "markerKey": "hct",
       "status": "value",
       "value": 45.8,
       "comparator": null,
@@ -291,6 +306,7 @@
     {
       "page": 2,
       "label": "Μέσος όγκος ερυθρών (MCV) (MCV)",
+      "markerKey": "mcv",
       "status": "value",
       "value": 87.1,
       "comparator": null,
@@ -310,6 +326,7 @@
     {
       "page": 2,
       "label": "Μέση περιεκτικότητα αιμοσφαιρίνης (MCH) (MCH)",
+      "markerKey": "mch",
       "status": "value",
       "value": 29.3,
       "comparator": null,
@@ -329,6 +346,7 @@
     {
       "page": 2,
       "label": "Μέση πυκνότητα αιμοσφαιρίνης (MCHC) (MCHC)",
+      "markerKey": "mchc",
       "status": "value",
       "value": 33.6,
       "comparator": null,
@@ -348,6 +366,7 @@
     {
       "page": 2,
       "label": "Εύρος κατανομής ερυθρών (RDW) (RDW)",
+      "markerKey": "rdw",
       "status": "value",
       "value": 13.3,
       "comparator": null,
@@ -367,6 +386,7 @@
     {
       "page": 2,
       "label": "Στοχοκυττάρωση (ΣΤΟΧΟΚΥΤ)",
+      "markerKey": "x:στοχοκυτταρωση-στοχοκυτ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -382,6 +402,7 @@
     {
       "page": 2,
       "label": "Ποικιλοκυττάρωση (ΠΟΙΚΙΛΟΚΥΤ)",
+      "markerKey": "x:ποικιλοκυτταρωση-ποικιλοκυτ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -397,6 +418,7 @@
     {
       "page": 2,
       "label": "Ανισοκυττάρωση (ΑΝΙΣΟΚΥΤΤ)",
+      "markerKey": "x:ανισοκυτταρωση-ανισοκυττ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -412,6 +434,7 @@
     {
       "page": 2,
       "label": "Ανισοχρωμία (ΑΝΙΣΟΧΡ)",
+      "markerKey": "x:ανισοχρωμια-ανισοχρ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -427,6 +450,7 @@
     {
       "page": 2,
       "label": "Μικροκυττάρωση (ΜΚΡΟΚΥΤ)",
+      "markerKey": "x:μικροκυτταρωση-μκροκυτ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -442,6 +466,7 @@
     {
       "page": 2,
       "label": "Μακροκυττάρωση (ΜΑΚΡΟΚΥΤ)",
+      "markerKey": "x:μακροκυτταρωση-μακροκυτ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -457,6 +482,7 @@
     {
       "page": 2,
       "label": "Υποχρωμία (ΥΠΟΧΡ)",
+      "markerKey": "x:υποχρωμια-υποχρ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -472,6 +498,7 @@
     {
       "page": 2,
       "label": "Βασεόφιλη στίξη (ΒΑΣΕΟΦ ΣΤ)",
+      "markerKey": "x:βασεοφιλη-στιξη-βασεοφ-στ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -487,6 +514,7 @@
     {
       "page": 2,
       "label": "Αιμοπετάλια (PLT) (PLT)",
+      "markerKey": "plt",
       "status": "value",
       "value": 293,
       "comparator": null,
@@ -506,6 +534,7 @@
     {
       "page": 3,
       "label": "Μέσος όγκος αιμοπεταλίων (MPV) (MPV)",
+      "markerKey": "mpv",
       "status": "value",
       "value": 8.9,
       "comparator": null,
@@ -525,6 +554,7 @@
     {
       "page": 3,
       "label": "Αιμοπεταλιοκρίτης (PCT) (PCT)",
+      "markerKey": "pct",
       "status": "value",
       "value": 0.3,
       "comparator": null,
@@ -544,6 +574,7 @@
     {
       "page": 3,
       "label": "Εύρος κατανομής αιμοπεταλίων (PWD) (PWD)",
+      "markerKey": "x:ευροσ-κατανομησ-αιμοπεταλιων-pwd-pwd",
       "status": "value",
       "value": 9.7,
       "comparator": null,
@@ -563,6 +594,7 @@
     {
       "page": 3,
       "label": "Μυελοκύτταρα (ΜΥΕΛΟΚΥΤΤΑΡΑ)",
+      "markerKey": "x:μυελοκυτταρα-μυελοκυτταρα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -578,6 +610,7 @@
     {
       "page": 3,
       "label": "Βλάστες (Βλάστες)",
+      "markerKey": "x:βλαστεσ-βλαστεσ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -593,6 +626,7 @@
     {
       "page": 3,
       "label": "Μεταμυελοκύτταρα (Μεταμυελοκύτταρα)",
+      "markerKey": "x:μεταμυελοκυτταρα-μεταμυελοκυτταρα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -608,6 +642,7 @@
     {
       "page": 3,
       "label": "Προμυελοκύτταρα (Προμυελοκύτταρα)",
+      "markerKey": "x:προμυελοκυτταρα-προμυελοκυτταρα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -623,6 +658,7 @@
     {
       "page": 3,
       "label": "ΣΑΚΧΑΡΟ ΑΙΜΑΤΟΣ (ΣΑΚΧ)",
+      "markerKey": "glucose",
       "status": "value",
       "value": 93,
       "comparator": null,
@@ -642,6 +678,7 @@
     {
       "page": 3,
       "label": "Non - HDL - C (Non - HDL - C)",
+      "markerKey": "x:non-hdl-c-non-hdl-c",
       "status": "value",
       "value": 170,
       "comparator": null,
@@ -657,6 +694,7 @@
     {
       "page": 3,
       "label": "Χοληστερίνη HDL (HDL)",
+      "markerKey": "hdl",
       "status": "value",
       "value": 64,
       "comparator": null,
@@ -672,6 +710,7 @@
     {
       "page": 4,
       "label": "ΤΡΙΓΛΥΚΕΡΙΔΙΑ (TRG)",
+      "markerKey": "triglycerides",
       "status": "value",
       "value": 67,
       "comparator": null,
@@ -687,6 +726,7 @@
     {
       "page": 4,
       "label": "Lp(a) (Lp(a))",
+      "markerKey": "x:lp-a-lp-a",
       "status": "value",
       "value": 27.5,
       "comparator": null,

@@ -85,7 +85,7 @@ export function extract(input: TextExtractionInput): ExtractionResult {
 
   const known = anchors.flatMap((anchor) => {
     const row = byId.get(rowIdOf(anchor.id));
-    return row === undefined ? [] : [readAnchor(anchor, row, rows, anchors)];
+    return row === undefined ? [] : [readAnchor(anchor, row, rows, anchors, document.columns)];
   });
   const unknown = unknownRows(rows, new Set(anchors.map((anchor) => rowIdOf(anchor.id))), document);
 

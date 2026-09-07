@@ -6,7 +6,7 @@ import { readAnchor } from './readout';
 import { clusterRows } from './rows';
 import { normaliseLabel } from './text';
 import { normaliseUnit } from './units';
-import type { ParsedRow, ReferenceRange, Row, TextItem } from './types';
+import type { Column, ColumnRole, ParsedRow, ReferenceRange, Row, TextItem } from './types';
 
 const SEED = new URL('../../fixtures/seed/', import.meta.url);
 
@@ -41,13 +41,14 @@ function readFixture(name: string): ParsedRow[] {
     throw new Error(`expected an ΑΗΦΥ document, got ${validation.reason}`);
   }
 
+  const { columns, sectionTitles } = validation.document;
   const rows = clusterRows(name, pages(name));
-  const anchors = findAnchors(rows, validation.document.sectionTitles);
+  const anchors = findAnchors(rows, sectionTitles);
   const byId = new Map(rows.map((row) => [row.id, row]));
 
   return anchors.flatMap((anchor) => {
     const row = byId.get(anchor.id.slice(0, anchor.id.indexOf(':anchor:')));
-    return row === undefined ? [] : [readAnchor(anchor, row, rows, anchors)];
+    return row === undefined ? [] : [readAnchor(anchor, row, rows, anchors, columns)];
   });
 }
 
@@ -90,12 +91,35 @@ function readRows(rows: readonly Row[]): ParsedRow[] {
 
   return anchors.flatMap((anchor) => {
     const owner = byId.get(anchor.id.slice(0, anchor.id.indexOf(':anchor:')));
-    return owner === undefined ? [] : [readAnchor(anchor, owner, rows, anchors)];
+    // No validated template: these rows exercise the untemplated search.
+    return owner === undefined ? [] : [readAnchor(anchor, owner, rows, anchors, null)];
   });
 }
 
 function fail(): never {
   throw new Error('the row anchored no marker');
+}
+
+/** The ΑΗΦΥ bands, as Pass V binds them on every document in the corpus. */
+const BANDS: Record<ColumnRole, Column> = {
+  label: { role: 'label', xMin: 0.131, xMax: 0.3837 },
+  value: { role: 'value', xMin: 0.3837, xMax: 0.5101 },
+  unit: { role: 'unit', xMin: 0.5101, xMax: 0.6364 },
+  range: { role: 'range', xMin: 0.6364, xMax: 0.7628 },
+  notes: { role: 'notes', xMin: 0.7628, xMax: 1 },
+};
+
+/** One row of measured items, read against the bound template. */
+function readPlaced(items: TextItem[]): ParsedRow {
+  const rows: Row[] = [{ id: 'r1', sourceId: 's', page: 1, items, y: items[0]?.y ?? 0, h: 0.0125 }];
+  const anchors = findAnchors(rows, []);
+  const anchor = anchors[0] ?? fail();
+
+  return readAnchor(anchor, rows[0] ?? fail(), rows, anchors, BANDS);
+}
+
+function placed(text: string, x: number, w: number, y = 0.2): TextItem {
+  return { id: `i-${String(Math.round(x * 1e4))}`, text, x, y, w, h: 0.0125 };
 }
 
 describe('readAnchor', () => {
@@ -459,6 +483,40 @@ describe('readAnchor', () => {
     });
   });
 
+  describe("the template's columns", () => {
+    it('reads past a label cell that names its marker twice', () => {
+      // Ιατρόκοσμος prints the marker in the label and again in brackets, so
+      // the anchor leaves a tail of label text. Before the columns were passed
+      // in, that tail was read as the row's cells and seventeen rows came back
+      // categorical with the label as their result.
+      expect(
+        readPlaced([
+          placed('Λευκά αιμοσφαίρια (WBC) (WBC)', 0.131, 0.2261),
+          placed('5,0', 0.4689, 0.021),
+        ]),
+      ).toMatchObject({ markerKey: 'wbc', status: 'value', value: 5 });
+    });
+
+    it('crosses the gap from a short label to the value column', () => {
+      // `RDW` is three characters wide and its value sits a third of the page
+      // away, which is wider than the gap rule allows on its own.
+      expect(
+        readPlaced([placed('RDW', 0.131, 0.03), placed('14,0', 0.4615, 0.0297)]),
+      ).toMatchObject({ markerKey: 'rdw', status: 'value', value: 14 });
+    });
+
+    it('still reads a whole printed line lexically', () => {
+      // The item runs out of the label column and across the table, so its
+      // tail really is the row's cells and § A2's lexical mode still applies.
+      expect(readPlaced([placed('WBC 5,03 x10^3 / μL 4 - 10,5', 0.131, 0.7)])).toMatchObject({
+        markerKey: 'wbc',
+        status: 'value',
+        value: 5.03,
+        referenceRange: { kind: 'closed', min: 4, max: 10.5 },
+      });
+    });
+  });
+
   describe('the seed fixtures', () => {
     it.each(['ahfy-full', 'ahfy-minimal'])(
       'reads %s as the independent derivation says',
@@ -552,8 +610,10 @@ describe('readAnchor', () => {
       // and strands the result from its label; the row itself does print
       // `Αρνητικό`. The reference is assembled in the row's x order rather
       // than the printed line order — the laboratory printed `Αρνητικό ή`
-      // above `ίχνη` — which is `rows.ts`'s documented ordering and needs the
-      // column roles Pass V bound to undo.
+      // above `ίχνη` — which is `rows.ts`'s documented ordering. The read-out
+      // is now given Pass V's columns, but uses them only to judge where a
+      // cell begins, never to re-order the tokens inside one; sorting a
+      // wrapped cell top to bottom is a further change and is not made here.
       const row = readFixture('ahfy-full').find((each) => each.markerKey === 'urine-urobilinogen');
 
       expect(row).toMatchObject({

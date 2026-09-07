@@ -4,6 +4,8 @@ import { tokenise } from './text';
 import { isKnownUnit, normaliseUnit } from './units';
 import type {
   Anchor,
+  Column,
+  ColumnRole,
   Comparator,
   Confidence,
   LexicalToken,
@@ -21,15 +23,25 @@ import type {
  * PASS A — reading outward from an anchor.
  *
  * `anchors.ts` answers which marker a row is about; this module answers what
- * the laboratory printed beside it. It owns no column model: D5 removed layout
- * discovery, and Pass V's column roles bind the *template*, not a row, so a
- * value is found by looking outward from the anchor's own box and letting the
- * numbers identify themselves.
+ * the laboratory printed beside it. It discovers no columns of its own — D5
+ * removed layout discovery — and a value is still found by looking outward
+ * from the anchor's own box and letting the numbers identify themselves.
  *
  * Two facts do the work. A printed number is unmistakable, so the read-out
  * assembles numeric groups first and assigns roles afterwards; and a stop
  * condition is cheaper than a wrong reading, so the search refuses to widen
  * rather than borrowing the next marker's cell.
+ *
+ * **Pass V's bound columns are passed in, and are consulted only where the
+ * outward search would otherwise judge wrongly.** They are not a second
+ * algorithm and they never locate a value: they answer two questions the
+ * anchor's own box cannot. Whether the text after the matched span is another
+ * cell or the rest of the label — `Λευκά αιμοσφαίρια (WBC) (WBC)` is one label
+ * cell, and reading its tail as a result is where seventeen of Ιατρόκοσμος's
+ * rows went. And whether a wide horizontal gap is a search wandering off or
+ * simply the distance from a short label to the value column, which is what
+ * `RDW` and a wrapped `(MCHC)` fall into. A caller with no validated template
+ * passes `null` and gets the untemplated search unchanged.
  */
 
 /** A printed unit may span whitespace: `x10^3`, `/`, `μL` is one unit. */
@@ -150,11 +162,18 @@ function lexicalTail(anchor: Anchor, item: TextItem | undefined): LexicalToken[]
  * another marker. The gap rule ends the walk only while nothing numeric has
  * been collected — once a value is in hand, a wide gap is the table's own
  * column spacing and means nothing.
+ *
+ * `reach` is where that spacing stops being an explanation. An item landing
+ * before it is inside the value column and is what the label was pointing at,
+ * however far the jump; past it, a gap that wide is the search wandering and
+ * the walk ends. An untemplated caller passes 0, which restores the plain gap
+ * rule for every item.
  */
 function walk(
   items: readonly TextItem[],
   from: number,
   barrier: number,
+  reach: number,
   found: () => boolean,
 ): { items: TextItem[]; stopped: boolean } {
   const kept: TextItem[] = [];
@@ -164,7 +183,7 @@ function walk(
     if (item.x >= barrier) {
       return { items: kept, stopped: true };
     }
-    if (item.x - edge > HORIZONTAL_GAP && !found() && kept.length === 0) {
+    if (item.x >= reach && item.x - edge > HORIZONTAL_GAP && !found() && kept.length === 0) {
       return { items: kept, stopped: true };
     }
     kept.push(item);
@@ -172,6 +191,21 @@ function walk(
   }
 
   return { items: kept, stopped: false };
+}
+
+/** Pass V's bound columns, or `null` from a caller with no validated template. */
+type Columns = Record<ColumnRole, Column> | null;
+
+/**
+ * Whether the anchor's own item is a label cell rather than a printed line.
+ *
+ * Measured on the item's right edge, not its centre: a whole line starts in
+ * the label column too, and only where it ends says which of the two it is.
+ * Without a bound template there is nothing to measure against, and the tail
+ * keeps its original meaning.
+ */
+function insideLabelColumn(item: TextItem | undefined, columns: Columns): boolean {
+  return columns !== null && item !== undefined && item.x + item.w <= columns.label.xMax;
 }
 
 interface Neighbourhood {
@@ -191,6 +225,7 @@ function neighbourhood(
   row: Row,
   allRows: readonly Row[],
   anchors: readonly Anchor[],
+  columns: Columns,
 ): Neighbourhood {
   const owned = new Set(anchor.sourceRef.itemIds ?? []);
   const box = anchor.sourceRef.box;
@@ -204,7 +239,12 @@ function neighbourhood(
   // sitting in a whole printed line, and § A2 forbids looking at another line
   // for its value — a narrow column, where each cell is its own item, is a
   // different shape and keeps the spatial search below.
-  if (box === undefined || tail.length > 0) {
+  //
+  // Which of the two it is cannot be told from the tail alone. A label cell
+  // that names its marker twice leaves a tail exactly as a whole line does,
+  // and the template settles it: an item that ends inside the label column
+  // holds no cells, whatever it still has to say.
+  if (box === undefined || (tail.length > 0 && !insideLabelColumn(parent, columns))) {
     return { candidates: tail, stopped: false };
   }
 
@@ -219,6 +259,7 @@ function neighbourhood(
     row.items.filter((item) => free(item) && beside(item) && item.x >= rightEdge),
     rightEdge,
     nextAnchorX(row, anchor, anchors, box),
+    columns === null ? 0 : columns.value.xMax,
     found,
   );
 
@@ -552,15 +593,17 @@ function demote(from: Confidence, to: Confidence): Confidence {
  * `allRows` is the document's, because a stacked cell may sit in the row below
  * the anchor's; `anchors` is the document's for the same reason the stop
  * conditions exist — the next marker's x and y are where this one's reading
- * ends. Neither is searched for a value beyond those bounds.
+ * ends. Neither is searched for a value beyond those bounds. `columns` is what
+ * Pass V bound for this document, or `null` where no template was validated.
  */
 export function readAnchor(
   anchor: Anchor,
   row: Row,
   allRows: readonly Row[],
   anchors: readonly Anchor[],
+  columns: Columns,
 ): ParsedRow {
-  const found = neighbourhood(anchor, row, allRows, anchors);
+  const found = neighbourhood(anchor, row, allRows, anchors, columns);
   const groups = groupsOf(found.candidates);
   const reading = assign(groups, found.candidates);
 

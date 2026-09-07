@@ -55,7 +55,6 @@ registerHooks({
 });
 
 const { extract } = await import('../src/domain/extract');
-const { markerKey } = await import('../src/domain/markerKey');
 const { REGISTRY_VERSION } = await import('../src/domain/registry');
 const { score } = await import('../src/domain/scorer');
 
@@ -70,6 +69,7 @@ type Split = 'training' | 'holdout';
 /** The subset of `expected.json` a score depends on. */
 interface ExpectedRow {
   label: string;
+  markerKey: string;
   status: ParsedRow['status'];
   value: number | null;
   comparator: ParsedRow['comparator'];
@@ -111,29 +111,24 @@ function load(): Fixture[] {
 /**
  * An expectation as a `ParsedRow` the scorer will accept.
  *
- * `expected.json` states what a reader sees on the page — a printed label, a
- * result, a unit, an interval — and says nothing about marker identity, which
- * is the parser's job and would not be an independent expectation if the
- * fixture asserted it. The key is derived here with `markerKey`, the only
- * label-to-identity function outside the parser; everything the scorer does
- * not read is filled with a value that cannot affect the comparison.
+ * The marker key is read from the fixture, not derived here. Identity is part
+ * of what a reader states about a printed row — `Μέσος όγκος ερυθρών (MCV)`
+ * names MCV whatever the parser goes on to decide — and the corpus is the only
+ * place that judgement can be recorded without the score becoming circular.
+ * Deriving it instead with `markerKey` is what the earlier runs did, and it
+ * cost more than it looked: `markerKey` matches a whole normalised label
+ * against the registry, while `anchors.ts` matches a marker *inside* a row, so
+ * every wrapped or bracketed label scored as a miss and again as a spurious
+ * emission. On ΙΑΣΩ that was all fifteen of its apparent misses.
  *
- * **This derivation under-reports, and the numbers below inherit it.**
- * `markerKey` matches a whole normalised label against the registry's aliases
- * and abbreviations; `anchors.ts` matches a marker *inside* a row with four
- * tiers of containment and edit distance. A fixture label is the whole printed
- * cell — `Μέσος όγκος ερυθρών (MCV) (MCV)` — so the parser resolves it to
- * `mcv` and this side derives `x:μεσοσ-ογκοσ-ερυθρων-mcv-mcv`, and a correct
- * row scores as a miss. On the committed corpus that is 11 of Iatrokosmos's 27
- * unmatched rows and 2 of Bioiatriki's 16. Resolving it needs a decision the
- * corpus owns — an expectation states a marker key, or the pairing is not
- * keyed on one — and neither belongs in this script. Raised on issue #26.
+ * Everything the scorer does not read is filled with a value that cannot
+ * affect the comparison.
  */
 function asParsedRow(row: ExpectedRow, lab: string, index: number): ParsedRow {
   return {
     id: `${lab}:expected:${String(index)}`,
     label: row.label,
-    markerKey: markerKey(row.label),
+    markerKey: row.markerKey,
     status: row.status,
     value: row.value,
     comparator: row.comparator,

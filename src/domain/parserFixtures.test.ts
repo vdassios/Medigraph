@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { validateAhfyDocument } from './ahfyDocument';
 import { findIdentifierCandidates } from './identifiers';
+import { MARKERS } from './registry';
 import type { ParsedRow, ReferenceRange, TextItem } from './types';
 
 const PARSER = new URL('../../fixtures/parser/', import.meta.url);
@@ -20,7 +21,14 @@ interface Fixture {
     sectionMarkers: { page: number; title: string }[];
     rows: (Pick<
       ParsedRow,
-      'label' | 'status' | 'value' | 'comparator' | 'textValue' | 'unit' | 'referenceRange'
+      | 'label'
+      | 'markerKey'
+      | 'status'
+      | 'value'
+      | 'comparator'
+      | 'textValue'
+      | 'unit'
+      | 'referenceRange'
     > & { page: number; categoricalReference: string | null })[];
     coverage: { note: string; rowsDerived: number; rowsCorroborated: number };
   };
@@ -131,6 +139,25 @@ describe.each(fixtures)('$split/$lab', (fixture) => {
       expect(row.page).toBeLessThanOrEqual(pages.length);
       expect(row.label).not.toBe('');
     }
+  });
+
+  it('names the marker each row measures, canonically or as a gap', () => {
+    // Identity is stated by the fixture, not derived from the label, because
+    // the only other place to get it is the parser being scored. A canonical
+    // key must name a marker the registry actually holds; anything else is an
+    // `x:` key, which is a claim that the registry has no entry for this row.
+    const canonical = new Set(MARKERS.map((marker) => marker.id));
+    const keys = fixture.expected.rows.map((row) => row.markerKey);
+
+    for (const key of keys) {
+      expect(key).not.toBe('');
+      if (!key.startsWith('x:')) {
+        expect(canonical).toContain(key);
+      }
+    }
+    // One document measures a marker once. Two rows sharing a key would make
+    // the scorer's one-to-one pairing arbitrary.
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   it('keeps every field consistent with its row status', () => {

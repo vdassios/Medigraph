@@ -9,6 +9,7 @@
     {
       "page": 2,
       "label": "WBC (WBC)",
+      "markerKey": "wbc",
       "status": "value",
       "value": 6.9,
       "comparator": null,
@@ -28,6 +29,7 @@
     {
       "page": 2,
       "label": "RBC (RBC)",
+      "markerKey": "rbc",
       "status": "value",
       "value": 5.2,
       "comparator": null,
@@ -47,6 +49,7 @@
     {
       "page": 2,
       "label": "HGB (HGB)",
+      "markerKey": "haemoglobin",
       "status": "value",
       "value": 15.2,
       "comparator": null,
@@ -66,6 +69,7 @@
     {
       "page": 2,
       "label": "HCT (HCT)",
+      "markerKey": "hct",
       "status": "value",
       "value": 45.3,
       "comparator": null,
@@ -85,6 +89,7 @@
     {
       "page": 2,
       "label": "MCV (MCV)",
+      "markerKey": "mcv",
       "status": "value",
       "value": 87.1,
       "comparator": null,
@@ -104,6 +109,7 @@
     {
       "page": 2,
       "label": "MCH (MCH)",
+      "markerKey": "mch",
       "status": "value",
       "value": 29.2,
       "comparator": null,
@@ -123,6 +129,7 @@
     {
       "page": 2,
       "label": "MCHC (MCHC)",
+      "markerKey": "mchc",
       "status": "value",
       "value": 33.6,
       "comparator": null,
@@ -142,6 +149,7 @@
     {
       "page": 2,
       "label": "PLT (PLT)",
+      "markerKey": "plt",
       "status": "value",
       "value": 297,
       "comparator": null,
@@ -161,6 +169,7 @@
     {
       "page": 2,
       "label": "NEUT% (NEUT%)",
+      "markerKey": "neutrophils-percent",
       "status": "value",
       "value": 50.7,
       "comparator": null,
@@ -180,6 +189,7 @@
     {
       "page": 2,
       "label": "LYMP% (LYMP%)",
+      "markerKey": "lymphocytes-percent",
       "status": "value",
       "value": 38.8,
       "comparator": null,
@@ -199,6 +209,7 @@
     {
       "page": 2,
       "label": "MONO% (MONO%)",
+      "markerKey": "monocytes-percent",
       "status": "value",
       "value": 6.7,
       "comparator": null,
@@ -218,6 +229,7 @@
     {
       "page": 2,
       "label": "EOSI% (EOSI%)",
+      "markerKey": "eosinophils-percent",
       "status": "value",
       "value": 2.8,
       "comparator": null,
@@ -237,6 +249,7 @@
     {
       "page": 2,
       "label": "BASO% (BASO%)",
+      "markerKey": "basophils-percent",
       "status": "value",
       "value": 1,
       "comparator": null,
@@ -256,6 +269,7 @@
     {
       "page": 2,
       "label": "NEUT# (NEUT#)",
+      "markerKey": "neutrophils-absolute",
       "status": "value",
       "value": 3.5,
       "comparator": null,
@@ -275,6 +289,7 @@
     {
       "page": 2,
       "label": "LYMP# (LYMP#)",
+      "markerKey": "lymphocytes-absolute",
       "status": "value",
       "value": 2.68,
       "comparator": null,
@@ -294,6 +309,7 @@
     {
       "page": 2,
       "label": "MONO# (MONO#)",
+      "markerKey": "monocytes-absolute",
       "status": "value",
       "value": 0.46,
       "comparator": null,
@@ -313,6 +329,7 @@
     {
       "page": 2,
       "label": "EOSI# (EOSI#)",
+      "markerKey": "eosinophils-absolute",
       "status": "value",
       "value": 0.19,
       "comparator": null,
@@ -332,6 +349,7 @@
     {
       "page": 2,
       "label": "BASO# (BASO#)",
+      "markerKey": "basophils-absolute",
       "status": "value",
       "value": 0.07,
       "comparator": null,
@@ -351,6 +369,7 @@
     {
       "page": 2,
       "label": "RDWSD (RDWSD)",
+      "markerKey": "rdw-sd",
       "status": "value",
       "value": 40.8,
       "comparator": null,
@@ -370,6 +389,7 @@
     {
       "page": 2,
       "label": "MPV (MPV)",
+      "markerKey": "mpv",
       "status": "value",
       "value": 9,
       "comparator": null,

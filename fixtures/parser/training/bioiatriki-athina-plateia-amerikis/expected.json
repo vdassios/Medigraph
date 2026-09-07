@@ -266,6 +266,7 @@
     {
       "page": 2,
       "label": "Ερυθρά Αιμοσφαίρια (RBC) (RBC)",
+      "markerKey": "rbc",
       "status": "value",
       "value": 5.26,
       "comparator": null,
@@ -285,6 +286,7 @@
     {
       "page": 2,
       "label": "Αιμοσφαιρίνη (HGB) (HGB)",
+      "markerKey": "haemoglobin",
       "status": "value",
       "value": 16.1,
       "comparator": null,
@@ -304,6 +306,7 @@
     {
       "page": 2,
       "label": "Αιματοκρίτης (HCT) (HCT)",
+      "markerKey": "hct",
       "status": "value",
       "value": 47.4,
       "comparator": null,
@@ -323,6 +326,7 @@
     {
       "page": 2,
       "label": "Μέσος Όγκος Ερυθρών (ΜCV) (MCV)",
+      "markerKey": "mcv",
       "status": "value",
       "value": 90.1,
       "comparator": null,
@@ -342,6 +346,7 @@
     {
       "page": 2,
       "label": "Μέση Περιεκτικότης HGB (MCH) (MCH)",
+      "markerKey": "mch",
       "status": "value",
       "value": 30.6,
       "comparator": null,
@@ -361,6 +366,7 @@
     {
       "page": 2,
       "label": "Μέση Πυκνότης HGB (MCHC) (MCHC)",
+      "markerKey": "mchc",
       "status": "value",
       "value": 34,
       "comparator": null,
@@ -380,6 +386,7 @@
     {
       "page": 2,
       "label": "Εύρος Κατανομής Ερυθρών (RDW) (RDW)",
+      "markerKey": "rdw",
       "status": "value",
       "value": 13.7,
       "comparator": null,
@@ -399,6 +406,7 @@
     {
       "page": 2,
       "label": "Λευκά Αιμοσφαίρια (WBC) (WBC)",
+      "markerKey": "wbc",
       "status": "value",
       "value": 5,
       "comparator": null,
@@ -418,6 +426,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα Ουδετερόφιλα (NEUT) % (NEUT%)",
+      "markerKey": "neutrophils-percent",
       "status": "value",
       "value": 51.6,
       "comparator": null,
@@ -437,6 +446,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα Ουδετερόφιλα (NEUT#)",
+      "markerKey": "neutrophils-absolute",
       "status": "value",
       "value": 2.58,
       "comparator": null,
@@ -456,6 +466,7 @@
     {
       "page": 2,
       "label": "Λεμφοκύτταρα (LYMPH) % (LYM%)",
+      "markerKey": "lymphocytes-percent",
       "status": "value",
       "value": 34.1,
       "comparator": null,
@@ -475,6 +486,7 @@
     {
       "page": 2,
       "label": "Λεμφοκύτταρα (LYM#)",
+      "markerKey": "lymphocytes-absolute",
       "status": "value",
       "value": 1.71,
       "comparator": null,
@@ -494,6 +506,7 @@
     {
       "page": 2,
       "label": "Μονοπύρηνα (MONO) % (MONO%)",
+      "markerKey": "monocytes-percent",
       "status": "value",
       "value": 10.5,
       "comparator": null,
@@ -513,6 +526,7 @@
     {
       "page": 2,
       "label": "Μονοπύρηνα (MONO#)",
+      "markerKey": "monocytes-absolute",
       "status": "value",
       "value": 0.53,
       "comparator": null,
@@ -532,6 +546,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα Ηωσινόφιλα (EOS) % (EOS%)",
+      "markerKey": "eosinophils-percent",
       "status": "value",
       "value": 2.9,
       "comparator": null,
@@ -551,6 +566,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα Ηωσινόφιλα (EOS#)",
+      "markerKey": "eosinophils-absolute",
       "status": "value",
       "value": 0.15,
       "comparator": null,
@@ -570,6 +586,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα Βασεόφιλα (BASO) % (BASO%)",
+      "markerKey": "basophils-percent",
       "status": "value",
       "value": 0.8,
       "comparator": null,
@@ -589,6 +606,7 @@
     {
       "page": 2,
       "label": "Πολυμορφοπύρηνα Βασεόφιλα (BASO#)",
+      "markerKey": "basophils-absolute",
       "status": "value",
       "value": 0.04,
       "comparator": null,
@@ -608,6 +626,7 @@
     {
       "page": 2,
       "label": "Αιμοπετάλια (PLT) (PLT)",
+      "markerKey": "plt",
       "status": "value",
       "value": 322,
       "comparator": null,
@@ -627,6 +646,7 @@
     {
       "page": 2,
       "label": "* Μέσος Όγκος Αιμοπεταλίων (MPV) (MPV)",
+      "markerKey": "mpv",
       "status": "value",
       "value": 8.8,
       "comparator": null,
@@ -646,6 +666,7 @@
     {
       "page": 3,
       "label": "Αιμοπεταλιοκρίτης (PCT) (PCT)",
+      "markerKey": "pct",
       "status": "value",
       "value": 0.28,
       "comparator": null,
@@ -665,6 +686,7 @@
     {
       "page": 3,
       "label": "Εύρος Κατανομής Αιμοπεταλίων (PDW) (PDW)",
+      "markerKey": "x:ευροσ-κατανομησ-αιμοπεταλιων-pdw-pdw",
       "status": "value",
       "value": 13.9,
       "comparator": null,
@@ -684,6 +706,7 @@
     {
       "page": 3,
       "label": "Ραβδοπύρηνα (Ραβδοπύρηνα)",
+      "markerKey": "x:ραβδοπυρηνα-ραβδοπυρηνα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -699,6 +722,7 @@
     {
       "page": 3,
       "label": "Μεταμυελοκυτταρα (Μεταμυελοκυτ)",
+      "markerKey": "x:μεταμυελοκυτταρα-μεταμυελοκυτ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -714,6 +738,7 @@
     {
       "page": 3,
       "label": "Μυελοκύτταρα (Μυελοκύτταρα)",
+      "markerKey": "x:μυελοκυτταρα-μυελοκυτταρα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -729,6 +754,7 @@
     {
       "page": 3,
       "label": "Προμυελοκύτταρα (Προμυελοκύτταρα)",
+      "markerKey": "x:προμυελοκυτταρα-προμυελοκυτταρα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -744,6 +770,7 @@
     {
       "page": 3,
       "label": "Άτυπα Κύτταρα (Άτυπα Κύτταρα)",
+      "markerKey": "x:ατυπα-κυτταρα-ατυπα-κυτταρα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -759,6 +786,7 @@
     {
       "page": 3,
       "label": "Εμπύρηνα RBC (ΕμπύρηναRBC)",
+      "markerKey": "x:εμπυρηνα-rbc-εμπυρηναrbc",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -774,6 +802,7 @@
     {
       "page": 3,
       "label": "Βλάστες (Βιβλιογραφία)",
+      "markerKey": "x:βλαστεσ-βιβλιογραφια",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -789,6 +818,7 @@
     {
       "page": 4,
       "label": "Ταχύτητα καθίζησης ερυθρών αιμοσφαιρίων (ΤΚΕ) (ΤΚΕ)",
+      "markerKey": "esr",
       "status": "value",
       "value": 3,
       "comparator": null,
@@ -808,6 +838,7 @@
     {
       "page": 5,
       "label": "Γλυκόζη (GLUC) (GLUC)",
+      "markerKey": "glucose",
       "status": "value",
       "value": 82,
       "comparator": null,
@@ -827,6 +858,7 @@
     {
       "page": 5,
       "label": "Ουρία (UREA) (UREA)",
+      "markerKey": "urea",
       "status": "value",
       "value": 28,
       "comparator": null,
@@ -846,6 +878,7 @@
     {
       "page": 5,
       "label": "Κρεατινίνη (CREA) (CREA)",
+      "markerKey": "creatinine",
       "status": "value",
       "value": 1.07,
       "comparator": null,
@@ -865,6 +898,7 @@
     {
       "page": 5,
       "label": "Ουρικό οξύ (UA) (UA)",
+      "markerKey": "uric-acid",
       "status": "value",
       "value": 5.8,
       "comparator": null,
@@ -884,6 +918,7 @@
     {
       "page": 7,
       "label": "Αμινοτρανσφεράση αλανίνης (SGPT/ALT) (ALT (SGPT))",
+      "markerKey": "alt",
       "status": "value",
       "value": 8,
       "comparator": null,
@@ -903,6 +938,7 @@
     {
       "page": 7,
       "label": "γ-Γλουταμυλοτρανσφεράση (γ-GT) (γ-GT)",
+      "markerKey": "ggt",
       "status": "value",
       "value": 22,
       "comparator": null,
@@ -922,6 +958,7 @@
     {
       "page": 7,
       "label": "Αλκαλική φωσφατάση (ALP) (ALP)",
+      "markerKey": "alp",
       "status": "value",
       "value": 82,
       "comparator": null,
@@ -941,6 +978,7 @@
     {
       "page": 7,
       "label": "Κρεατινική κινάση (CK) (CPK)",
+      "markerKey": "ck",
       "status": "value",
       "value": 198,
       "comparator": null,
@@ -960,6 +998,7 @@
     {
       "page": 7,
       "label": "Μαγνήσιο (Mg) (Mg)",
+      "markerKey": "magnesium",
       "status": "value",
       "value": 2.2,
       "comparator": null,
@@ -979,6 +1018,7 @@
     {
       "page": 7,
       "label": "Σίδηρος ορού (Fe) (FE)",
+      "markerKey": "iron",
       "status": "value",
       "value": 131,
       "comparator": null,
@@ -998,6 +1038,7 @@
     {
       "page": 7,
       "label": "Φερριτίνη (FERR)",
+      "markerKey": "ferritin",
       "status": "value",
       "value": 45.2,
       "comparator": null,
@@ -1017,6 +1058,7 @@
     {
       "page": 8,
       "label": "Γλυκοζυλιωμένη Αιμοσφαιρίνη (HbA1C) (HBA1c)",
+      "markerKey": "hba1c",
       "status": "value",
       "value": 4.8,
       "comparator": null,
@@ -1032,6 +1074,7 @@
     {
       "page": 8,
       "label": "Φυλλικό οξύ (Folate acid)",
+      "markerKey": "folate",
       "status": "value",
       "value": 10,
       "comparator": null,
@@ -1047,6 +1090,7 @@
     {
       "page": 9,
       "label": "Ανοσοσφαιρίνη E (IGE) (IgE)",
+      "markerKey": "ige",
       "status": "value",
       "value": 10.1,
       "comparator": null,
@@ -1066,6 +1110,7 @@
     {
       "page": 9,
       "label": "C-Αντιδρώσα πρωτεϊνη (CRP) (CRP)",
+      "markerKey": "crp",
       "status": "value",
       "value": 1,
       "comparator": "<",
@@ -1085,6 +1130,7 @@
     {
       "page": 10,
       "label": "Τριιωδοθυρονίνη (T3) (T3)",
+      "markerKey": "t3",
       "status": "value",
       "value": 103,
       "comparator": null,
@@ -1104,6 +1150,7 @@
     {
       "page": 10,
       "label": "Ελεύθερη θυροξίνη (FT4) (FT4)",
+      "markerKey": "ft4",
       "status": "value",
       "value": 1.16,
       "comparator": null,
@@ -1123,6 +1170,7 @@
     {
       "page": 10,
       "label": "25-υδροξυβιταμίνη D [25(ΟΗ)D] (Vit-D 25(ΟΗ))",
+      "markerKey": "vitamin-d",
       "status": "value",
       "value": 11,
       "comparator": null,
@@ -1138,6 +1186,7 @@
     {
       "page": 11,
       "label": "Ειδικό προστατικό αντιγόνο (PSA) (PSA)",
+      "markerKey": "psa",
       "status": "value",
       "value": 0.91,
       "comparator": null,
@@ -1157,6 +1206,7 @@
     {
       "page": 12,
       "label": "Χροιά (Χροιά)",
+      "markerKey": "urine-colour",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1172,6 +1222,7 @@
     {
       "page": 12,
       "label": "Όψη (Οψη)",
+      "markerKey": "urine-appearance",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1187,6 +1238,7 @@
     {
       "page": 12,
       "label": "Αντίδραση PH (PH)",
+      "markerKey": "urine-ph",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1202,6 +1254,7 @@
     {
       "page": 12,
       "label": "Ειδικό βάρος (Ειδικό βάρος)",
+      "markerKey": "urine-specific-gravity",
       "status": "value",
       "value": 1024,
       "comparator": null,
@@ -1221,6 +1274,7 @@
     {
       "page": 12,
       "label": "Λεύκωμα (Λεύκωμα)",
+      "markerKey": "urine-protein",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1236,6 +1290,7 @@
     {
       "page": 12,
       "label": "Σάκχαρο (Σάκχαρο)",
+      "markerKey": "urine-glucose",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1251,6 +1306,7 @@
     {
       "page": 12,
       "label": "Οξόνη (Οξόνη)",
+      "markerKey": "urine-ketones",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1266,6 +1322,7 @@
     {
       "page": 12,
       "label": "Αιμοσφαιρίνη (Αιμοσφαιρίνη)",
+      "markerKey": "urine-haemoglobin",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1281,6 +1338,7 @@
     {
       "page": 12,
       "label": "Χολερυθρίνη (Χολερυθρίνη)",
+      "markerKey": "urine-bilirubin",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1296,6 +1354,7 @@
     {
       "page": 12,
       "label": "Ουροχολινογόνο (Ουροχολινογόνο)",
+      "markerKey": "urine-urobilinogen",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1311,6 +1370,7 @@
     {
       "page": 12,
       "label": "Νιτρικά (Νιτρικά)",
+      "markerKey": "urine-nitrites",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1326,6 +1386,7 @@
     {
       "page": 12,
       "label": "Πυοσφαίρια (Πυοσφαίρια)",
+      "markerKey": "urine-leukocytes",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1341,6 +1402,7 @@
     {
       "page": 12,
       "label": "Ερυθρά αιμοσφαίρια (Ερυθρά αιμοσφ.)",
+      "markerKey": "urine-erythrocytes",
       "status": "categorical",
       "value": null,
       "comparator": null,
@@ -1356,6 +1418,7 @@
     {
       "page": 12,
       "label": "Πλακώδη επιθήλια (Πλακ. Επιθήλια)",
+      "markerKey": "x:πλακωδη-επιθηλια-πλακ-επιθηλια",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1371,6 +1434,7 @@
     {
       "page": 12,
       "label": "Μη πλακώδη επιθήλια (Μη Πλ. Επιθήλια)",
+      "markerKey": "x:μη-πλακωδη-επιθηλια-μη-πλ-επιθηλια",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1386,6 +1450,7 @@
     {
       "page": 12,
       "label": "Βλέννη (Βλέννη)",
+      "markerKey": "x:βλεννη-βλεννη",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1401,6 +1466,7 @@
     {
       "page": 12,
       "label": "Άμορφα άλατα (Άμορφα άλατα)",
+      "markerKey": "x:αμορφα-αλατα-αμορφα-αλατα",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1416,6 +1482,7 @@
     {
       "page": 12,
       "label": "Βακτήρια (Βακτήρια)",
+      "markerKey": "x:βακτηρια-βακτηρια",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1431,6 +1498,7 @@
     {
       "page": 12,
       "label": "Μύκητες (Μύκητες)",
+      "markerKey": "x:μυκητεσ-μυκητεσ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1446,6 +1514,7 @@
     {
       "page": 12,
       "label": "- Οξαλικού Ασβεστίου (Κρύσ.Οξαλικοί)",
+      "markerKey": "x:οξαλικου-ασβεστιου-κρυσ-οξαλικοι",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1461,6 +1530,7 @@
     {
       "page": 12,
       "label": "- Εναμμωνίου Φωσφορικού (Κρύσ.Φωσφορικοί)",
+      "markerKey": "x:εναμμωνιου-φωσφορικου-κρυσ-φωσφορικοι",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1476,6 +1546,7 @@
     {
       "page": 12,
       "label": "- Ουρικού Οξέος (Κρύσ.Ουρικοί)",
+      "markerKey": "x:ουρικου-οξεοσ-κρυσ-ουρικοι",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1491,6 +1562,7 @@
     {
       "page": 13,
       "label": "- Υελώδεις (Κύλ.Υελώδεις)",
+      "markerKey": "x:υελωδεισ-κυλ-υελωδεισ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1506,6 +1578,7 @@
     {
       "page": 13,
       "label": "- Υελοκοκκώδεις (Κύλ.Υελοκοκκώδε)",
+      "markerKey": "x:υελοκοκκωδεισ-κυλ-υελοκοκκωδε",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1521,6 +1594,7 @@
     {
       "page": 13,
       "label": "- Κοκκώδεις (Κύλ.Κοκκώδεις)",
+      "markerKey": "x:κοκκωδεισ-κυλ-κοκκωδεισ",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1536,6 +1610,7 @@
     {
       "page": 13,
       "label": "- Αιμορραγικοί (Κύλ.Αιμορραγικο)",
+      "markerKey": "x:αιμορραγικοι-κυλ-αιμορραγικο",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1551,6 +1626,7 @@
     {
       "page": 13,
       "label": "- Επιθηλιακοί (Κύλ.Επιθηλιακοί)",
+      "markerKey": "x:επιθηλιακοι-κυλ-επιθηλιακοι",
       "status": "missing",
       "value": null,
       "comparator": null,
