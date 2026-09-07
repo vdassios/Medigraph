@@ -1,0 +1,712 @@
+{
+  "sourceId": "iatrokosmos-athinon",
+  "derivation": "poppler pdftotext -bbox-layout column reconstruction, corroborated against the committed TextItems; independent of Medigraph’s rows.ts, anchors.ts, numbers.ts and ranges.ts",
+  "collectionDate": "2026-01-15",
+  "resultDate": "2026-01-15",
+  "issuingLaboratory": "ΙΑΤΡΟΚΟΣΜΟΣ ΑΘΗΝΩΝ",
+  "sectionMarkers": [
+    {
+      "page": 3,
+      "title": "ΗΔΙΚΑ ΚΑΡΔΙΟΛΟΓΙΚΑ"
+    }
+  ],
+  "rows": [
+    {
+      "page": 2,
+      "label": "Λευκά αιμοσφαίρια (WBC) (WBC)",
+      "status": "value",
+      "value": 5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/ml",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4,
+        "max": 10
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα (NEUT%) (NEUT%)",
+      "status": "value",
+      "value": 48.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 40,
+        "max": 75
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα (NEUT) (NEUT)",
+      "status": "value",
+      "value": 2.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.4,
+        "max": 6.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYM%) (LYM%)",
+      "status": "value",
+      "value": 37.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 20,
+        "max": 45
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYM) (LYM)",
+      "status": "value",
+      "value": 1.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.2,
+        "max": 3.6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοπύρηνα (MON%) (MON%)",
+      "status": "value",
+      "value": 8.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2,
+        "max": 9
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοπύρηνα (MON) (ΜΟΝΟ)",
+      "status": "value",
+      "value": 0.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ηωσινόφιλα (EOS%) (EOS%)",
+      "status": "value",
+      "value": 4.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1,
+        "max": 6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ηωσινόφιλα (EOS) (EOS)",
+      "status": "value",
+      "value": 0.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 0.7
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Βασεόφιλα (BAS%) (BAS%)",
+      "status": "value",
+      "value": 1.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Βασεόφιλα (BAS) (BAS)",
+      "status": "value",
+      "value": 0.06,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 0.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ραβδοπύρηνα (ΡΑΒΔΟΠ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ερυθρά αιμοσφαίρια (RBC) (RBC)",
+      "status": "value",
+      "value": 5.26,
+      "comparator": null,
+      "textValue": null,
+      "unit": "M/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.5,
+        "max": 6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοσφαιρίνη (HGB) (HGB)",
+      "status": "value",
+      "value": 15.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "gr/dl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 14,
+        "max": 18
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιματοκρίτης (HCT) (HCT)",
+      "status": "value",
+      "value": 45.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 42,
+        "max": 52
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέσος όγκος ερυθρών (MCV) (MCV)",
+      "status": "value",
+      "value": 87.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 80,
+        "max": 96
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέση περιεκτικότητα αιμοσφαιρίνης (MCH) (MCH)",
+      "status": "value",
+      "value": 29.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "pg",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 26,
+        "max": 32
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέση πυκνότητα αιμοσφαιρίνης (MCHC) (MCHC)",
+      "status": "value",
+      "value": 33.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "gr/dl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 32,
+        "max": 36
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Εύρος κατανομής ερυθρών (RDW) (RDW)",
+      "status": "value",
+      "value": 13.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 11,
+        "max": 16
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Στοχοκυττάρωση (ΣΤΟΧΟΚΥΤ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ποικιλοκυττάρωση (ΠΟΙΚΙΛΟΚΥΤ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ανισοκυττάρωση (ΑΝΙΣΟΚΥΤΤ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Ανισοχρωμία (ΑΝΙΣΟΧΡ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μικροκυττάρωση (ΜΚΡΟΚΥΤ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μακροκυττάρωση (ΜΑΚΡΟΚΥΤ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Υποχρωμία (ΥΠΟΧΡ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Βασεόφιλη στίξη (ΒΑΣΕΟΦ ΣΤ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοπετάλια (PLT) (PLT)",
+      "status": "value",
+      "value": 293,
+      "comparator": null,
+      "textValue": null,
+      "unit": "Κ/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 150,
+        "max": 400
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 2
+      }
+    },
+    {
+      "page": 3,
+      "label": "Μέσος όγκος αιμοπεταλίων (MPV) (MPV)",
+      "status": "value",
+      "value": 8.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 7.9,
+        "max": 11.9
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Αιμοπεταλιοκρίτης (PCT) (PCT)",
+      "status": "value",
+      "value": 0.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.17,
+        "max": 0.35
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Εύρος κατανομής αιμοπεταλίων (PWD) (PWD)",
+      "status": "value",
+      "value": 9.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 9,
+        "max": 17
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Μυελοκύτταρα (ΜΥΕΛΟΚΥΤΤΑΡΑ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Βλάστες (Βλάστες)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Μεταμυελοκύτταρα (Μεταμυελοκύτταρα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Προμυελοκύτταρα (Προμυελοκύτταρα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "-",
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "ΣΑΚΧΑΡΟ ΑΙΜΑΤΟΣ (ΣΑΚΧ)",
+      "status": "value",
+      "value": 93,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 70,
+        "max": 105
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Non - HDL - C (Non - HDL - C)",
+      "status": "value",
+      "value": 170,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dl",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Χοληστερίνη HDL (HDL)",
+      "status": "value",
+      "value": 64,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 3
+      }
+    },
+    {
+      "page": 4,
+      "label": "ΤΡΙΓΛΥΚΕΡΙΔΙΑ (TRG)",
+      "status": "value",
+      "value": 67,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 4
+      }
+    },
+    {
+      "page": 4,
+      "label": "Lp(a) (Lp(a))",
+      "status": "value",
+      "value": 27.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg %",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "max": 30,
+        "comparator": "<"
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "iatrokosmos-athinon",
+        "page": 4
+      }
+    }
+  ],
+  "coverage": {
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "rowsDerived": 42,
+    "rowsCorroborated": 40
+  }
+}

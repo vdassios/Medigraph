@@ -1,0 +1,1572 @@
+{
+  "sourceId": "bioiatriki-athina-plateia-amerikis",
+  "derivation": "poppler pdftotext -bbox-layout column reconstruction, corroborated against the committed TextItems; independent of Medigraph’s rows.ts, anchors.ts, numbers.ts and ranges.ts",
+  "collectionDate": "2025-03-11",
+  "resultDate": "2025-03-12",
+  "issuingLaboratory": "ΒΙΟΙΑΤΡΙΚΗ - ΑΘΗΝΑ - ΠΛΑΤΕΙΑ ΑΜΕΡΙΚΗΣ",
+  "sectionMarkers": [
+    {
+      "page": 2,
+      "title": "ΕΡΥΘΡΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ"
+    },
+    {
+      "page": 2,
+      "title": "(LABEL RBC)"
+    },
+    {
+      "page": 2,
+      "title": "ΛΕΥΚΟΚΥΤΤΑΡΙΚΗ ΣΕΙΡΑ (LABEL"
+    },
+    {
+      "page": 2,
+      "title": "WBC)"
+    },
+    {
+      "page": 2,
+      "title": "Τύπος Λευκών Κυττάρων"
+    },
+    {
+      "page": 2,
+      "title": "(LABELWBC TYPE)"
+    },
+    {
+      "page": 2,
+      "title": "ΑΙΜΟΠΕΤΑΛΙΑ (PLT) (LABEL"
+    },
+    {
+      "page": 2,
+      "title": "PLT)"
+    },
+    {
+      "page": 3,
+      "title": "Μορφολογία Ερυθρών (RBC"
+    },
+    {
+      "page": 3,
+      "title": "Morphology)"
+    },
+    {
+      "page": 3,
+      "title": "Ανισοκυττάρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Ανισοκυττάρωση)"
+    },
+    {
+      "page": 3,
+      "title": "Υποχρωμία (Υποχρωμία)"
+    },
+    {
+      "page": 3,
+      "title": "Ποικιλοκυττάρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Ποικιλοκυ/ρωση)"
+    },
+    {
+      "page": 3,
+      "title": "Μικροκυττάρωση (Μικροκυτ/ση)"
+    },
+    {
+      "page": 3,
+      "title": "Μακροκυττάρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Μακροκυτ/ση)"
+    },
+    {
+      "page": 3,
+      "title": "Στοχοκυτ/ρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Στοχοκυτ/ρωση)"
+    },
+    {
+      "page": 3,
+      "title": "Πολυχρωμ/φιλία"
+    },
+    {
+      "page": 3,
+      "title": "(Πολυχρωμ/φιλία)"
+    },
+    {
+      "page": 3,
+      "title": "Ελλειπτοκυττάρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Ελλειπτοκυττά)"
+    },
+    {
+      "page": 3,
+      "title": "Βασ.Στίξη (Βασ.Στίξη)"
+    },
+    {
+      "page": 3,
+      "title": "Σφαιροκυττάρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Σφαιροκυτ/ση)"
+    },
+    {
+      "page": 3,
+      "title": "Σχιστοκυττάρωση"
+    },
+    {
+      "page": 3,
+      "title": "(Σχιστοκυτ/ση)"
+    },
+    {
+      "page": 3,
+      "title": "Παρατηρήσεις Γενικής Εξέτασης"
+    },
+    {
+      "page": 3,
+      "title": "Αίματος (Παρατηρήσεις)"
+    },
+    {
+      "page": 3,
+      "title": "Ιστογράμματα Γενικής Αίματος"
+    },
+    {
+      "page": 3,
+      "title": "(Histogramms)"
+    },
+    {
+      "page": 5,
+      "title": "Γλυκόζη (GLU)"
+    },
+    {
+      "page": 5,
+      "title": "Ουρία (UREA)"
+    },
+    {
+      "page": 5,
+      "title": "Κρεατινίνη (CREA)"
+    },
+    {
+      "page": 5,
+      "title": "Ουρικό οξύ (UA)"
+    },
+    {
+      "page": 5,
+      "title": "Ολική χοληστερόλη (TC)"
+    },
+    {
+      "page": 5,
+      "title": "Τριγλυκερίδια (TRIG)"
+    },
+    {
+      "page": 7,
+      "title": "Aμινοτρανσφεράση αλανίνης (ALT/ SGPT)"
+    },
+    {
+      "page": 7,
+      "title": "γ-Γλουταμυλοτρανσφεράση (γ-GT)"
+    },
+    {
+      "page": 7,
+      "title": "Αλκαλική φωσφατάση (ALP)"
+    },
+    {
+      "page": 7,
+      "title": "Κρεατινική κινάση"
+    },
+    {
+      "page": 7,
+      "title": "Μαγνήσιο (Mg)"
+    },
+    {
+      "page": 7,
+      "title": "Σίδηρος ορού (Fe)"
+    },
+    {
+      "page": 7,
+      "title": "Φερριτίνη"
+    },
+    {
+      "page": 8,
+      "title": "Γλυκοζυλιωμένη αιμοσφαιρίνη A1c (ΗbA1c)"
+    },
+    {
+      "page": 8,
+      "title": "Βιταμίνη Β12"
+    },
+    {
+      "page": 8,
+      "title": "Φυλλικό οξύ"
+    },
+    {
+      "page": 9,
+      "title": "Ανοσοσφαιρίνη E"
+    },
+    {
+      "page": 9,
+      "title": "C-Αντιδρώσα πρωτεϊνη (CRP)"
+    },
+    {
+      "page": 10,
+      "title": "Τριιωδοθυρονίνη (T3)"
+    },
+    {
+      "page": 10,
+      "title": "Ελεύθερη θυροξίνη (FT4)"
+    },
+    {
+      "page": 10,
+      "title": "25-υδροξυβιταμίνη D [25(ΟΗ)D]"
+    },
+    {
+      "page": 11,
+      "title": "Ειδικό προστατικό αντιγόνο (PSA)"
+    },
+    {
+      "page": 12,
+      "title": "Γενική εξέταση ούρων"
+    },
+    {
+      "page": 12,
+      "title": "Φυσικά χαρακτηριστικά (Φυσικά"
+    },
+    {
+      "page": 12,
+      "title": "χαρακτηρ)"
+    },
+    {
+      "page": 12,
+      "title": "Βιοχημικά χαρακτηριστικά"
+    },
+    {
+      "page": 12,
+      "title": "(Χημικά χαρακτηρ)"
+    },
+    {
+      "page": 12,
+      "title": "Μικροσκοπική εξέταση ιζήματος"
+    },
+    {
+      "page": 12,
+      "title": "(Μικροσκοπική)"
+    },
+    {
+      "page": 12,
+      "title": "Κρύσταλλοι (Κρύσταλλοι)"
+    },
+    {
+      "page": 12,
+      "title": "Κύλινδροι (Κύλινδροι)"
+    }
+  ],
+  "rows": [
+    {
+      "page": 2,
+      "label": "Ερυθρά Αιμοσφαίρια (RBC) (RBC)",
+      "status": "value",
+      "value": 5.26,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10^6 / μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.4,
+        "max": 6.3
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοσφαιρίνη (HGB) (HGB)",
+      "status": "value",
+      "value": 16.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "gr/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 13,
+        "max": 17.6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιματοκρίτης (HCT) (HCT)",
+      "status": "value",
+      "value": 47.4,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 40,
+        "max": 52
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέσος Όγκος Ερυθρών (ΜCV) (MCV)",
+      "status": "value",
+      "value": 90.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 77,
+        "max": 100
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέση Περιεκτικότης HGB (MCH) (MCH)",
+      "status": "value",
+      "value": 30.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "pg",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 26,
+        "max": 34.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μέση Πυκνότης HGB (MCHC) (MCHC)",
+      "status": "value",
+      "value": 34,
+      "comparator": null,
+      "textValue": null,
+      "unit": "gr/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 31.6,
+        "max": 36
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Εύρος Κατανομής Ερυθρών (RDW) (RDW)",
+      "status": "value",
+      "value": 13.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 11.5,
+        "max": 15.1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λευκά Αιμοσφαίρια (WBC) (WBC)",
+      "status": "value",
+      "value": 5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10^3 / μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4,
+        "max": 10.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα Ουδετερόφιλα (NEUT) % (NEUT%)",
+      "status": "value",
+      "value": 51.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 40,
+        "max": 75
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα Ουδετερόφιλα (NEUT#)",
+      "status": "value",
+      "value": 2.58,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2.5,
+        "max": 7.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYMPH) % (LYM%)",
+      "status": "value",
+      "value": 34.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 20,
+        "max": 45
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Λεμφοκύτταρα (LYM#)",
+      "status": "value",
+      "value": 1.71,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1,
+        "max": 3.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοπύρηνα (MONO) % (MONO%)",
+      "status": "value",
+      "value": 10.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2,
+        "max": 10
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Μονοπύρηνα (MONO#)",
+      "status": "value",
+      "value": 0.53,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.2,
+        "max": 0.8
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα Ηωσινόφιλα (EOS) % (EOS%)",
+      "status": "value",
+      "value": 2.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 7
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα Ηωσινόφιλα (EOS#)",
+      "status": "value",
+      "value": 0.15,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.04,
+        "max": 0.66
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα Βασεόφιλα (BASO) % (BASO%)",
+      "status": "value",
+      "value": 0.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 2.3
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Πολυμορφοπύρηνα Βασεόφιλα (BASO#)",
+      "status": "value",
+      "value": 0.04,
+      "comparator": null,
+      "textValue": null,
+      "unit": "K/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.02,
+        "max": 0.15
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "Αιμοπετάλια (PLT) (PLT)",
+      "status": "value",
+      "value": 322,
+      "comparator": null,
+      "textValue": null,
+      "unit": "x10^3 / μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 140,
+        "max": 450
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "* Μέσος Όγκος Αιμοπεταλίων (MPV) (MPV)",
+      "status": "value",
+      "value": 8.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 7,
+        "max": 12.8
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 2
+      }
+    },
+    {
+      "page": 3,
+      "label": "Αιμοπεταλιοκρίτης (PCT) (PCT)",
+      "status": "value",
+      "value": 0.28,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.09,
+        "max": 0.26
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Εύρος Κατανομής Αιμοπεταλίων (PDW) (PDW)",
+      "status": "value",
+      "value": 13.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "10 (GSD)",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 9,
+        "max": 17
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Ραβδοπύρηνα (Ραβδοπύρηνα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Μεταμυελοκυτταρα (Μεταμυελοκυτ)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Μυελοκύτταρα (Μυελοκύτταρα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Προμυελοκύτταρα (Προμυελοκύτταρα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Άτυπα Κύτταρα (Άτυπα Κύτταρα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Εμπύρηνα RBC (ΕμπύρηναRBC)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 3,
+      "label": "Βλάστες (Βιβλιογραφία)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 3
+      }
+    },
+    {
+      "page": 4,
+      "label": "Ταχύτητα καθίζησης ερυθρών αιμοσφαιρίων (ΤΚΕ) (ΤΚΕ)",
+      "status": "value",
+      "value": 3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mm",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 15
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 4
+      }
+    },
+    {
+      "page": 5,
+      "label": "Γλυκόζη (GLUC) (GLUC)",
+      "status": "value",
+      "value": 82,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 74,
+        "max": 100
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Ουρία (UREA) (UREA)",
+      "status": "value",
+      "value": 28,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 10,
+        "max": 50
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Κρεατινίνη (CREA) (CREA)",
+      "status": "value",
+      "value": 1.07,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.6,
+        "max": 1.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 5
+      }
+    },
+    {
+      "page": 5,
+      "label": "Ουρικό οξύ (UA) (UA)",
+      "status": "value",
+      "value": 5.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 3.5,
+        "max": 7.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 5
+      }
+    },
+    {
+      "page": 7,
+      "label": "Αμινοτρανσφεράση αλανίνης (SGPT/ALT) (ALT (SGPT))",
+      "status": "value",
+      "value": 8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "U/L",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "max": 45,
+        "comparator": "<"
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "γ-Γλουταμυλοτρανσφεράση (γ-GT) (γ-GT)",
+      "status": "value",
+      "value": 22,
+      "comparator": null,
+      "textValue": null,
+      "unit": "U/L",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 12,
+        "max": 64
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Αλκαλική φωσφατάση (ALP) (ALP)",
+      "status": "value",
+      "value": 82,
+      "comparator": null,
+      "textValue": null,
+      "unit": "U/L",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 50,
+        "max": 116
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Κρεατινική κινάση (CK) (CPK)",
+      "status": "value",
+      "value": 198,
+      "comparator": null,
+      "textValue": null,
+      "unit": "U/L",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 30,
+        "max": 200
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Μαγνήσιο (Mg) (Mg)",
+      "status": "value",
+      "value": 2.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "mg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1.6,
+        "max": 2.6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Σίδηρος ορού (Fe) (FE)",
+      "status": "value",
+      "value": 131,
+      "comparator": null,
+      "textValue": null,
+      "unit": "μg/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 65,
+        "max": 175
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 7,
+      "label": "Φερριτίνη (FERR)",
+      "status": "value",
+      "value": 45.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/mL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 30,
+        "max": 400
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 7
+      }
+    },
+    {
+      "page": 8,
+      "label": "Γλυκοζυλιωμένη Αιμοσφαιρίνη (HbA1C) (HBA1c)",
+      "status": "value",
+      "value": 4.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 8
+      }
+    },
+    {
+      "page": 8,
+      "label": "Φυλλικό οξύ (Folate acid)",
+      "status": "value",
+      "value": 10,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/mL",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 8
+      }
+    },
+    {
+      "page": 9,
+      "label": "Ανοσοσφαιρίνη E (IGE) (IgE)",
+      "status": "value",
+      "value": 10.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "IU/mL",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "max": 100,
+        "comparator": "<"
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 9
+      }
+    },
+    {
+      "page": 9,
+      "label": "C-Αντιδρώσα πρωτεϊνη (CRP) (CRP)",
+      "status": "value",
+      "value": 1,
+      "comparator": "<",
+      "textValue": null,
+      "unit": "mg/L",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "max": 5,
+        "comparator": "<"
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 9
+      }
+    },
+    {
+      "page": 10,
+      "label": "Τριιωδοθυρονίνη (T3) (T3)",
+      "status": "value",
+      "value": 103,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 35,
+        "max": 193
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 10
+      }
+    },
+    {
+      "page": 10,
+      "label": "Ελεύθερη θυροξίνη (FT4) (FT4)",
+      "status": "value",
+      "value": 1.16,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/dL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.7,
+        "max": 1.48
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 10
+      }
+    },
+    {
+      "page": 10,
+      "label": "25-υδροξυβιταμίνη D [25(ΟΗ)D] (Vit-D 25(ΟΗ))",
+      "status": "value",
+      "value": 11,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/mL",
+      "referenceRange": null,
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 10
+      }
+    },
+    {
+      "page": 11,
+      "label": "Ειδικό προστατικό αντιγόνο (PSA) (PSA)",
+      "status": "value",
+      "value": 0.91,
+      "comparator": null,
+      "textValue": null,
+      "unit": "ng/mL",
+      "referenceRange": {
+        "kind": "maxOnly",
+        "max": 2.5,
+        "comparator": "<"
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 11
+      }
+    },
+    {
+      "page": 12,
+      "label": "Χροιά (Χροιά)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Ωχροκίτρινη",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Κίτρινη",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Όψη (Οψη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Διαυγής",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Διαυγής",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Αντίδραση PH (PH)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "6.0 Όξινη",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "4.5 - 7.5",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Ειδικό βάρος (Ειδικό βάρος)",
+      "status": "value",
+      "value": 1024,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1010,
+        "max": 1030
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Λεύκωμα (Λεύκωμα)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικό",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικό(<=10 mg/dl)",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Σάκχαρο (Σάκχαρο)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικό",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικό",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Οξόνη (Οξόνη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητική",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητική",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Αιμοσφαιρίνη (Αιμοσφαιρίνη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητική",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητική",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Χολερυθρίνη (Χολερυθρίνη)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητική",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητική",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Ουροχολινογόνο (Ουροχολινογόνο)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικό",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικό ή ίχνη",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Νιτρικά (Νιτρικά)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "Αρνητικά",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Αρνητικά",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Πυοσφαίρια (Πυοσφαίρια)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "0-1 κ.ο.π. (Σπανιότατα)",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "0-2 κ.ο.π",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Ερυθρά αιμοσφαίρια (Ερυθρά αιμοσφ.)",
+      "status": "categorical",
+      "value": null,
+      "comparator": null,
+      "textValue": "0-1 κ.ο.π. (Σπανιότατα)",
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "0-2 κ.ο.π",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Πλακώδη επιθήλια (Πλακ. Επιθήλια)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "0-4 κ.ο.π",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Μη πλακώδη επιθήλια (Μη Πλ. Επιθήλια)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Βλέννη (Βλέννη)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Άμορφα άλατα (Άμορφα άλατα)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Βακτήρια (Βακτήρια)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "Μύκητες (Μύκητες)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "- Οξαλικού Ασβεστίου (Κρύσ.Οξαλικοί)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "- Εναμμωνίου Φωσφορικού (Κρύσ.Φωσφορικοί)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 12,
+      "label": "- Ουρικού Οξέος (Κρύσ.Ουρικοί)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 12
+      }
+    },
+    {
+      "page": 13,
+      "label": "- Υελώδεις (Κύλ.Υελώδεις)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "0-2 κ.10 ο.π",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 13
+      }
+    },
+    {
+      "page": 13,
+      "label": "- Υελοκοκκώδεις (Κύλ.Υελοκοκκώδε)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 13
+      }
+    },
+    {
+      "page": 13,
+      "label": "- Κοκκώδεις (Κύλ.Κοκκώδεις)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 13
+      }
+    },
+    {
+      "page": 13,
+      "label": "- Αιμορραγικοί (Κύλ.Αιμορραγικο)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 13
+      }
+    },
+    {
+      "page": 13,
+      "label": "- Επιθηλιακοί (Κύλ.Επιθηλιακοί)",
+      "status": "missing",
+      "value": null,
+      "comparator": null,
+      "textValue": null,
+      "unit": null,
+      "referenceRange": null,
+      "categoricalReference": "Όχι",
+      "sourceRef": {
+        "sourceId": "bioiatriki-athina-plateia-amerikis",
+        "page": 13
+      }
+    }
+  ],
+  "coverage": {
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "rowsDerived": 99,
+    "rowsCorroborated": 76
+  }
+}

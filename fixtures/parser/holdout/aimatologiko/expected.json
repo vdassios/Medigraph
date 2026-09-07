@@ -1,0 +1,395 @@
+{
+  "sourceId": "aimatologiko",
+  "derivation": "poppler pdftotext -bbox-layout column reconstruction, corroborated against the committed TextItems; independent of Medigraph’s rows.ts, anchors.ts, numbers.ts and ranges.ts",
+  "collectionDate": "2024-09-24",
+  "resultDate": "2024-09-24",
+  "issuingLaboratory": "ΑΙΜΑΤΟΛΟΓΙΚO",
+  "sectionMarkers": [],
+  "rows": [
+    {
+      "page": 2,
+      "label": "WBC (WBC)",
+      "status": "value",
+      "value": 6.9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4,
+        "max": 11
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "RBC (RBC)",
+      "status": "value",
+      "value": 5.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "Μ/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 4.2,
+        "max": 6.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "HGB (HGB)",
+      "status": "value",
+      "value": 15.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "g/dl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 11.8,
+        "max": 17.8
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "HCT (HCT)",
+      "status": "value",
+      "value": 45.3,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 36,
+        "max": 52
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MCV (MCV)",
+      "status": "value",
+      "value": 87.1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 79,
+        "max": 98
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MCH (MCH)",
+      "status": "value",
+      "value": 29.2,
+      "comparator": null,
+      "textValue": null,
+      "unit": "pg",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 26,
+        "max": 32
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MCHC (MCHC)",
+      "status": "value",
+      "value": 33.6,
+      "comparator": null,
+      "textValue": null,
+      "unit": "g/dl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 31.4,
+        "max": 38.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "PLT (PLT)",
+      "status": "value",
+      "value": 297,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 150,
+        "max": 400
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "NEUT% (NEUT%)",
+      "status": "value",
+      "value": 50.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 45,
+        "max": 85
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "LYMP% (LYMP%)",
+      "status": "value",
+      "value": 38.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 20,
+        "max": 45
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MONO% (MONO%)",
+      "status": "value",
+      "value": 6.7,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2,
+        "max": 10
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "EOSI% (EOSI%)",
+      "status": "value",
+      "value": 2.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2,
+        "max": 6
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "BASO% (BASO%)",
+      "status": "value",
+      "value": 1,
+      "comparator": null,
+      "textValue": null,
+      "unit": "%",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "NEUT# (NEUT#)",
+      "status": "value",
+      "value": 3.5,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μL",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 2.4,
+        "max": 9.2
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "LYMP# (LYMP#)",
+      "status": "value",
+      "value": 2.68,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 1,
+        "max": 4
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MONO# (MONO#)",
+      "status": "value",
+      "value": 0.46,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.1,
+        "max": 1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "EOSI# (EOSI#)",
+      "status": "value",
+      "value": 0.19,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0.1,
+        "max": 0.4
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "BASO# (BASO#)",
+      "status": "value",
+      "value": 0.07,
+      "comparator": null,
+      "textValue": null,
+      "unit": "k/μl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 0,
+        "max": 0.1
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "RDWSD (RDWSD)",
+      "status": "value",
+      "value": 40.8,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 40,
+        "max": 75
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    },
+    {
+      "page": 2,
+      "label": "MPV (MPV)",
+      "status": "value",
+      "value": 9,
+      "comparator": null,
+      "textValue": null,
+      "unit": "fl",
+      "referenceRange": {
+        "kind": "closed",
+        "min": 7,
+        "max": 10.5
+      },
+      "categoricalReference": null,
+      "sourceRef": {
+        "sourceId": "aimatologiko",
+        "page": 2
+      }
+    }
+  ],
+  "coverage": {
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "rowsDerived": 20,
+    "rowsCorroborated": 20
+  }
+}
