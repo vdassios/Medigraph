@@ -546,16 +546,42 @@ describe('readAnchor', () => {
     );
 
     it('emits one row per anchor, and reads a result into all but one', () => {
-      // Every anchored row yields a ParsedRow. The single exception on
-      // ahfy-full is the urine leukocyte count, whose result cell prints an
-      // interval rather than a measurement.
+      // Every anchored row yields a ParsedRow. The rows that yield no result
+      // are the ones the document prints without one Pass A can reach: the
+      // differential's sub-rows, which print a unit and an empty result cell;
+      // the nucleated-red-cell row, which repeats `RBC` in its label; the two
+      // lipid fractions whose result sits in a cell the wrapped label hides;
+      // and the urine leukocyte count, whose cell prints an interval.
       expect(readFixture('ahfy-minimal')).toHaveLength(20);
 
       const full = readFixture('ahfy-full');
-      expect(full).toHaveLength(59);
+      expect(full).toHaveLength(80);
       expect(
         full.filter((each) => each.status === 'missing').map((each) => each.markerKey),
-      ).toEqual(['urine-leukocytes']);
+      ).toEqual([
+        'band-neutrophils',
+        'metamyelocytes',
+        'myelocytes',
+        'promyelocytes',
+        'atypical-cells',
+        'rbc',
+        'blasts',
+        'hdl',
+        'ldl',
+        'urine-leukocytes',
+        'urine-mucus',
+        'urine-amorphous-salts',
+        'urine-bacteria',
+        'urine-yeast',
+        'urine-calcium-oxalate-crystals',
+        'urine-ammonium-phosphate-crystals',
+        'urine-uric-acid-crystals',
+        'urine-hyaline-casts',
+        'urine-hyaline-granular-casts',
+        'urine-granular-casts',
+        'urine-haemorrhagic-casts',
+        'urine-epithelial-casts',
+      ]);
     });
 
     it('reads the urine panel as categorical rather than discarding it', () => {

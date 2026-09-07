@@ -208,6 +208,12 @@ function insideLabelColumn(item: TextItem | undefined, columns: Columns): boolea
   return columns !== null && item !== undefined && item.x + item.w <= columns.label.xMax;
 }
 
+/** Whether an item's centre falls in one bound column. */
+function inColumn(item: TextItem, column: Column): boolean {
+  const centre = item.x + item.w / 2;
+  return centre >= column.xMin && centre < column.xMax;
+}
+
 interface Neighbourhood {
   candidates: Candidate[];
   stopped: boolean;
@@ -607,8 +613,8 @@ export function readAnchor(
   const groups = groupsOf(found.candidates);
   const reading = assign(groups, found.candidates);
 
-  const unit = unitOf(reading.unitTokens, reading.unitAt);
-  const categorical = groups.length === 0 ? categoricalOf(found.candidates) : null;
+  const unit = unitOf(reading.unitTokens, reading.unitAt) ?? printedUnit(row, columns);
+  const categorical = groups.length === 0 ? categoricalOf(found.candidates, columns) : null;
 
   const { confidence, flags } = grade(anchor, reading, unit, found.stopped, categorical !== null);
   const cells = consumed(found.candidates, categorical?.read ?? reading.read, unit);
@@ -681,6 +687,36 @@ function unitOf(tokens: readonly string[], from: number): Unit | undefined {
 }
 
 /**
+ * The unit column's own contents, for a row the outward search read nothing
+ * from.
+ *
+ * A differential sub-row prints `%` and leaves its result cell empty. There is
+ * no number for the search to walk out from, so it collects nothing and the
+ * printed unit is lost — a row reported as `missing` with no unit says less
+ * than the laboratory did. Only consulted when the search found no unit, and
+ * only for a unit the allowlist recognises: an unrecognised token sitting in
+ * that column is not evidence of anything.
+ */
+function printedUnit(row: Row, columns: Columns): Unit | undefined {
+  if (columns === null) {
+    return undefined;
+  }
+
+  const printed = row.items
+    .filter((item) => inColumn(item, columns.unit))
+    .map((item) => item.text)
+    .join(' ')
+    .trim();
+
+  return printed !== '' && isKnownUnit(printed)
+    ? { text: normaliseUnit(printed), recognised: true, read: [] }
+    : undefined;
+}
+
+/** `-` is how a laboratory prints the absence of a result, not a result. */
+const PLACEHOLDER = /^[-–—]+$/u;
+
+/**
  * A result the laboratory printed as words (D15).
  *
  * The urine panel is entirely non-numeric, and reading it as `missing` would
@@ -689,12 +725,23 @@ function unitOf(tokens: readonly string[], from: number): Unit | undefined {
  * beside it, verbatim — including compound forms like `Αρνητικό(<=10 mg/dl)`.
  * A whole printed line has no cells to divide, so there the first token is the
  * result and the rest the reference.
+ *
+ * Two things are not results, and both only became reachable once Task 2.5r
+ * gave the differential's sub-rows markers of their own. A cell outside the
+ * value column is not the row's result — ΒΙΟΙΑΤΡΙΚΗ leaves `Ραβδοπύρηνα` with
+ * an empty result and a `%` in the unit column, and reading the unit as the
+ * measurement is worse than reporting none. And a cell holding only a dash is
+ * the laboratory saying it reported nothing, which is `missing`.
  */
 function categoricalOf(
   candidates: readonly Candidate[],
+  columns: Columns,
 ): { textValue: string; reference: string | null; read: number[] } | null {
   const [first] = candidates;
   if (first === undefined) {
+    return null;
+  }
+  if (first.item !== null && columns !== null && !inColumn(first.item, columns.value)) {
     return null;
   }
 
@@ -708,9 +755,13 @@ function categoricalOf(
   const rest = printed.slice(head.length);
 
   const reference = rest.map((candidate) => candidate.text).join(' ');
+  const textValue = head.map((candidate) => candidate.text).join(' ');
+  if (PLACEHOLDER.test(textValue)) {
+    return null;
+  }
 
   return {
-    textValue: head.map((candidate) => candidate.text).join(' '),
+    textValue,
     reference: reference === '' ? null : reference,
     read: printed.map((candidate) => candidates.indexOf(candidate)),
   };

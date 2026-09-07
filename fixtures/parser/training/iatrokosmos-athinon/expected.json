@@ -230,7 +230,7 @@
     {
       "page": 2,
       "label": "Ραβδοπύρηνα (ΡΑΒΔΟΠ)",
-      "markerKey": "x:ραβδοπυρηνα-ραβδοπ",
+      "markerKey": "band-neutrophils",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -386,7 +386,7 @@
     {
       "page": 2,
       "label": "Στοχοκυττάρωση (ΣΤΟΧΟΚΥΤ)",
-      "markerKey": "x:στοχοκυτταρωση-στοχοκυτ",
+      "markerKey": "target-cells",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -402,7 +402,7 @@
     {
       "page": 2,
       "label": "Ποικιλοκυττάρωση (ΠΟΙΚΙΛΟΚΥΤ)",
-      "markerKey": "x:ποικιλοκυτταρωση-ποικιλοκυτ",
+      "markerKey": "poikilocytosis",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -418,7 +418,7 @@
     {
       "page": 2,
       "label": "Ανισοκυττάρωση (ΑΝΙΣΟΚΥΤΤ)",
-      "markerKey": "x:ανισοκυτταρωση-ανισοκυττ",
+      "markerKey": "anisocytosis",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -434,7 +434,7 @@
     {
       "page": 2,
       "label": "Ανισοχρωμία (ΑΝΙΣΟΧΡ)",
-      "markerKey": "x:ανισοχρωμια-ανισοχρ",
+      "markerKey": "anisochromia",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -450,7 +450,7 @@
     {
       "page": 2,
       "label": "Μικροκυττάρωση (ΜΚΡΟΚΥΤ)",
-      "markerKey": "x:μικροκυτταρωση-μκροκυτ",
+      "markerKey": "microcytosis",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -466,7 +466,7 @@
     {
       "page": 2,
       "label": "Μακροκυττάρωση (ΜΑΚΡΟΚΥΤ)",
-      "markerKey": "x:μακροκυτταρωση-μακροκυτ",
+      "markerKey": "macrocytosis",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -482,7 +482,7 @@
     {
       "page": 2,
       "label": "Υποχρωμία (ΥΠΟΧΡ)",
-      "markerKey": "x:υποχρωμια-υποχρ",
+      "markerKey": "hypochromia",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -498,7 +498,7 @@
     {
       "page": 2,
       "label": "Βασεόφιλη στίξη (ΒΑΣΕΟΦ ΣΤ)",
-      "markerKey": "x:βασεοφιλη-στιξη-βασεοφ-στ",
+      "markerKey": "basophilic-stippling",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -574,7 +574,7 @@
     {
       "page": 3,
       "label": "Εύρος κατανομής αιμοπεταλίων (PWD) (PWD)",
-      "markerKey": "x:ευροσ-κατανομησ-αιμοπεταλιων-pwd-pwd",
+      "markerKey": "pdw",
       "status": "value",
       "value": 9.7,
       "comparator": null,
@@ -594,7 +594,7 @@
     {
       "page": 3,
       "label": "Μυελοκύτταρα (ΜΥΕΛΟΚΥΤΤΑΡΑ)",
-      "markerKey": "x:μυελοκυτταρα-μυελοκυτταρα",
+      "markerKey": "myelocytes",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -610,7 +610,7 @@
     {
       "page": 3,
       "label": "Βλάστες (Βλάστες)",
-      "markerKey": "x:βλαστεσ-βλαστεσ",
+      "markerKey": "blasts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -626,7 +626,7 @@
     {
       "page": 3,
       "label": "Μεταμυελοκύτταρα (Μεταμυελοκύτταρα)",
-      "markerKey": "x:μεταμυελοκυτταρα-μεταμυελοκυτταρα",
+      "markerKey": "metamyelocytes",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -642,7 +642,7 @@
     {
       "page": 3,
       "label": "Προμυελοκύτταρα (Προμυελοκύτταρα)",
-      "markerKey": "x:προμυελοκυτταρα-προμυελοκυτταρα",
+      "markerKey": "promyelocytes",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -678,7 +678,7 @@
     {
       "page": 3,
       "label": "Non - HDL - C (Non - HDL - C)",
-      "markerKey": "x:non-hdl-c-non-hdl-c",
+      "markerKey": "non-hdl-c",
       "status": "value",
       "value": 170,
       "comparator": null,
@@ -726,7 +726,7 @@
     {
       "page": 4,
       "label": "Lp(a) (Lp(a))",
-      "markerKey": "x:lp-a-lp-a",
+      "markerKey": "lp-a",
       "status": "value",
       "value": 27.5,
       "comparator": null,

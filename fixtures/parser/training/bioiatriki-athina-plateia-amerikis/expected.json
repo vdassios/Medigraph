@@ -686,7 +686,7 @@
     {
       "page": 3,
       "label": "Εύρος Κατανομής Αιμοπεταλίων (PDW) (PDW)",
-      "markerKey": "x:ευροσ-κατανομησ-αιμοπεταλιων-pdw-pdw",
+      "markerKey": "pdw",
       "status": "value",
       "value": 13.9,
       "comparator": null,
@@ -706,7 +706,7 @@
     {
       "page": 3,
       "label": "Ραβδοπύρηνα (Ραβδοπύρηνα)",
-      "markerKey": "x:ραβδοπυρηνα-ραβδοπυρηνα",
+      "markerKey": "band-neutrophils",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -722,7 +722,7 @@
     {
       "page": 3,
       "label": "Μεταμυελοκυτταρα (Μεταμυελοκυτ)",
-      "markerKey": "x:μεταμυελοκυτταρα-μεταμυελοκυτ",
+      "markerKey": "metamyelocytes",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -738,7 +738,7 @@
     {
       "page": 3,
       "label": "Μυελοκύτταρα (Μυελοκύτταρα)",
-      "markerKey": "x:μυελοκυτταρα-μυελοκυτταρα",
+      "markerKey": "myelocytes",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -754,7 +754,7 @@
     {
       "page": 3,
       "label": "Προμυελοκύτταρα (Προμυελοκύτταρα)",
-      "markerKey": "x:προμυελοκυτταρα-προμυελοκυτταρα",
+      "markerKey": "promyelocytes",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -770,7 +770,7 @@
     {
       "page": 3,
       "label": "Άτυπα Κύτταρα (Άτυπα Κύτταρα)",
-      "markerKey": "x:ατυπα-κυτταρα-ατυπα-κυτταρα",
+      "markerKey": "atypical-cells",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -786,7 +786,7 @@
     {
       "page": 3,
       "label": "Εμπύρηνα RBC (ΕμπύρηναRBC)",
-      "markerKey": "x:εμπυρηνα-rbc-εμπυρηναrbc",
+      "markerKey": "nrbc-percent",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -802,7 +802,7 @@
     {
       "page": 3,
       "label": "Βλάστες (Βιβλιογραφία)",
-      "markerKey": "x:βλαστεσ-βιβλιογραφια",
+      "markerKey": "blasts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1422,7 +1422,7 @@
     {
       "page": 12,
       "label": "Πλακώδη επιθήλια (Πλακ. Επιθήλια)",
-      "markerKey": "x:πλακωδη-επιθηλια-πλακ-επιθηλια",
+      "markerKey": "urine-squamous-epithelial",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1438,7 +1438,7 @@
     {
       "page": 12,
       "label": "Μη πλακώδη επιθήλια (Μη Πλ. Επιθήλια)",
-      "markerKey": "x:μη-πλακωδη-επιθηλια-μη-πλ-επιθηλια",
+      "markerKey": "urine-non-squamous-epithelial",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1454,7 +1454,7 @@
     {
       "page": 12,
       "label": "Βλέννη (Βλέννη)",
-      "markerKey": "x:βλεννη-βλεννη",
+      "markerKey": "urine-mucus",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1470,7 +1470,7 @@
     {
       "page": 12,
       "label": "Άμορφα άλατα (Άμορφα άλατα)",
-      "markerKey": "x:αμορφα-αλατα-αμορφα-αλατα",
+      "markerKey": "urine-amorphous-salts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1486,7 +1486,7 @@
     {
       "page": 12,
       "label": "Βακτήρια (Βακτήρια)",
-      "markerKey": "x:βακτηρια-βακτηρια",
+      "markerKey": "urine-bacteria",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1502,7 +1502,7 @@
     {
       "page": 12,
       "label": "Μύκητες (Μύκητες)",
-      "markerKey": "x:μυκητεσ-μυκητεσ",
+      "markerKey": "urine-yeast",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1518,7 +1518,7 @@
     {
       "page": 12,
       "label": "- Οξαλικού Ασβεστίου (Κρύσ.Οξαλικοί)",
-      "markerKey": "x:οξαλικου-ασβεστιου-κρυσ-οξαλικοι",
+      "markerKey": "urine-calcium-oxalate-crystals",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1534,7 +1534,7 @@
     {
       "page": 12,
       "label": "- Εναμμωνίου Φωσφορικού (Κρύσ.Φωσφορικοί)",
-      "markerKey": "x:εναμμωνιου-φωσφορικου-κρυσ-φωσφορικοι",
+      "markerKey": "urine-ammonium-phosphate-crystals",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1550,7 +1550,7 @@
     {
       "page": 12,
       "label": "- Ουρικού Οξέος (Κρύσ.Ουρικοί)",
-      "markerKey": "x:ουρικου-οξεοσ-κρυσ-ουρικοι",
+      "markerKey": "urine-uric-acid-crystals",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1566,7 +1566,7 @@
     {
       "page": 13,
       "label": "- Υελώδεις (Κύλ.Υελώδεις)",
-      "markerKey": "x:υελωδεισ-κυλ-υελωδεισ",
+      "markerKey": "urine-hyaline-casts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1582,7 +1582,7 @@
     {
       "page": 13,
       "label": "- Υελοκοκκώδεις (Κύλ.Υελοκοκκώδε)",
-      "markerKey": "x:υελοκοκκωδεισ-κυλ-υελοκοκκωδε",
+      "markerKey": "urine-hyaline-granular-casts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1598,7 +1598,7 @@
     {
       "page": 13,
       "label": "- Κοκκώδεις (Κύλ.Κοκκώδεις)",
-      "markerKey": "x:κοκκωδεισ-κυλ-κοκκωδεισ",
+      "markerKey": "urine-granular-casts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1614,7 +1614,7 @@
     {
       "page": 13,
       "label": "- Αιμορραγικοί (Κύλ.Αιμορραγικο)",
-      "markerKey": "x:αιμορραγικοι-κυλ-αιμορραγικο",
+      "markerKey": "urine-haemorrhagic-casts",
       "status": "missing",
       "value": null,
       "comparator": null,
@@ -1630,7 +1630,7 @@
     {
       "page": 13,
       "label": "- Επιθηλιακοί (Κύλ.Επιθηλιακοί)",
-      "markerKey": "x:επιθηλιακοι-κυλ-επιθηλιακοι",
+      "markerKey": "urine-epithelial-casts",
       "status": "missing",
       "value": null,
       "comparator": null,

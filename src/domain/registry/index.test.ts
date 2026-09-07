@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { MarkerDef } from '../types';
 import { normaliseLabel } from '../text';
@@ -18,6 +19,7 @@ import {
 
 const SEED = new URL('../../../fixtures/seed/', import.meta.url);
 const REGISTRY_SEED = new URL('../../../fixtures/registry-seed/', import.meta.url);
+const TRAINING = new URL('../../../fixtures/parser/training/', import.meta.url);
 
 interface Item {
   text: string;
@@ -33,14 +35,30 @@ interface Fixture {
 /** The label column starts every ΑΗΦΥ row; the result column starts at 0.384. */
 const LABEL_COLUMN_MAX_X = 0.37;
 
+/** One page's label column, in reading order: a wrapped cell rejoined. */
+function labelColumn(page: readonly Item[]): string {
+  return [...page]
+    .filter((item) => item.x < LABEL_COLUMN_MAX_X)
+    .sort((a, b) => a.y - b.y || a.x - b.x)
+    .map((item) => item.text)
+    .join(' ');
+}
+
 /**
  * Everything alias rule 4 allows an alias to be quoted from: the Task 0.5c
- * ΚΕΟΚΕΕ seed and the two Task 0.3 fixtures.
+ * ΚΕΟΚΕΕ seed, the two Task 0.3 fixtures, and the **training** half of the
+ * Task 0.5a corpus, which is what Task 2.5r authors each panel from.
  *
- * The fixtures contribute three readings of the same pages, because a printed
- * `Περιγραφή` cell can be split three ways by pdf.js: the whole-line items as
- * they stand, and the label-column fragments of each page in reading order,
- * which rejoins a cell the laboratory wrapped across two lines.
+ * The fixtures contribute several readings of the same pages, because a printed
+ * `Περιγραφή` cell can be split more than one way by pdf.js: the whole-line
+ * items as they stand where a fixture commits them, and the label-column
+ * fragments of each page in reading order, which rejoins a cell the laboratory
+ * wrapped across two lines.
+ *
+ * `fixtures/parser/holdout/` is not read here and must not be. The corpus keeps
+ * one laboratory blind precisely so that no alias is authored against it, and a
+ * vocabulary that included it would make that seal unenforceable — a registry
+ * tuned to the holdout would score well on it and tell us nothing.
  *
  * Substring containment is the check, not equality. It cannot prove an alias
  * is the *right* marker's — only human review does that, one panel at a time —
@@ -59,12 +77,22 @@ function sourcedVocabulary(): string {
     for (const page of fixture.wholeLine.pages) {
       sources.push(page.map((item) => item.text).join(' '));
     }
+    for (const page of fixture.fragmented.pages) {
+      sources.push(labelColumn(page));
+    }
+  }
+
+  for (const lab of readdirSync(fileURLToPath(TRAINING)).sort()) {
+    if (!statSync(fileURLToPath(new URL(lab, TRAINING))).isDirectory()) {
+      continue;
+    }
+    const fixture = JSON.parse(
+      readFileSync(new URL(`${lab}/textitems.json`, TRAINING), 'utf8'),
+    ) as { fragmented: { pages: Item[][] } };
 
     for (const page of fixture.fragmented.pages) {
-      const labelColumn = page
-        .filter((item) => item.x < LABEL_COLUMN_MAX_X)
-        .sort((a, b) => a.y - b.y || a.x - b.x);
-      sources.push(labelColumn.map((item) => item.text).join(' '));
+      sources.push(labelColumn(page));
+      sources.push(page.map((item) => item.text).join(' '));
     }
   }
 
@@ -90,8 +118,9 @@ const PANELS: [string, readonly MarkerDef[]][] = [
 ];
 
 describe('REGISTRY_VERSION', () => {
-  it('starts at 1', () => {
-    expect(REGISTRY_VERSION).toBe(1);
+  it('increments once per merged change set', () => {
+    // 1 was the Task 1.6b-core seed; 2 is Task 2.5r's panel expansion.
+    expect(REGISTRY_VERSION).toBe(2);
   });
 
   it('is an integer, because equality is what fixtures assert', () => {
@@ -104,10 +133,11 @@ describe('MARKERS', () => {
     expect(MARKERS).toEqual(PANELS.flatMap(([, markers]) => [...markers]));
   });
 
-  it('seeds the markers the two fixtures print', () => {
-    // The Task 1.6b-core scope: enough to unblock Wave 2, not the v1 coverage
-    // target of ≥120 markers, which Task 2.5r reaches from the 0.5a corpus.
-    expect(MARKERS.length).toBeGreaterThanOrEqual(40);
+  it('covers every marker the training corpus prints', () => {
+    // Task 2.5r's scope, which is what the corpus sources — not the v1 target
+    // of ≥120 markers, which needs documents ordering panels these four
+    // laboratories did not.
+    expect(MARKERS.length).toBeGreaterThanOrEqual(95);
   });
 
   it('carries no coagulation marker yet', () => {
@@ -194,12 +224,25 @@ describe('MARKERS', () => {
   });
 
   it('leaves canonicalUnit null only where the laboratory prints no unit', () => {
-    // The urinalysis dipstick and sediment rows, and nothing else so far.
+    // The urinalysis dipstick and sediment rows, and the red-cell morphology
+    // rows ΙΑΤΡΟΚΟΣΜΟΣ prints with neither a result nor a unit. `null` is not
+    // a sentinel for "unit unknown": a numeric marker whose printed unit has
+    // not been observed does not enter the registry until it has been.
+    const morphology = [
+      'anisocytosis',
+      'anisochromia',
+      'poikilocytosis',
+      'target-cells',
+      'microcytosis',
+      'macrocytosis',
+      'hypochromia',
+      'basophilic-stippling',
+    ];
     const unitless = MARKERS.filter((marker) => marker.canonicalUnit === null).map(
       (marker) => marker.id,
     );
 
-    expect(unitless).toEqual(URINALYSIS_MARKERS.map((marker) => marker.id));
+    expect(unitless).toEqual([...morphology, ...URINALYSIS_MARKERS.map((marker) => marker.id)]);
   });
 
   it.each(
@@ -237,10 +280,18 @@ describe('MARKERS', () => {
 
   it('gives a sectionHint only where it breaks a tie', () => {
     // The plan reserves sectionHint for the T4 tier's unique tie-break, so a
-    // hint on a marker no other entry can be confused with is noise.
+    // hint on a marker no other entry can be confused with is noise. Every
+    // hint so far is on a urinalysis dipstick row a blood marker could be
+    // read as — `Αιμοσφαιρίνη`, `Σάκχαρο`. The sediment rows Task 2.5r added
+    // name nothing another panel claims and carry none.
     const hinted = MARKERS.filter((marker) => marker.sectionHint !== undefined);
-    expect(hinted.map((marker) => marker.id)).toEqual(
-      URINALYSIS_MARKERS.map((marker) => marker.id),
-    );
+    const urinalysis = new Set(URINALYSIS_MARKERS.map((marker) => marker.id));
+
+    expect(hinted.length).toBeGreaterThan(0);
+    for (const marker of hinted) {
+      expect(urinalysis).toContain(marker.id);
+      expect(marker.sectionHint?.trim()).toBe(marker.sectionHint);
+      expect(marker.sectionHint).not.toBe('');
+    }
   });
 });

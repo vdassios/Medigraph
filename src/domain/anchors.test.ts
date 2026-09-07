@@ -67,17 +67,19 @@ describe('findAnchors', () => {
       expect(anchor(texts)).toMatchObject({ markerKey, tier: 'T1', confidence: 'high' });
     });
 
-    it.each([['Non - HDL - C (Non - HDL - C)'], ['Εμπύρηνα RBC (ΕμπύρηναRBC)']])(
-      'reads a bare abbreviation in %s as prose, not the row it names',
-      (text) => {
-        // The cell prints its own bracketed code, so a registry abbreviation
-        // loose in the prose beside it names something else: non-HDL cholesterol
-        // is not HDL, and nucleated red cells are not the red cell count.
-        // `preferParenthesised` cannot reach either — the bracketed code is no
-        // registry abbreviation, so it never becomes a hit to be preferred.
-        expect(anchor([text])).toBeUndefined();
-      },
-    );
+    it.each([
+      ['Non - HDL - C (Non - HDL - C)', 'hdl'],
+      ['Εμπύρηνα RBC (ΕμπύρηναRBC)', 'rbc'],
+    ])('reads a bare abbreviation in %s as prose, not the row it names', (text, wrong) => {
+      // The cell prints its own bracketed code, so a registry abbreviation
+      // loose in the prose beside it names something else: non-HDL cholesterol
+      // is not HDL, and nucleated red cells are not the red cell count.
+      // `preferParenthesised` cannot reach either — the bracketed code is no
+      // registry abbreviation, so it never becomes a hit to be preferred.
+      // Whether anything else claims the row is a registry question; the tier
+      // rule is only that this abbreviation does not.
+      expect(anchor([text])?.markerKey).not.toBe(wrong);
+    });
 
     it('still reads a bare abbreviation when the cell prints no code', () => {
       expect(anchor(['Χοληστερίνη HDL (HDL)'])).toMatchObject({ markerKey: 'hdl', tier: 'T1' });
@@ -85,19 +87,25 @@ describe('findAnchors', () => {
     });
 
     it('never fuzzes a percentage into a count', () => {
-      // `MON%` and `MONO#` are one edit apart on a bound of two, and that one
-      // character is the whole difference between the two rows a differential
-      // prints. ΙΑΤΡΟΚΟΣΜΟΣ prints `MON%`, which the registry does not hold —
-      // an honest gap beats reading it as the absolute count.
-      expect(anchor(['Μονοπύρηνα (MON%) (MON%)'])).toBeUndefined();
+      // A code the registry does not hold, two edits from the count's alias
+      // `Μονοπύρηνα (MONO#)` and far from every percentage one. Unguarded, the
+      // fuzzy tier spends one of those edits turning `%` into `#` and answers
+      // a percentage row with the absolute count. No anchor is the right
+      // answer: the laboratory's code is a registry gap, and Task 2.5r's.
+      expect(anchor(['Μονοπύρηνα (MONX%)'])).toBeUndefined();
+      expect(anchor(['Μονοπύρηνα (MONX#)'])).toMatchObject({
+        markerKey: 'monocytes-absolute',
+        tier: 'T4',
+      });
     });
 
     it('still reaches the count from a label that names neither', () => {
-      // Silence about `%` or `#` is not disagreement: `(MON)` beside a `(MON%)`
-      // row means the count, and T4 may still reach it.
+      // Silence about `%` or `#` is not disagreement, and a bare population
+      // code names the population rather than the count — so `(MON)` reaches
+      // the count through the whole printed cell, not through an abbreviation.
       expect(anchor(['Μονοπύρηνα (MON) (ΜΟΝΟ)'])).toMatchObject({
         markerKey: 'monocytes-absolute',
-        tier: 'T4',
+        tier: 'T2',
       });
     });
 
@@ -283,7 +291,7 @@ describe('findAnchors', () => {
       const { anchors } = anchorFixture('ahfy-full');
       const rowIds = anchors.map((found) => found.id.slice(0, found.id.indexOf(':anchor:')));
 
-      expect(anchors).toHaveLength(59);
+      expect(anchors).toHaveLength(80);
       expect(new Set(rowIds).size).toBe(anchors.length);
     });
 
@@ -332,15 +340,16 @@ describe('findAnchors', () => {
       // task surfaced, not a defect in the tier rules.
 
       it.each([
-        ['ast', '(SGOT/AST)', 'AST/SGOT'],
-        ['alt', '(SGPT/ALT)', 'ALT/SGPT'],
-      ])('misses %s, printed %s where the registry holds %s', (markerKey) => {
+        ['ast', '(SGOT/AST)'],
+        ['alt', '(SGPT/ALT)'],
+      ])('reaches %s, printed %s, since Task 2.5r sourced the printed order', (markerKey) => {
         // The laboratory prints the pair in the opposite order to ΚΕΟΚΕΕ, and
         // a slash-joined pair is neither a standalone token nor parenthesised
-        // on its own. Two fixture-sourced abbreviations in Task 2.5r close it.
+        // on its own, so the seed registry could not reach either row. Both
+        // printed orders are now abbreviations, which is what closes it.
         const { anchors } = anchorFixture('ahfy-full');
 
-        expect(anchors.filter((found) => found.markerKey === markerKey)).toEqual([]);
+        expect(anchors.filter((found) => found.markerKey === markerKey)).toHaveLength(1);
       });
 
       it.each(['vitamin-d', 'urine-erythrocytes'])('misses %s, whose label wraps', (markerKey) => {

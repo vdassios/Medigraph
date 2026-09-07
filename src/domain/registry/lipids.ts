@@ -14,7 +14,12 @@ export const LIPID_MARKERS: readonly MarkerDef[] = [
     en: 'Cholesterol',
     el: 'Χοληστερόλη',
     abbreviations: ['CHOL', 'TC'],
-    aliases: ['ΧΟΛΗΣΤΕΡΟΛΗ', 'ΟΛΙΚΗ ΧΟΛΗΣΤΕΡΟΛΗ', 'Ολική χοληστερόλη (TC) (CHOL)'],
+    aliases: [
+      'ΧΟΛΗΣΤΕΡΟΛΗ',
+      'ΟΛΙΚΗ ΧΟΛΗΣΤΕΡΟΛΗ',
+      'Ολική χοληστερόλη (TC) (CHOL)',
+      'ΧΟΛΗΣΤΕΡΙΝΗ (CHOL)',
+    ],
     canonicalUnit: 'mg/dL',
     plausibleRange: [10, 1000],
   },
@@ -57,9 +62,40 @@ export const LIPID_MARKERS: readonly MarkerDef[] = [
     id: 'triglycerides',
     en: 'Triglycerides',
     el: 'Τριγλυκερίδια',
-    abbreviations: ['TRIG'],
-    aliases: ['ΤΡΙΓΛΥΚΕΡΙΔΙΑ', 'Τριγλυκερίδια (TRIG) (TRIG)'],
+    // `TRG` is ΙΑΤΡΟΚΟΣΜΟΣ's spelling of the same code.
+    abbreviations: ['TRIG', 'TRG'],
+    aliases: ['ΤΡΙΓΛΥΚΕΡΙΔΙΑ', 'Τριγλυκερίδια (TRIG) (TRIG)', 'ΤΡΙΓΛΥΚΕΡΙΔΙΑ (TRG)'],
     canonicalUnit: 'mg/dL',
     plausibleRange: [1, 10000],
+  },
+
+  {
+    // ΚΕΟΚΕΕ 12.01.04.21.001, which spells the Greek name `ΛΙΠΟΠΡΩΤΕΙΝΗ (a)`
+    // and the abbreviation `LP(a)`. ΙΑΤΡΟΚΟΣΜΟΣ prints `Lp(a)`, which
+    // `normaliseAbbreviation` folds onto the same form.
+    //
+    // The laboratory prints `mg %` for this row, which the unit allowlist does
+    // not carry; `mg/dL` is what the seed and ΒΙΟΙΑΤΡΙΚΗ print for every other
+    // lipid and is the same quantity. The printed spelling reaches review as
+    // an unrecognised unit, which is the honest report.
+    id: 'lp-a',
+    en: 'Lipoprotein (a)',
+    el: 'ΛΙΠΟΠΡΩΤΕΙΝΗ (a)',
+    abbreviations: ['LP(a)'],
+    aliases: ['ΛΙΠΟΠΡΩΤΕΙΝΗ (a)', 'Lp(a) (Lp(a))'],
+    canonicalUnit: 'mg/dL',
+    plausibleRange: [0.1, 1000],
+  },
+  {
+    // ΚΕΟΚΕΕ carries no non-HDL row; ΙΑΤΡΟΚΟΣΜΟΣ prints one, and the printed
+    // code is the whole name. Claiming it as an abbreviation is what stops the
+    // bare `HDL` inside it from answering the row — see § A1.
+    id: 'non-hdl-c',
+    en: 'Non-HDL Cholesterol',
+    el: 'Non - HDL - C',
+    abbreviations: ['Non - HDL - C'],
+    aliases: ['Non - HDL - C (Non - HDL - C)'],
+    canonicalUnit: 'mg/dL',
+    plausibleRange: [1, 1000],
   },
 ];

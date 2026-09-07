@@ -143,4 +143,129 @@ export const URINALYSIS_MARKERS: readonly MarkerDef[] = [
     canonicalUnit: null,
     sectionHint: URINE_SECTION,
   },
+
+  // The microscopic sediment, from ΒΙΟΙΑΤΡΙΚΗ's `Μικροσκοπική εξέταση
+  // ιζήματος` block. ΚΕΟΚΕΕ lists none of these: the whole urinalysis is the
+  // single orderable `Γενική εξέταση ούρων`, so the rows it reports are not
+  // separately coded and every alias here is quoted from the printed cell.
+  //
+  // The crystal and cast rows are printed with a leading `- ` bullet, which is
+  // presentation rather than name — the same reading `mpv` gives its footnote
+  // asterisk — so the aliases carry the label without it and T3 reaches the
+  // printed cell through containment.
+  {
+    id: 'urine-squamous-epithelial',
+    en: 'Squamous Epithelial Cells',
+    el: 'Πλακώδη επιθήλια',
+    abbreviations: [],
+    // The bare label is deliberately not claimed: `Μη πλακώδη επιθήλια` is
+    // the negated row printed two lines below, and it contains this one
+    // whole-word, so T3 would answer both rows with the same marker.
+    aliases: ['Πλακώδη επιθήλια (Πλακ. Επιθήλια)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-non-squamous-epithelial',
+    en: 'Non-squamous Epithelial Cells',
+    el: 'Μη πλακώδη επιθήλια',
+    abbreviations: [],
+    aliases: ['Μη πλακώδη επιθήλια', 'Μη πλακώδη επιθήλια (Μη Πλ. Επιθήλια)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-mucus',
+    en: 'Mucus',
+    el: 'Βλέννη',
+    abbreviations: [],
+    aliases: ['Βλέννη', 'Βλέννη (Βλέννη)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-amorphous-salts',
+    en: 'Amorphous Salts',
+    el: 'Άμορφα άλατα',
+    abbreviations: [],
+    aliases: ['Άμορφα άλατα', 'Άμορφα άλατα (Άμορφα άλατα)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-bacteria',
+    en: 'Bacteria',
+    el: 'Βακτήρια',
+    abbreviations: [],
+    aliases: ['Βακτήρια', 'Βακτήρια (Βακτήρια)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-yeast',
+    en: 'Yeast',
+    el: 'Μύκητες',
+    abbreviations: [],
+    aliases: ['Μύκητες', 'Μύκητες (Μύκητες)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-calcium-oxalate-crystals',
+    en: 'Calcium Oxalate Crystals',
+    el: 'Κρύσταλλοι Οξαλικού Ασβεστίου',
+    abbreviations: [],
+    aliases: ['Οξαλικού Ασβεστίου', 'Οξαλικού Ασβεστίου (Κρύσ.Οξαλικοί)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-ammonium-phosphate-crystals',
+    en: 'Ammonium Phosphate Crystals',
+    el: 'Κρύσταλλοι Εναμμωνίου Φωσφορικού',
+    abbreviations: [],
+    aliases: ['Εναμμωνίου Φωσφορικού', 'Εναμμωνίου Φωσφορικού (Κρύσ.Φωσφορικοί)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-uric-acid-crystals',
+    en: 'Uric Acid Crystals',
+    el: 'Κρύσταλλοι Ουρικού Οξέος',
+    abbreviations: [],
+    aliases: ['Ουρικού Οξέος (Κρύσ.Ουρικοί)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-hyaline-casts',
+    en: 'Hyaline Casts',
+    el: 'Υελώδεις κύλινδροι',
+    abbreviations: [],
+    aliases: ['Υελώδεις (Κύλ.Υελώδεις)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-hyaline-granular-casts',
+    en: 'Hyaline Granular Casts',
+    el: 'Υελοκοκκώδεις κύλινδροι',
+    abbreviations: [],
+    aliases: ['Υελοκοκκώδεις', 'Υελοκοκκώδεις (Κύλ.Υελοκοκκώδε)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-granular-casts',
+    en: 'Granular Casts',
+    el: 'Κοκκώδεις κύλινδροι',
+    abbreviations: [],
+    aliases: ['Κοκκώδεις (Κύλ.Κοκκώδεις)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-haemorrhagic-casts',
+    en: 'Haemorrhagic Casts',
+    el: 'Αιμορραγικοί κύλινδροι',
+    abbreviations: [],
+    aliases: ['Αιμορραγικοί (Κύλ.Αιμορραγικο)'],
+    canonicalUnit: null,
+  },
+  {
+    id: 'urine-epithelial-casts',
+    en: 'Epithelial Casts',
+    el: 'Επιθηλιακοί κύλινδροι',
+    abbreviations: [],
+    aliases: ['Επιθηλιακοί (Κύλ.Επιθηλιακοί)'],
+    canonicalUnit: null,
+  },
 ];

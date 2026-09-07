@@ -389,7 +389,7 @@
     {
       "page": 2,
       "label": "Εύρος καταν. αιμ. (PDW)",
-      "markerKey": "x:ευροσ-καταν-αιμ-pdw",
+      "markerKey": "pdw",
       "status": "value",
       "value": 52.5,
       "comparator": null,
@@ -449,7 +449,7 @@
     {
       "page": 2,
       "label": "Εμπύρηνα Ερυθρά (NRBC%)",
-      "markerKey": "x:εμπυρηνα-ερυθρα-nrbc",
+      "markerKey": "nrbc-percent",
       "status": "value",
       "value": 0,
       "comparator": null,

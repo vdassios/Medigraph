@@ -62,7 +62,10 @@ export const BIOCHEMISTRY_MARKERS: readonly MarkerDef[] = [
     id: 'ast',
     en: 'Aspartate Amino-Transferase',
     el: 'Ασπαρτική αμινοτρανσφεράση',
-    abbreviations: ['AST', 'SGOT', 'AST/SGOT'],
+    // Both orderings are printed: ΚΕΟΚΕΕ writes `AST/SGOT`, and the seed and
+    // ΒΙΟΙΑΤΡΙΚΗ both print `(SGOT/AST)` in the label cell. Without the
+    // second, a row whose label wraps loses its only reachable code.
+    abbreviations: ['AST', 'SGOT', 'AST/SGOT', 'SGOT/AST'],
     aliases: [
       'ΑΣΠΑΡΤΙΚΗ ΑΜΙΝΟΤΡΑΝΣΦΕΡΑΣΗ',
       'Αμινοτρανσφεράση του ασπαρτικού οξέος (SGOT/AST) (AST (SGOT))',
@@ -75,7 +78,8 @@ export const BIOCHEMISTRY_MARKERS: readonly MarkerDef[] = [
     id: 'alt',
     en: 'Alanine Amino-Transferase',
     el: 'Αμινοτρανσφεράση αλανίνης',
-    abbreviations: ['ALT', 'SGPT', 'ALT/SGPT'],
+    // Both orderings, for the reason `ast` records.
+    abbreviations: ['ALT', 'SGPT', 'ALT/SGPT', 'SGPT/ALT'],
     aliases: ['ΑΜΙΝΟΤΡΑΝΣΦΕΡΑΣΗ ΑΛΑΝΙΝΗΣ', 'Αμινοτρανσφεράση αλανίνης (SGPT/ALT) (ALT (SGPT))'],
     canonicalUnit: 'U/L',
     plausibleRange: [1, 20000],

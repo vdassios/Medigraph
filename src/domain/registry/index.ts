@@ -18,14 +18,16 @@ import { VITAMIN_MARKERS } from './vitamins';
  * produced by a different registry is a different result, and pretending
  * otherwise would let a stale fixture pass against a changed vocabulary.
  */
-export const REGISTRY_VERSION = 1;
+export const REGISTRY_VERSION = 2;
 
 /**
  * Every canonical marker, in panel order.
  *
- * This is the seed authored under Task 1.6b-core: the markers the two Task 0.3
- * fixtures print, and nothing else. It is not the v1 coverage target — Task
- * 2.5r expands each panel from the Task 0.5a corpus, one issue per file.
+ * The Task 1.6b-core seed — the markers the two Task 0.3 fixtures print —
+ * expanded by Task 2.5r from the training half of the Task 0.5a corpus, one
+ * issue per panel file. Every printed marker in that corpus now resolves; what
+ * the corpus does not print is not here, because alias rule 4 admits nothing a
+ * fixture or the ΚΕΟΚΕΕ seed does not source.
  *
  * Registry coverage is parser quality (D5a), so this array is versioned data
  * with its own tests, not a lookup table.

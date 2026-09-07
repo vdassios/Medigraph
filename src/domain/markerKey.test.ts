@@ -186,11 +186,12 @@ describe('markerKey', () => {
     });
 
     it('does not transliterate a Greek letter inside a Latin abbreviation', () => {
-      // `ahfy-full` prints `(ΜCV)` with a Greek capital mu. The all-Latin
-      // spelling is a different string and stays unknown here; `anchors.ts`
-      // catches it at the T1 tier, where the row's `(MCV)` token matches the
-      // abbreviation directly.
-      expect(markerKey('Μέσος Όγκος Ερυθρών (MCV)')).toMatch(/^x:/u);
+      // `ahfy-full` prints `(ΜCV)` with a Greek capital mu. The mu spelling is
+      // a different string from the Latin one and is never folded here;
+      // `anchors.ts` catches it at the T1 tier, where the row's `(MCV)` token
+      // matches the abbreviation directly.
+      expect(markerKey('\u039CCV')).toMatch(/^x:/u);
+      expect(markerKey('MCV')).toBe('mcv');
       expect(markerKey('Μέσος Όγκος Ερυθρών (\u039CCV) (MCV)')).toBe('mcv');
     });
   });

@@ -2290,6 +2290,14 @@ in the Task 0.5a training corpus and standard Greek general-checkup seed list. T
 holdout measures generalisation and does not become an alias source before its first
 score. No LOINC (D10).
 
+Task 2.5r reached **95 markers and 100% of the training corpus's printed identities**,
+which is the second half of that target and as far as the first half can be taken from
+the documents in hand. The remaining 25 are panels these four laboratories did not
+order — coagulation above all, where neither a fixture nor the corpus prints a single
+row — and they are not authored from ΚΕΟΚΕΕ alone: importing a seed list by name
+similarity is the failure alias rule 4 exists to prevent, and nothing in the corpus
+would catch a wrong one. They arrive with the documents that print them.
+
 ### Units (`units.ts`)
 
 `normaliseUnit(s)` always returns trimmed normalised text, including for an unknown

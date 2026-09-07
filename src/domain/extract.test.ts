@@ -154,9 +154,11 @@ describe('extract', () => {
     });
 
     it('keeps a unit-only row as a missing measurement', () => {
-      // The white-cell morphology sub-rows print `%` and no result. Dropping
-      // them would lose a printed row the laboratory reported on.
-      const row = withRows([['Ραβδοπύρηνα (Ραβδοπύρηνα)', '', '%', '', '']]).rows.find((each) =>
+      // A differential sub-row prints `%` and no result. Dropping it would lose
+      // a printed row the laboratory reported on. The label here is one no
+      // registry entry claims, because the subject is the shape of the row
+      // rather than the marker — Task 2.5r has since named most of these.
+      const row = withRows([['Νεοδείκτης (ΝΔ)', '', '%', '', '']]).rows.find((each) =>
         each.markerKey.startsWith('x:'),
       );
 
@@ -213,20 +215,26 @@ describe('extract', () => {
       expect(extracted('ahfy-minimal').unrecognised).toEqual([]);
 
       const full = extracted('ahfy-full');
-      expect(full.rows).toHaveLength(70);
-      expect(full.rows.filter((row) => row.markerKey.startsWith('x:'))).toHaveLength(9);
+      expect(full.rows).toHaveLength(82);
+      // Task 2.5r names eight of the nine Task 1.6b-core left unknown. eGFR is
+      // the one that remains, and it stays out for a unit reason rather than a
+      // vocabulary one — see `recovers the registry gaps the plan names`.
+      expect(full.rows.filter((row) => row.markerKey.startsWith('x:'))).toHaveLength(1);
     });
 
     it('recovers the registry gaps the plan names', () => {
-      // Task 1.6b-core leaves eGFR, PDW and the morphology sub-rows out of the
-      // seed registry deliberately; each must reach review as an unknown
-      // marker rather than vanishing, and Task 2.5b measures them from here.
-      const { unrecognised } = extracted('ahfy-full');
+      // A marker no panel claims must reach review as an unknown rather than
+      // vanishing, which is what Task 2.5b measures from here. eGFR is the one
+      // left, and not for want of a printed name: the unit it is reported in,
+      // `mL/min/1.73m^2`, is not on the `units.ts` allowlist, and the plan
+      // keeps a numeric marker out of the registry until its unit is carried.
+      const { unrecognised, rows } = extracted('ahfy-full');
+      const keys = rows.map((row) => row.markerKey);
 
-      expect(unrecognised.some((label) => label.includes('GFR'))).toBe(true);
-      expect(unrecognised.some((label) => label.includes('(PDW)'))).toBe(true);
-      expect(unrecognised.some((label) => label.includes('Ραβδοπύρηνα'))).toBe(true);
-      expect(unrecognised.some((label) => label.includes('SGOT/AST'))).toBe(true);
+      expect(unrecognised).toEqual(['ρυθμός σπειραματικής διήθησης (Estimated GFR 2021 CKD-EPI']);
+      expect(keys).toContain('pdw');
+      expect(keys).toContain('band-neutrophils');
+      expect(keys).toContain('ast');
     });
 
     it('closes two of Pass A’s four measured gaps by reading positionally', () => {
