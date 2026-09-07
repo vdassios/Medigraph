@@ -83,6 +83,12 @@ interface Candidate {
   text: string; // as printed
   label: string; // normaliseLabel
   abbreviation: string; // normaliseAbbreviation
+  /**
+   * Character offsets into the single token this candidate is a part of, for
+   * a code the laboratory printed with no space in front of it. Absent when
+   * the candidate is the whole token run, which is every other case.
+   */
+  within?: { start: number; end: number };
 }
 
 interface Hit {
@@ -104,6 +110,16 @@ function placedTokens(row: Row): PlacedToken[] {
   return row.items.flatMap((item) => tokenise(item).map((token) => ({ token, item })));
 }
 
+/**
+ * A laboratory code printed with no space in front of it.
+ *
+ * `Μονοκύτταρα(ΜΟΝΟ%)` and `Ερυθρά αιμοσφαίρια(RBC)` are one whitespace token
+ * each, so the code never becomes a candidate of its own and T1 — the tier
+ * that exists for exactly this signal — never sees it. The prefix must be
+ * non-empty: an already-separate `(MONO%)` is a whole token and needs nothing.
+ */
+const GLUED_CODE = /^(.+)(\([^()]*\))$/u;
+
 function candidatesOf(tokens: readonly PlacedToken[]): Candidate[] {
   const candidates: Candidate[] = [];
 
@@ -123,9 +139,32 @@ function candidatesOf(tokens: readonly PlacedToken[]): Candidate[] {
         abbreviation: normaliseAbbreviation(text),
       });
     }
+
+    const glued = glue(tokens[start]?.token.text ?? '');
+    if (glued !== undefined) {
+      candidates.push({ start, end: start + 1, ...glued });
+    }
   }
 
   return candidates;
+}
+
+/** The bracketed tail of a glued token, as its own candidate. */
+function glue(
+  text: string,
+): (Omit<Candidate, 'start' | 'end'> & { within: { start: number; end: number } }) | undefined {
+  const found = GLUED_CODE.exec(text);
+  const [, prefix, code] = found ?? [];
+  if (prefix === undefined || code === undefined) {
+    return undefined;
+  }
+
+  return {
+    text: code,
+    label: normaliseLabel(code),
+    abbreviation: normaliseAbbreviation(code),
+    within: { start: prefix.length, end: text.length },
+  };
 }
 
 /**
@@ -339,7 +378,14 @@ function sourceRefFor(row: Row, tokens: readonly PlacedToken[], candidate: Candi
   const first = placed[0];
   const last = placed.at(-1);
   if (only !== undefined && first !== undefined && last !== undefined) {
-    ref.textRange = { itemId: only.id, start: first.token.start, end: last.token.end };
+    // A glued code matched part of one token, so the span is measured from
+    // that token's own start rather than from the whole of it.
+    const { within } = candidate;
+    ref.textRange = {
+      itemId: only.id,
+      start: first.token.start + (within?.start ?? 0),
+      end: within === undefined ? last.token.end : first.token.start + within.end,
+    };
   }
 
   return ref;

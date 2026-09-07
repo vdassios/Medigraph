@@ -1640,7 +1640,13 @@ excluded by its label.
 #### A1. Matching (`fuzzy.ts`, `anchors.ts`)
 
 For every Row, generate marker candidates deterministically: parent items left to
-right; start offset left to right; contiguous token-run length 5 down to 1. Evaluate
+right; start offset left to right; contiguous token-run length 5 down to 1. One further
+candidate per token: **a bracketed code the laboratory printed with no space in front of
+it** — `Μονοκύτταρα(ΜΟΝΟ%)`, `Ερυθρά αιμοσφαίρια(RBC)` — is one whitespace token, so the
+code never becomes a candidate of its own and T1, the tier that exists for exactly that
+signal, never sees it. The bracketed tail of such a token is offered alone, and its
+`textRange` is the code's own characters rather than the whole token. A token that is
+_already_ just `(MONO%)` needs nothing and gets no extra candidate. Evaluate
 all candidates at T1 before T2, all at T2 before T3, then T4. Within the first tier
 that has hits, retain the longest non-overlapping spans; ties use leftmost source
 order. This tier-wide search prevents a short alias from winning merely because it

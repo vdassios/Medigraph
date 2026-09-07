@@ -58,6 +58,23 @@ describe('findAnchors', () => {
       expect(anchor(['( RBC )'])).toMatchObject({ markerKey: 'rbc', tier: 'T1' });
     });
 
+    it.each([
+      ['a Latin code', ['Ερυθρά', 'αιμοσφαίρια(RBC)'], 'rbc'],
+      ['a code in Greek capitals', ['Μονοκύτταρα(ΜΟΝΟ%)'], 'monocytes-percent'],
+    ])('matches %s glued to its label with no space', (_name, texts, markerKey) => {
+      // ΙΑΣΩ prints no space before the bracket, so the code is not a token of
+      // its own and T1 — the tier that exists for it — never saw it.
+      expect(anchor(texts)).toMatchObject({ markerKey, tier: 'T1', confidence: 'high' });
+    });
+
+    it('points at the glued code alone, not at the label it is stuck to', () => {
+      const found = anchor(['Μονοκύτταρα(ΜΟΝΟ%)']);
+
+      expect(found?.label).toBe('(ΜΟΝΟ%)');
+      // `Μονοκύτταρα` is eleven characters; the code is the seven after it.
+      expect(found?.sourceRef.textRange).toMatchObject({ start: 11, end: 18 });
+    });
+
     it('folds Greek and Latin confusables, but only in an abbreviation', () => {
       // ahfy-full prints `(ΗDL-C)` opening with a GREEK CAPITAL ETA. The
       // registry stores it as printed, and the fold is what lets the Latin
