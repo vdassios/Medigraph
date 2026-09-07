@@ -1,6 +1,7 @@
 import type {
   CollectedAt,
   Conflict,
+  ExtractionResult,
   IdentifierResolution,
   ParsedRow,
   Profile,
@@ -122,6 +123,50 @@ function editRow(
   );
 
   return edited === session ? session : withApproval(edited, rowId, approved);
+}
+
+/**
+ * Open a review session over one attach batch.
+ *
+ * **One document is exactly one Report (D6)**, so there is no grouping step and
+ * no proposal to accept: each `ExtractionResult` becomes one draft, in the
+ * order the batch produced them. A batch that extracted nothing opens a session
+ * with no drafts, which `canConfirm` refuses — an empty Confirm writes nothing
+ * and enabling it would be worse than leaving it off.
+ *
+ * The collection date is **seeded, not confirmed**. Pass V read it from
+ * `Ημερομηνία Λήψης Δείγματος` and the parse is near-certain, but D6 keeps the
+ * user the author of their own record, so `dateConfirmed` starts false and one
+ * tap on the pre-filled value discharges it. Precision starts at `day`, which
+ * is what the repository prints; a same-day collision is what asks for minutes.
+ *
+ * Ids are derived from the sources rather than generated. A session is
+ * ephemeral and never persisted, and a domain module that reached for a random
+ * generator would be reaching for a runtime object it is not allowed to know
+ * about (D4) — and would make every test that names a draft unwritable.
+ */
+export function beginReview(results: readonly ExtractionResult[]): ReviewSession {
+  const reportDrafts = results.map((result) =>
+    withRebuiltConflicts({
+      id: `draft:${result.sourceId}`,
+      sourceIds: [result.sourceId],
+      targetReportId: null,
+      collectedAt: { date: result.collectionDate, time: null, precision: 'day' },
+      dateConfirmed: false,
+      rows: [...result.rows],
+      conflicts: [],
+    }),
+  );
+
+  return {
+    id: `review:${results.map((result) => result.sourceId).join('+')}`,
+    results: [...results],
+    reportDrafts,
+    identifierResolutions: {},
+    approvedUnknownRowIds: [],
+    existingReportDateUpdates: {},
+    samePersonConfirmed: null,
+  };
 }
 
 /**

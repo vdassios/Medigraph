@@ -36,10 +36,17 @@ export default defineConfig([
     },
   },
 
-  // Build-time scripts run in Node, not the browser.
+  // Build-time scripts and the end-to-end static server run in Node, not the
+  // browser.
   {
-    files: ['scripts/**/*.mjs'],
+    files: ['scripts/**/*.mjs', 'e2e/**/*.mjs'],
     languageOptions: { globals: globals.nodeBuiltin, sourceType: 'module' },
+  },
+
+  // Playwright specs and config are Node too, and are not shipped.
+  {
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+    languageOptions: { globals: globals.nodeBuiltin },
   },
 
   // The service worker runs in its own global scope, not the window's: `self`,

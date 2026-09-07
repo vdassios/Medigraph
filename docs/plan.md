@@ -167,9 +167,10 @@ authorise sending anything to it.
 
 ### Field-level contracts
 
-These are the authoritative shapes for Task 0.2. They remain **provisional until the
-E0 walking slice in Task 3.8 passes**; after that task they are frozen. A field
-change before or after freeze updates this section and all affected fixtures in the
+These are the authoritative shapes for Task 0.2, and they are **frozen**: Task 3.8's E0
+walking slice crossed every one of them end to end, under the production
+Content-Security-Policy and with no test-only adapter, and found no mismatch to resolve.
+A field change from here updates this section and all affected fixtures in the
 same change—builders never add convenience fields locally.
 
 ```ts
@@ -506,6 +507,7 @@ export function stageExistingReportDate(
   reportId: string,
   collectedAt: CollectedAt,
 ): ReviewSession;
+export function beginReview(results: readonly ExtractionResult[]): ReviewSession;
 export function reassignMarker(
   session: ReviewSession,
   rowId: string,

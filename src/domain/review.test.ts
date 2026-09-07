@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   approveUnknownMarker,
+  beginReview,
   canConfirm,
   deleteRow,
   reassignMarker,
@@ -96,6 +97,64 @@ function profile(reports: Report[]): Profile {
 function conflictOf(session_: ReviewSession, index = 0): Conflict | undefined {
   return session_.reportDrafts[0]?.conflicts[index];
 }
+
+describe('beginReview', () => {
+  const extracted = (sourceId: string, rows: ParsedRow[]): ExtractionResult => ({
+    ...result(),
+    sourceId,
+    rows,
+  });
+
+  it('opens one draft per document, in batch order (D6)', () => {
+    const opened = beginReview([
+      extracted('a', [row('r1', 'glucose')]),
+      extracted('b', [row('r2', 'urea')]),
+    ]);
+
+    expect(opened.reportDrafts.map((each) => each.sourceIds)).toEqual([['a'], ['b']]);
+    expect(opened.results.map((each) => each.sourceId)).toEqual(['a', 'b']);
+  });
+
+  it('seeds the collection date without confirming it (D6)', () => {
+    // Pass V read the date and the parse is near-certain; the tap that
+    // confirms it is what keeps the user the author of their own record.
+    const [draft_] = beginReview([extracted('a', [])]).reportDrafts;
+
+    expect(draft_?.collectedAt).toEqual({ date: '2025-05-14', time: null, precision: 'day' });
+    expect(draft_?.dateConfirmed).toBe(false);
+  });
+
+  it('raises a duplicate-marker conflict the batch already carries', () => {
+    const opened = beginReview([extracted('a', [row('r1', 'glucose'), row('r2', 'glucose')])]);
+
+    expect(opened.reportDrafts[0]?.conflicts).toMatchObject([
+      { markerKey: 'glucose', candidateRowIds: ['r1', 'r2'], resolution: null },
+    ]);
+  });
+
+  it('answers nothing on the user’s behalf', () => {
+    const opened = beginReview([extracted('a', [row('r1', 'x:unknown')])]);
+
+    expect(opened.identifierResolutions).toEqual({});
+    expect(opened.approvedUnknownRowIds).toEqual([]);
+    expect(opened.samePersonConfirmed).toBeNull();
+    expect(opened.reportDrafts[0]?.targetReportId).toBeNull();
+  });
+
+  it('refuses to confirm a batch that extracted nothing', () => {
+    // An empty Confirm writes no Report, and the one irreversible action in
+    // the product may not be enabled to do nothing.
+    expect(canConfirm(beginReview([]), null)).toBe(false);
+  });
+
+  it('copies the rows it was given rather than aliasing them', () => {
+    const rows = [row('r1', 'glucose')];
+    const opened = beginReview([extracted('a', rows)]);
+    rows.push(row('r2', 'urea'));
+
+    expect(opened.reportDrafts[0]?.rows).toHaveLength(1);
+  });
+});
 
 /** A session whose every gate is already open, so one change closes exactly one. */
 function confirmable(): ReviewSession {

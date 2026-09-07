@@ -8,9 +8,12 @@ import { AMKA_PATTERN, EMAIL_PATTERN, PHONE_PATTERN } from './identifiers';
  * Field-level contracts (docs/plan.md, "Field-level contracts") plus the two
  * validators Task 0.2 requires.
  *
- * These shapes are **provisional until Task 3.8** freezes them. A field change
- * before or after freeze updates the plan and every affected fixture in the same
- * change — never add a convenience field locally.
+ * These shapes are **frozen**: Task 3.8's E0 walking slice crossed every one of
+ * them end to end — attach, review, Confirm, IndexedDB, Series, chart and a
+ * plaintext round trip — under the production Content-Security-Policy, and the
+ * slice found no mismatch to resolve. A field change from here updates the
+ * plan's "Field-level contracts" and every affected fixture in the same change;
+ * never add a convenience field locally.
  *
  * Pure domain code: zero DOM, zero I/O, and no browser or vendor runtime objects (D4).
  */
