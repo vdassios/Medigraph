@@ -96,6 +96,9 @@ the product accepts, and several earlier records only make sense after it.
 - `docs/adr/0014-categorical-measurements.md` — numeric and categorical measurements
 - `docs/adr/0017-the-service-worker-asset-list-is-generated.md` — the precache list is
   generated and the cache name derived; the worker itself stays hand-written
+- `docs/adr/0018-a-non-exhaustive-corpus-declares-what-it-cannot-judge.md` — a corpus
+  that is a subset of its document names the markers it cannot judge, and the score
+  sets those rows aside instead of charging them
 
 **Historical** — kept as the record of why, not as current rules. Everything in them that
 still binds is restated in the invariants above and in the records in force; nothing in

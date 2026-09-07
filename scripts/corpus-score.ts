@@ -83,6 +83,8 @@ interface Fixture {
   lab: string;
   pages: TextItem[][];
   expected: ExpectedRow[];
+  /** Markers this document prints whose truth the corpus could not establish. */
+  notScored: ReadonlySet<string>;
 }
 
 function load(): Fixture[] {
@@ -99,9 +101,18 @@ function load(): Fixture[] {
       const read = (name: string): unknown =>
         JSON.parse(readFileSync(new URL(`${split}/${lab}/${name}`, PARSER), 'utf8'));
       const items = read('textitems.json') as { fragmented: { pages: TextItem[][] } };
-      const expected = read('expected.json') as { rows: ExpectedRow[] };
+      const expected = read('expected.json') as {
+        rows: ExpectedRow[];
+        coverage: { notScored: string[] };
+      };
 
-      found.push({ split, lab, pages: items.fragmented.pages, expected: expected.rows });
+      found.push({
+        split,
+        lab,
+        pages: items.fragmented.pages,
+        expected: expected.rows,
+        notScored: new Set(expected.coverage.notScored),
+      });
     }
   }
 
@@ -172,8 +183,8 @@ function scoreOne(fixture: Fixture): Scored {
   return {
     fixture,
     result,
-    all: score(expected, result.rows),
-    passA: score(expected, result.rows.filter(isPassA)),
+    all: score(expected, result.rows, fixture.notScored),
+    passA: score(expected, result.rows.filter(isPassA), fixture.notScored),
   };
 }
 
@@ -206,6 +217,7 @@ function aggregate(scores: readonly CorpusScore[]): CorpusScore {
     valuePrecision: sum((each) => each.valuePrecision),
     unitPrecision: sum((each) => each.unitPrecision),
     rangePrecision: sum((each) => each.rangePrecision),
+    unjudged: scores.reduce((total, each) => total + each.unjudged, 0),
   };
 }
 
@@ -249,7 +261,16 @@ function table(
     );
   }
   console.log(`  ${'─'.repeat(NAME_WIDTH + CELL_WIDTH * METRICS.length - 2)}`);
-  console.log(row('aggregate', aggregate(scored.map(read))));
+
+  const total = aggregate(scored.map(read));
+  console.log(row('aggregate', total));
+
+  // Rows set aside because the corpus derived their marker and could not judge
+  // it. Printed, not swallowed: a number that grows is the corpus falling
+  // further behind the documents, not the parser improving.
+  if (total.unjudged > 0) {
+    console.log(`  ${'set aside as notScored'.padEnd(NAME_WIDTH)}${String(total.unjudged)}`);
+  }
   console.log('');
 }
 

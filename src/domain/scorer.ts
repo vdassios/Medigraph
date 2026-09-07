@@ -18,6 +18,13 @@ import type { ParsedRow, ReferenceRange } from './types';
  *   a marker costs recall. Emitting one that should not exist, or emitting a
  *   second copy of one that should, costs precision. A parser cannot buy recall
  *   by guessing, because every guess it emits is a precision denominator.
+ * - **Except where the corpus says it derived a row and could not judge it.**
+ *   A hand-checked corpus is not always exhaustive: a document may print a row
+ *   whose truth the derivation could not establish, and charging the parser for
+ *   reading one is measuring the corpus, not the parser. `notScored` names
+ *   those markers, and rows carrying one are set aside before anything is
+ *   counted. Set aside, not credited — they reach no numerator either, and a
+ *   marker the corpus never derived is a false positive exactly as before.
  * - **Unit and range precision count field opportunities, not rows.** A field
  *   scores when either side printed it, so an omitted unit and an invented one
  *   are both wrong, and a pair with no unit on either side is not counted at
@@ -34,6 +41,8 @@ export interface CorpusScore {
   valuePrecision: MetricCount;
   unitPrecision: MetricCount;
   rangePrecision: MetricCount;
+  /** Emitted rows set aside as `notScored`, reported so nothing is hidden. */
+  unjudged: number;
 }
 
 /**
@@ -236,7 +245,10 @@ function opportunities<T>(
 /**
  * Score one table of predictions against one table of expectations.
  *
- * Both are plain `ParsedRow` arrays, so the caller decides what a "corpus" is:
+ * `notScored` is the marker keys the corpus derived and could not judge; it
+ * defaults to empty, which is an exhaustive corpus and the metric exactly as it
+ * was. Both tables are plain `ParsedRow` arrays, so the caller decides what a
+ * "corpus" is:
  * `scripts/corpus-score.ts` calls this once per issuing laboratory and once
  * over everything, which is the per-laboratory axis the parser gate reads. The
  * counts are returned as integers rather than ratios so a small laboratory
@@ -246,19 +258,42 @@ function opportunities<T>(
  * malformed table is a broken fixture or a broken caller, and reporting it as
  * a parser failure would send someone hunting in the wrong place.
  */
-export function score(expected: readonly ParsedRow[], actual: readonly ParsedRow[]): CorpusScore {
+export function score(
+  expected: readonly ParsedRow[],
+  actual: readonly ParsedRow[],
+  notScored: ReadonlySet<string> = new Set(),
+): CorpusScore {
   assertScorable(expected, 'expected');
   assertScorable(actual, 'actual');
+  assertJudgeable(expected, notScored);
 
-  const pairing = pair(expected, actual);
+  const judged = actual.filter((row) => !notScored.has(row.markerKey));
+  const pairing = pair(expected, judged);
 
   return {
     markerRecall: { correct: pairing.matched.length, total: expected.length },
     valuePrecision: {
       correct: pairing.matched.filter((each) => sameResult(each.expected, each.actual)).length,
-      total: actual.length,
+      total: judged.length,
     },
     unitPrecision: opportunities(pairing, (row) => row.unit, sameUnit),
     rangePrecision: opportunities(pairing, (row) => row.referenceRange, sameRange),
+    unjudged: actual.length - judged.length,
   };
+}
+
+/**
+ * A marker is either expected or unjudged, never both.
+ *
+ * Naming one in `notScored` while also expecting it would delete the row from
+ * the precision denominator and keep it in the recall one — a marker that can
+ * only be missed. That is a broken caller, and it fails the way every other
+ * unscorable table does rather than quietly flattering the score.
+ */
+function assertJudgeable(expected: readonly ParsedRow[], notScored: ReadonlySet<string>): void {
+  for (const row of expected) {
+    if (notScored.has(row.markerKey)) {
+      throw new Error(`unscorable-row: expected[${row.markerKey}] is also named notScored`);
+    }
+  }
 }

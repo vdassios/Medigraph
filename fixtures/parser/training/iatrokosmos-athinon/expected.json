@@ -745,8 +745,13 @@
     }
   ],
   "coverage": {
-    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing. notScored names the markers this document prints whose truth the derivation could not establish, so that reading one is neither credited nor charged. It is a floor, not the whole of what was withheld — rowsDerived minus rowsCorroborated is.",
+    "exhaustive": false,
     "rowsDerived": 42,
-    "rowsCorroborated": 40
+    "rowsCorroborated": 40,
+    "notScored": [
+      "cholesterol",
+      "ldl"
+    ]
   }
 }

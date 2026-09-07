@@ -30,7 +30,13 @@ interface Fixture {
       | 'unit'
       | 'referenceRange'
     > & { page: number; categoricalReference: string | null })[];
-    coverage: { note: string; rowsDerived: number; rowsCorroborated: number };
+    coverage: {
+      note: string;
+      exhaustive: boolean;
+      rowsDerived: number;
+      rowsCorroborated: number;
+      notScored: string[];
+    };
   };
 }
 
@@ -158,6 +164,28 @@ describe.each(fixtures)('$split/$lab', (fixture) => {
     // One document measures a marker once. Two rows sharing a key would make
     // the scorer's one-to-one pairing arbitrary.
     expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('says which markers it printed and could not judge', () => {
+    // A corpus that is a subset of its document has to say so, or every row it
+    // withheld is charged to the parser as an invention. `notScored` names the
+    // markers whose truth the derivation could not establish; a marker outside
+    // both lists is a false positive exactly as before.
+    const { coverage, rows } = fixture.expected;
+    const expectedKeys = new Set(rows.map((row) => row.markerKey));
+
+    expect(coverage.exhaustive).toBe(coverage.rowsDerived === coverage.rowsCorroborated);
+    for (const key of coverage.notScored) {
+      expect(key).not.toBe('');
+      expect(expectedKeys).not.toContain(key);
+    }
+    expect(new Set(coverage.notScored).size).toBe(coverage.notScored.length);
+    if (coverage.exhaustive) {
+      expect(coverage.notScored).toEqual([]);
+    }
+    expect(coverage.notScored.length).toBeLessThanOrEqual(
+      coverage.rowsDerived - coverage.rowsCorroborated,
+    );
   });
 
   it('keeps every field consistent with its row status', () => {

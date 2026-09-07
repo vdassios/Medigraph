@@ -58,6 +58,7 @@ describe('score', () => {
         valuePrecision: { correct: 0, total: 0 },
         unitPrecision: { correct: 0, total: 0 },
         rangePrecision: { correct: 0, total: 0 },
+        unjudged: 0,
       });
     });
   });
@@ -314,7 +315,75 @@ describe('score', () => {
         valuePrecision: { correct: 2, total: 3 },
         unitPrecision: { correct: 1, total: 2 },
         rangePrecision: { correct: 1, total: 2 },
+        unjudged: 0,
       });
+    });
+  });
+
+  describe('markers the corpus could not judge', () => {
+    const closed = { kind: 'closed', min: 30, max: 400 } as const;
+
+    it('sets an emitted row aside instead of charging it', () => {
+      // The document prints ferritin; the corpus derived the row and could not
+      // establish its truth. Reading it is neither right nor wrong here.
+      const found = score(
+        [row('wbc', { value: 5.03 })],
+        [row('wbc', { value: 5.03 }), row('ferritin', { value: 45.5, unit: 'ng/ml' })],
+        new Set(['ferritin']),
+      );
+
+      expect(found.valuePrecision).toEqual({ correct: 1, total: 1 });
+      expect(found.unitPrecision).toEqual({ correct: 0, total: 0 });
+      expect(found.unjudged).toBe(1);
+    });
+
+    it('still charges a marker the corpus never derived', () => {
+      // Setting one row aside is not an amnesty for the next: this is what
+      // stops a parser buying recall by guessing.
+      const found = score(
+        [row('wbc', { value: 5.03 })],
+        [row('wbc', { value: 5.03 }), row('ferritin'), row('psa')],
+        new Set(['ferritin']),
+      );
+
+      expect(found.valuePrecision).toEqual({ correct: 1, total: 2 });
+      expect(found.unjudged).toBe(1);
+    });
+
+    it('sets aside a duplicate of an unjudged marker too', () => {
+      const found = score([], [row('ferritin'), row('ferritin')], new Set(['ferritin']));
+
+      expect(found.valuePrecision).toEqual({ correct: 0, total: 0 });
+      expect(found.unjudged).toBe(2);
+    });
+
+    it('never lets an unjudged row reach a numerator', () => {
+      const found = score(
+        [],
+        [row('ferritin', { value: 45.5, unit: 'ng/ml', referenceRange: closed })],
+        new Set(['ferritin']),
+      );
+
+      expect(found).toEqual({
+        markerRecall: { correct: 0, total: 0 },
+        valuePrecision: { correct: 0, total: 0 },
+        unitPrecision: { correct: 0, total: 0 },
+        rangePrecision: { correct: 0, total: 0 },
+        unjudged: 1,
+      });
+    });
+
+    it('refuses a marker the corpus both expects and cannot judge', () => {
+      expect(() => score([row('wbc')], [], new Set(['wbc']))).toThrow(
+        /unscorable-row: expected\[wbc\] is also named notScored/u,
+      );
+    });
+
+    it('scores exactly as before when the corpus is exhaustive', () => {
+      const expected = [row('wbc', { value: 5.03 })];
+      const actual = [row('wbc', { value: 5.03 }), row('ferritin')];
+
+      expect(score(expected, actual)).toEqual(score(expected, actual, new Set()));
     });
   });
 });

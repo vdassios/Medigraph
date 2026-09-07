@@ -408,8 +408,10 @@
     }
   ],
   "coverage": {
-    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree. Not exhaustive: a marker absent here is not an expectation that the parser find nothing.",
+    "note": "Rows are those where poppler column reconstruction and the committed TextItems agree, and that is every row this document prints. notScored is empty: a marker absent here is a marker the laboratory did not report.",
+    "exhaustive": true,
     "rowsDerived": 20,
-    "rowsCorroborated": 20
+    "rowsCorroborated": 20,
+    "notScored": []
   }
 }

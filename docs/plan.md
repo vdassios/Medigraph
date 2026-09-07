@@ -2889,6 +2889,17 @@ that compared only `ParseStatus` would report a urine panel as perfect while the
 printed the wrong word. Scores print integer numerator/denominator as well as
 percentages so small labs cannot hide behind rounding.
 
+**A corpus that is a subset of its document says so (ADR-0018).** `expected.json`
+carries `coverage.exhaustive` and `coverage.notScored`: the marker keys the derivation
+found the document printing and could not establish the truth of. `score` takes that set
+and removes matching emitted rows before anything is counted, so reading one is neither
+credited nor charged, and reports how many it set aside. A marker in neither list is a
+false positive exactly as before, which is what keeps a parser from buying recall by
+guessing. A marker may not be both expected and `notScored`; `score` throws on a caller
+that says so. `notScored` is a floor on what a laboratory withheld, not the whole of it
+— `rowsDerived` minus `rowsCorroborated` is — so an unlisted withheld row still costs
+precision and the score stays conservative.
+
 **Fixture-schema validation lives inside `score`.** It is the only exported surface, so
 that is where a table is checked before it is counted: a non-empty marker key, a known
 status, a finite-or-null value, and the status/value/comparator/`textValue` consistency
