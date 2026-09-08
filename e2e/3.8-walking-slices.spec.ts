@@ -94,6 +94,10 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   await expect(page.getByTestId('charts')).toHaveCount(0);
   expect(await storedProfile(page)).toBeNull();
 
+  // The island resolved a row's SourceRef through the evidence it is holding
+  // for this batch — the map it releases when the transaction ends.
+  await expect(page.getByTestId('evidence')).toHaveAttribute('data-kind', 'evidence');
+
   // Confirm is the one irreversible action, and it stays shut until asked for.
   await expect(page.getByTestId('confirm')).toBeDisabled();
   await answerEveryGate(page);
@@ -107,7 +111,7 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   await expect(page.getByTestId('series').locator('> li').first()).toBeVisible();
   await expect(page.getByTestId('review')).toHaveCount(0);
 
-  const stored = await storedProfile(page);
+  const stored = (await storedProfile(page)) as Record<string, unknown> | null;
   expect(stored).not.toBeNull();
 
   // Export and import round-trip to the same validated Profile.
@@ -121,18 +125,42 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   // is the envelope's Profile rather than the file.
   expect(JSON.parse(exported)).toMatchObject({ format: 'medigraph', v: 1, profile: stored });
 
+  // Import a Profile the screen is not already showing. Replacing it with what
+  // is already there would pass whether the file landed or was dropped, so the
+  // one imported here is emptied of its Reports and the count has to follow.
+  const emptied = { ...stored, reports: [] };
+
   await page.getByTestId('import').setInputFiles({
     name: 'medigraph.medigraph',
     mimeType: 'application/json',
-    buffer: Buffer.from(exported, 'utf8'),
+    buffer: Buffer.from(JSON.stringify({ format: 'medigraph', v: 1, profile: emptied }), 'utf8'),
   });
 
-  // Parsed, validated and written back: the same Profile, from the file alone.
-  await expect(page.getByTestId('report-count')).toHaveText('1');
+  // Parsed, validated, written and shown, from the file alone.
+  await expect(page.getByTestId('report-count')).toHaveText('0');
   await expect(page.getByTestId('error')).toHaveCount(0);
-  expect(await storedProfile(page)).toEqual(stored);
+  expect(await storedProfile(page)).toEqual(emptied);
 
   expect(violations).toEqual([]);
+});
+
+test('a confirmed Profile is charted again when the tab is reloaded', async ({ page }) => {
+  // Hydration is its own slice: the Profile has to survive the island being
+  // torn down and rebuilt, and nothing may be re-extracted to put it back.
+  // It reloads rather than asserting in the slice above because that test
+  // holds every page load in the run to the CSP, and this one adds a load.
+  await page.getByTestId('attach').setInputFiles(AHFY);
+  await expect(page.getByTestId('review')).toBeVisible();
+  await answerEveryGate(page);
+  await page.getByTestId('confirm').click();
+  await expect(page.getByTestId('report-count')).toHaveText('1');
+
+  await page.reload();
+
+  // Read back from IndexedDB alone: charting, with no document attached.
+  await expect(page.getByTestId('app')).toHaveAttribute('data-phase', 'viewing');
+  await expect(page.getByTestId('report-count')).toHaveText('1');
+  await expect(page.getByTestId('review')).toHaveCount(0);
 });
 
 test('a non-ΑΗΦΥ PDF is refused at its own source, and writes nothing', async ({ page }) => {

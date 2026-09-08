@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'preact/hooks';
 import {
   canConfirm,
   beginReview,
@@ -9,67 +9,90 @@ import {
 } from '../domain/review';
 import { applyProfileChange, buildProfileChange, setReportDate } from '../domain/profile';
 import { buildSeries } from '../domain/series';
-import type { Profile, ReviewSession, Series } from '../domain/types';
+import type { ParsedRow, Profile, ReviewSession, Series, SourceRef } from '../domain/types';
 import { parseMedigraph, serialiseMedigraph } from '../io/fileFormat';
 import { routeFiles } from '../io/fileRouter';
-import type { RouteFailure } from '../io/fileRouter';
 import { loadProfile, replaceProfile, saveProfile } from '../io/storage';
+import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
+import type { EvidenceLookup, EvidenceResource } from './appState';
 
 /**
- * The single Preact application island (D2), as the E0 walking slice needs it.
+ * The single Preact application island (D2), and the owner of everything the
+ * reducer may not hold.
  *
- * This is Task 3.8's minimal shell, not the product's review screen: it owns
- * every I/O call and every state transition the slice has to cross — attach,
- * review, the one atomic Confirm, persistence, the chart primitive and
- * plaintext export/import — with the smallest surface that can cross them.
- * Task 4.0 replaces the state below with `appState.ts`'s reducer, and Tasks
- * 4.1–4.5 replace each region with a real component. Nothing here should
- * survive that; what has to survive is the order the calls happen in.
+ * `appState.ts` owns the transaction's shape; this module owns its I/O and its
+ * resources. Every `routeFiles`, `saveProfile`, `parseMedigraph` and
+ * `createObjectURL` in the app happens here, and the `Map<sourceId,
+ * EvidenceResource>` below is deliberately a ref rather than state: it holds
+ * File handles, object URLs and open bitmaps, none of which belong in a
+ * serialisable value the app copies on every keystroke.
  *
- * Two rules it exists to hold, because the tests assert them from outside:
- * **nothing is persisted or charted before Confirm** (D6), and the review
- * session — which holds every page of evidence — is dropped the moment the
- * transaction ends, whether it was confirmed or cancelled.
+ * **The map is emptied on all four ways a transaction can end** — Confirm,
+ * Cancel, any failure and unmount — so a page crop can never outlive the review
+ * that opened it.
+ *
+ * The regions below are still Task 3.8's minimal shell. Tasks 4.1–4.5 replace
+ * each with a real component; what survives is the order the calls happen in,
+ * and the fact that no child makes any of them.
  */
 
-type Phase = 'idle' | 'extracting' | 'reviewing' | 'viewing';
-
 export function MedigraphApp(): JSX.Element {
-  const [phase, setPhase] = useState<Phase>('idle');
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [review, setReview] = useState<ReviewSession | null>(null);
-  const [failures, setFailures] = useState<RouteFailure[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(appReducer, initialState);
+  const { phase, profile, review, routeFailures, error } = state;
   const aborterRef = useRef<AbortController | null>(null);
+  const evidenceRef = useRef<Map<string, EvidenceResource>>(new Map());
+
+  /** The four ways a transaction ends all run through here. */
+  const release = useCallback(() => {
+    releaseEvidence(evidenceRef.current, (url) => {
+      URL.revokeObjectURL(url);
+    });
+  }, []);
 
   useEffect(() => {
     void loadProfile().then((stored) => {
       if (stored !== null) {
-        setProfile(stored);
-        setPhase('viewing');
+        dispatch({ type: 'profile-loaded', profile: stored });
       }
     });
-  }, []);
+
+    return release;
+  }, [release]);
 
   const attach = useCallback(
     async (files: File[]) => {
-      setError(null);
-      setFailures([]);
-      setPhase('extracting');
+      release();
+      dispatch({ type: 'extract-started' });
       aborterRef.current = new AbortController();
 
-      const batch = await routeFiles(files, aborterRef.current.signal, () => undefined);
-      setFailures(batch.failures);
+      const batch = await routeFiles(files, aborterRef.current.signal, (progress) => {
+        dispatch({ type: 'extract-progressed', progress });
+      });
 
-      if (batch.results.length === 0) {
-        setPhase(profile === null ? 'idle' : 'viewing');
-        return;
+      // The batch's own documents are what a review would be asked to show, so
+      // they are held from here until the transaction ends.
+      for (const [index, result] of batch.results.entries()) {
+        const file = files[index];
+        if (file !== undefined) {
+          evidenceRef.current.set(result.sourceId, {
+            file,
+            objectUrls: new Set(),
+            bitmaps: new Set(),
+          });
+        }
       }
 
-      setReview(beginReview(batch.results));
-      setPhase('reviewing');
+      dispatch({
+        type: 'review-ready',
+        review: beginReview(batch.results),
+        routeFailures: batch.failures,
+      });
+
+      if (batch.results.length === 0) {
+        release();
+      }
     },
-    [profile],
+    [release],
   );
 
   // Confirm is the only path to persistence, and it releases the evidence it
@@ -79,39 +102,51 @@ export function MedigraphApp(): JSX.Element {
       return;
     }
 
+    dispatch({ type: 'commit-started' });
     const change = buildProfileChange(review, profile);
     const next = applyProfileChange(profile, change, review.samePersonConfirmed ?? true);
 
     try {
       await saveProfile(next);
     } catch {
-      setError('commit-failed');
+      release();
+      dispatch({ type: 'failed', error: 'commit-failed' });
       return;
     }
 
-    setReview(null);
-    setProfile(next);
-    setPhase('viewing');
-  }, [review, profile]);
+    release();
+    dispatch({ type: 'commit-succeeded', profile: next });
+  }, [review, profile, release]);
 
   const cancel = useCallback(() => {
-    setReview(null);
-    setFailures([]);
-    setPhase(profile === null ? 'idle' : 'viewing');
-  }, [profile]);
+    aborterRef.current?.abort();
+    release();
+    dispatch({ type: 'cancelled' });
+  }, [release]);
 
   const importProfile = useCallback(async (file: File) => {
     const parsed = parseMedigraph(new Uint8Array(await file.arrayBuffer()));
     if (!parsed.ok) {
-      setError(parsed.error);
+      dispatch({ type: 'failed', error: parsed.error });
       return;
     }
 
     await replaceProfile(parsed.value);
-    setProfile(parsed.value);
-    setError(null);
-    setPhase('viewing');
+    dispatch({ type: 'profile-loaded', profile: parsed.value });
   }, []);
+
+  /**
+   * Resolve a row's `SourceRef` to the page it came from.
+   *
+   * The review region is given this callback rather than the map: a child that
+   * could read the map could also keep a reference into it past release, which
+   * is the one thing this ownership exists to prevent.
+   */
+  const inspect = useCallback(
+    (ref: SourceRef): EvidenceLookup =>
+      inspectSource(evidenceRef.current, review?.results ?? [], ref),
+    [review],
+  );
 
   const series = useMemo(
     () => (phase === 'viewing' && profile !== null ? buildSeries(profile) : []),
@@ -122,9 +157,9 @@ export function MedigraphApp(): JSX.Element {
     <div class="medigraph-app" data-testid="app" data-phase={phase}>
       <Attach onFiles={attach} disabled={phase === 'extracting' || phase === 'reviewing'} />
 
-      {failures.length > 0 && (
+      {routeFailures.length > 0 && (
         <ul data-testid="failures">
-          {failures.map((failure) => (
+          {routeFailures.map((failure) => (
             <li key={`${failure.scope}:${failure.code}`} data-testid={`failure-${failure.code}`}>
               {failure.scope === 'source' ? failure.fileName : 'batch'}: {failure.code}
             </li>
@@ -138,7 +173,10 @@ export function MedigraphApp(): JSX.Element {
         <Review
           review={review}
           profile={profile}
-          onChange={setReview}
+          onChange={(next) => {
+            dispatch({ type: 'review-updated', review: next });
+          }}
+          onInspectSource={inspect}
           onConfirm={() => void confirm()}
           onCancel={cancel}
         />
@@ -192,12 +230,14 @@ function Review({
   review,
   profile,
   onChange,
+  onInspectSource,
   onConfirm,
   onCancel,
 }: {
   review: ReviewSession;
   profile: Profile | null;
   onChange: (session: ReviewSession) => void;
+  onInspectSource: (ref: SourceRef) => EvidenceLookup;
   onConfirm: () => void;
   onCancel: () => void;
 }): JSX.Element {
@@ -218,6 +258,7 @@ function Review({
       {review.reportDrafts.map((draft) => (
         <article key={draft.id} data-testid={`draft-${draft.sourceIds.join('+')}`}>
           <p data-testid="draft-rows">{draft.rows.length}</p>
+          <Evidence rows={draft.rows} onInspectSource={onInspectSource} />
           <p>
             <span data-testid="draft-date">{draft.collectedAt?.date ?? ''}</span>{' '}
             <button
@@ -298,6 +339,39 @@ function Review({
         </button>
       </p>
     </section>
+  );
+}
+
+/**
+ * What the review can show of the document a row came from.
+ *
+ * Every refusal is rendered rather than swallowed, because each says something
+ * different to the person reading: a source whose evidence has been released is
+ * not the same as an adapter that never had any, and a page outside the
+ * document is a bug worth seeing rather than a crop worth guessing at. Task 4.2
+ * turns this into the crop beside the row; what it must keep is asking the
+ * island rather than holding the map.
+ */
+function Evidence({
+  rows,
+  onInspectSource,
+}: {
+  rows: readonly ParsedRow[];
+  onInspectSource: (ref: SourceRef) => EvidenceLookup;
+}): JSX.Element | null {
+  const ref = rows.find((row) => row.sourceRef !== undefined)?.sourceRef;
+  if (ref === undefined) {
+    return null;
+  }
+
+  const found = onInspectSource(ref);
+
+  return (
+    <p data-testid="evidence" data-kind={found.kind}>
+      {found.kind === 'evidence'
+        ? `${found.resource.file.name} p${String(found.page)}`
+        : found.kind}
+    </p>
   );
 }
 
