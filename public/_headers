@@ -23,18 +23,26 @@
 # `'wasm-unsafe-eval'` covers pdf.js image-codec WebAssembly and permits no
 # inline or eval'd JavaScript.
 #
-# `style-src-attr 'unsafe-inline'` is the scoped exception recorded in ADR-0008,
-# and the style directives are not relaxed further. Per ADR-0008, Task 0.4
-# records which browsers honour the split. From MDN browser-compat-data
-# (verified 2026-09-02), `style-src-attr` is supported by Chrome/Edge 75+,
-# Firefox 108+ and Safari 15.4+, the mobile engines mirroring their desktop
-# counterparts — Baseline widely available since December 2022. Older engines
-# ignore the directive and fall back to `style-src`, where a style attribute
-# stays blocked. That is why a style attribute or `define:vars` must never carry
-# load-bearing layout or anything a page cannot be read without. `style-src-elem`
-# has the same support floor, except that Safari 15.4-26.1 parsed it without
-# effect; harmless here, since `style-src` and `style-src-elem` carry the
-# identical value 'self'.
+# `style-src-attr 'unsafe-inline'` is the scoped exception recorded in ADR-0008.
+# `style-src-elem 'unsafe-inline'` is the one recorded in ADR-0019: Astro emits
+# its island shim — `astro-island,astro-slot,astro-static-slot{display:contents}`
+# — as an inline <style> element on every page carrying an island, and
+# `inlineStylesheets: 'never'` does not reach it, because that setting governs
+# component <style> blocks rather than the framework's own custom-element shim.
+# `style-src` itself is not relaxed.
+#
+# Per ADR-0008, Task 0.4 records which browsers honour the split. From MDN
+# browser-compat-data (verified 2026-09-02), `style-src-attr` is supported by
+# Chrome/Edge 75+, Firefox 108+ and Safari 15.4+, the mobile engines mirroring
+# their desktop counterparts — Baseline widely available since December 2022.
+# Older engines ignore the directive and fall back to `style-src`, where a style
+# attribute stays blocked. That is why a style attribute or `define:vars` must
+# never carry load-bearing layout or anything a page cannot be read without.
+# `style-src-elem` has the same support floor, except that Safari 15.4-26.1
+# parses it without effect. Since `style-src` and `style-src-elem` no longer
+# carry identical values, those versions fall back to `style-src 'self'` and
+# block the island shim — so `display: contents` on an island wrapper is under
+# the same rule: never load-bearing (ADR-0019).
 #
 # There is deliberately no Cross-Origin-Embedder-Policy. Its only beneficiary was
 # Task 3.3's WASM threads, which ADR-0013 deleted along with E1; nothing uses
@@ -42,7 +50,7 @@
 # no gain (ADR-0016).
 
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self'; style-src-elem 'self' 'unsafe-inline'; style-src-attr 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; img-src 'self' blob: data:; font-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; frame-ancestors 'none'
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   Referrer-Policy: no-referrer
