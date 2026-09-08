@@ -557,7 +557,11 @@ describe('what the screen shows', () => {
       }),
     });
 
+    // The flagged row is the one review is asking about; the clean one has
+    // collapsed into the pre-accepted group behind it.
     expect(all('row-marker').map((each) => each.textContent)).toEqual(['Φερριτίνη', 'Γλυκόζη']);
+    expect(find('row-flagged')?.getAttribute('data-triage')).toBe('expanded');
+    expect(find('row-clean')?.getAttribute('data-triage')).toBe('pre-accepted');
   });
 
   it('opens the source beside a row, and asks the island for it', () => {
@@ -610,6 +614,148 @@ describe('what the screen shows', () => {
 
     expect(confirmEnabled()).toBe(false);
     expect(text('blockers')).toContain('Δεν υπάρχει τίποτα προς οριστικοποίηση');
+  });
+});
+
+describe('confidence triage (4.2a)', () => {
+  function rowsOf(triage: string): string[] {
+    return [...host.querySelectorAll<HTMLElement>(`[data-triage="${triage}"]`)].map(
+      (each) => each.getAttribute('data-testid') ?? '',
+    );
+  }
+
+  const clean = [
+    row('a', 'glucose', { sourceOrder: 0 }),
+    row('b', 'ferritin', { sourceOrder: 1 }),
+    row('c', 'urea', { sourceOrder: 2 }),
+  ];
+
+  it('collapses every row the parser is sure of into one count', () => {
+    mount({ session: session({ reportDrafts: [draft({ dateConfirmed: true, rows: clean })] }) });
+
+    expect(text('pre-accepted-count')).toBe('3');
+    expect(find('rows-expanded')).toBeNull();
+    expect(find('nothing-to-review')).not.toBeNull();
+    expect(confirmEnabled()).toBe(true);
+  });
+
+  it('keeps the disclosure open to per-row correction', () => {
+    const ready = session({ reportDrafts: [draft({ dateConfirmed: true, rows: clean })] });
+    mount({ session: ready });
+
+    // The controls inside the disclosure are the same controls: batch
+    // acceptance is a default, not a restriction.
+    void act(() => {
+      host
+        .querySelector<HTMLElement>('[data-testid="pre-accepted"] [data-testid="delete-row"]')
+        ?.click();
+    });
+
+    expect(current(ready).reportDrafts[0]?.rows.map((each) => each.id)).toEqual(['b', 'c']);
+  });
+
+  it('never collapses a flagged or low-confidence row', () => {
+    mount({
+      session: session({
+        reportDrafts: [
+          draft({
+            dateConfirmed: true,
+            rows: [
+              row('clean', 'glucose'),
+              row('flagged', 'ferritin', { flags: ['unrecognised-unit'] }),
+              row('unsure', 'urea', { confidence: 'medium' }),
+            ],
+          }),
+        ],
+      }),
+    });
+
+    expect(rowsOf('expanded').sort()).toEqual(['row-flagged', 'row-unsure']);
+    expect(rowsOf('pre-accepted')).toEqual(['row-clean']);
+  });
+
+  it('never collapses an unknown marker until it is approved', () => {
+    const unknown = session({
+      reportDrafts: [draft({ dateConfirmed: true, rows: [row('r1', 'x:kappa')] })],
+    });
+    mount({ session: unknown });
+
+    expect(rowsOf('expanded')).toEqual(['row-r1']);
+    expect(confirmEnabled()).toBe(false);
+
+    click('approve-unknown');
+
+    expect(rowsOf('pre-accepted')).toEqual(['row-r1']);
+    expect(confirmEnabled()).toBe(true);
+  });
+
+  it('never collapses a row a conflict is still asking about', () => {
+    const duplicated = session({
+      reportDrafts: [
+        draft({
+          dateConfirmed: true,
+          rows: [row('r1', 'glucose', { value: 5 }), row('r2', 'glucose', { value: 6 })],
+          conflicts: [
+            {
+              id: 'c1',
+              markerKey: 'glucose',
+              candidateRowIds: ['r1', 'r2'],
+              resolution: null,
+            },
+          ],
+        }),
+      ],
+    });
+    mount({ session: duplicated });
+
+    expect(rowsOf('expanded').sort()).toEqual(['row-r1', 'row-r2']);
+
+    click('resolve-conflict-glucose');
+
+    expect(rowsOf('pre-accepted').sort()).toEqual(['row-r1', 'row-r2']);
+  });
+});
+
+describe('inline correction (4.2a)', () => {
+  const flagged = session({
+    reportDrafts: [
+      draft({
+        dateConfirmed: true,
+        rows: [
+          row('r1', 'glucose', {
+            flags: ['implausible-value'],
+            sourceRef: { sourceId: 's1', page: 1 },
+          }),
+        ],
+      }),
+    ],
+  });
+
+  it('opens the source beside the field, without asking for it separately', () => {
+    mount({ session: flagged });
+    expect(find('evidence')).toBeNull();
+
+    click('edit-row');
+
+    expect(find('row-editor')).not.toBeNull();
+    expect(find('evidence')?.getAttribute('data-kind')).toBe('evidence');
+  });
+
+  it('closes the source with the editor', () => {
+    mount({ session: flagged });
+    click('edit-row');
+
+    click('cancel-row-edit');
+
+    expect(find('evidence')).toBeNull();
+  });
+
+  it('shows one crop, not two, when the row is also being inspected', () => {
+    mount({ session: flagged });
+    click('inspect-source');
+    click('edit-row');
+
+    expect(all('evidence')).toHaveLength(1);
   });
 });
 

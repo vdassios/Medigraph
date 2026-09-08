@@ -142,6 +142,32 @@ function printedRange(row: ParsedRow): string {
     : `${range.comparator}${String(range.max)}`;
 }
 
+/**
+ * Whether this row is one the user is being asked to look at (Task 4.2a).
+ *
+ * A row the parser is sure of and flagged nothing on is **pre-accepted**: it
+ * collapses into a count with a disclosure, and Confirm accepts it with every
+ * other. That is a change to how much has to be read, never to what may be
+ * confirmed — the four questions that block Confirm keep their row on screen
+ * regardless of confidence, because a gate nobody can see is not a gate.
+ *
+ * An approved unknown collapses, since it has been answered; its label stays
+ * listed in the identifier panel, which is where free text heading into a
+ * Profile is read.
+ */
+function needsReview(row: ParsedRow, session: ReviewSession, draft: ReviewReportDraft): boolean {
+  if (row.confidence !== 'high' || row.flags.length > 0) {
+    return true;
+  }
+  if (isUnknown(row.markerKey) && !session.approvedUnknownRowIds.includes(row.id)) {
+    return true;
+  }
+
+  return draft.conflicts.some(
+    (conflict) => conflict.resolution === null && conflict.candidateRowIds.includes(row.id),
+  );
+}
+
 /** A row the user has not adjudicated yet sorts above one the parser is sure of. */
 function reviewOrder(a: ParsedRow, b: ParsedRow): number {
   const weight = (row: ParsedRow): number =>
@@ -494,7 +520,9 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
 
   const stored = draft.collectedAt;
   const dirty = date !== (stored?.date ?? '') || time !== (stored?.time ?? '');
-  const rows = [...draft.rows].sort(reviewOrder);
+  const sorted = [...draft.rows].sort(reviewOrder);
+  const rows = sorted.filter((row) => needsReview(row, session, draft));
+  const preAccepted = sorted.filter((row) => !needsReview(row, session, draft));
   const sameDay = (existingProfile?.reports ?? []).filter(
     (report) => report.collectedAt.date === date,
   );
@@ -610,22 +638,21 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
         <ConflictView key={conflict.id} conflict={conflict} draft={draft} {...props} />
       ))}
 
-      <table class="review-rows">
-        <thead>
-          <tr>
-            <th scope="col">Δείκτης</th>
-            <th scope="col">Αποτέλεσμα</th>
-            <th scope="col">Μονάδα</th>
-            <th scope="col">Τιμές αναφοράς</th>
-            <th scope="col">Ενέργειες</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <RowView key={row.id} row={row} {...props} />
-          ))}
-        </tbody>
-      </table>
+      {rows.length > 0 ? (
+        <RowTable rows={rows} triage="expanded" {...props} />
+      ) : (
+        <p data-testid="nothing-to-review">Καμία γραμμή δεν χρειάζεται έλεγχο.</p>
+      )}
+
+      {preAccepted.length > 0 && (
+        <details class="review-pre-accepted" data-testid="pre-accepted">
+          <summary>
+            <span data-testid="pre-accepted-count">{preAccepted.length}</span> γραμμές διαβάστηκαν
+            χωρίς επιφύλαξη και θα αποθηκευτούν όπως είναι. Δείτε τες κι αυτές.
+          </summary>
+          <RowTable rows={preAccepted} triage="pre-accepted" {...props} />
+        </details>
+      )}
     </article>
   );
 }
@@ -707,7 +734,11 @@ function ConflictView({
 }
 
 /** One parsed row, and every tool review has for disagreeing with it. */
-function RowView({ row, ...props }: RegionProps & { row: ParsedRow }): JSX.Element {
+function RowView({
+  row,
+  triage,
+  ...props
+}: RegionProps & { row: ParsedRow; triage: 'expanded' | 'pre-accepted' }): JSX.Element {
   const { session, onChange, onPending } = props;
   const [editing, setEditing] = useState(false);
   const [reassigning, setReassigning] = useState(false);
@@ -719,6 +750,7 @@ function RowView({ row, ...props }: RegionProps & { row: ParsedRow }): JSX.Eleme
   return (
     <tr
       data-testid={`row-${row.id}`}
+      data-triage={triage}
       data-confidence={row.confidence}
       data-flagged={row.flags.length > 0 ? 'true' : 'false'}
     >
@@ -813,7 +845,14 @@ function RowView({ row, ...props }: RegionProps & { row: ParsedRow }): JSX.Eleme
             }}
           />
         )}
-        {inspecting && row.sourceRef !== undefined && (
+        {/*
+          The crop opens with the editor as well as on request (Task 4.2a):
+          correcting a value is exactly the moment the document is worth
+          seeing, and a correction made from memory is a worse record than the
+          parse it replaces. One element either way — two would be two answers
+          to the same question.
+        */}
+        {(inspecting || editing) && row.sourceRef !== undefined && (
           <EvidenceView sourceRef={row.sourceRef} {...props} />
         )}
       </td>
@@ -1065,5 +1104,38 @@ function EvidenceView({
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * One group of rows: the ones review is asking about, or the pre-accepted ones
+ * behind their disclosure.
+ *
+ * Both groups get the same controls. Batch acceptance is a default, not a
+ * restriction: a row inside the disclosure can still be corrected, reassigned
+ * or deleted one at a time (Task 4.2a's per-row exception).
+ */
+function RowTable({
+  rows,
+  triage,
+  ...props
+}: RegionProps & { rows: readonly ParsedRow[]; triage: 'expanded' | 'pre-accepted' }): JSX.Element {
+  return (
+    <table class="review-rows" data-testid={`rows-${triage}`}>
+      <thead>
+        <tr>
+          <th scope="col">Δείκτης</th>
+          <th scope="col">Αποτέλεσμα</th>
+          <th scope="col">Μονάδα</th>
+          <th scope="col">Τιμές αναφοράς</th>
+          <th scope="col">Ενέργειες</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <RowView key={row.id} row={row} triage={triage} {...props} />
+        ))}
+      </tbody>
+    </table>
   );
 }

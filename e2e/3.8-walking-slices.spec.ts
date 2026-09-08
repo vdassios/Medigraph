@@ -97,7 +97,12 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   // The island resolves a row's SourceRef through the evidence it is holding
   // for this batch — the map it releases when the transaction ends. Since Task
   // 4.2 the crop opens beside the row that asked for it, so the assertion asks
-  // for it too rather than expecting it on screen unbidden.
+  // for it too rather than expecting it on screen unbidden — and since 4.2a a
+  // document this clean has every row behind the pre-accepted disclosure.
+  const preAccepted = page.getByTestId('pre-accepted');
+  if ((await preAccepted.count()) > 0) {
+    await preAccepted.locator('summary').click();
+  }
   await page.getByTestId('inspect-source').first().click();
   await expect(page.getByTestId('evidence').first()).toHaveAttribute('data-kind', 'evidence');
 

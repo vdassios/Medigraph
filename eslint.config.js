@@ -21,6 +21,10 @@ export default defineConfig([
       'public/ocr/**',
       'public/pdf/**',
       'pnpm-lock.yaml',
+      // Playwright writes these on a failed run. They are gitignored, and
+      // linting a generated trace report only ever fails the next lint.
+      'test-results/**',
+      'playwright-report/**',
     ],
   },
 
