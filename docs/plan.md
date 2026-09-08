@@ -815,6 +815,13 @@ src/
     storage.ts           IndexedDB via idb
   ui/                 one MedigraphApp island with child components
     MedigraphApp.tsx     owns the attach→review→confirm transaction
+    appState.ts          the transaction's phases, and the evidence beside it
+    FileDrop.tsx         attach: drag/drop, picker, progress, typed failures
+    ReviewTable.tsx      every D6/D7/D8 gate, and none of the deciding
+    panelMeter.ts        pure: range status and meter geometry, zero DOM
+    PanelView.tsx        one Report, one row per marker, factual meters
+  styles/
+    viz.css              the visualisation palette, light and dark (Theming)
   pages/              Astro routes: index (landing), app, privacy
 scripts/
   corpus-score.ts      parser-corpus runner and aggregate/per-lab reporting
@@ -2621,9 +2628,14 @@ palette (not an inverted light one), declared under **both**
 `@media (prefers-color-scheme: dark)` and `:root[data-theme="dark"]`. Every text,
 icon, focus and graphical-object pair meets WCAG 2.2 AA contrast; status remains
 understandable in monochrome and forced-colours mode. These tokens are declared once
-in the global stylesheet and consumed by component `<style>` blocks; see
+in `src/styles/viz.css` and consumed by component `<style>` blocks; see
 [Astro component styles](#astro-component-styles) for how per-datapoint geometry and
-state reach the DOM without a CSP-blocked style attribute.
+state reach the DOM without a CSP-blocked style attribute. A Preact island has no
+scoped `<style>` block of its own, so it **imports** that stylesheet: Astro extracts the
+import into the page's external stylesheet, which `style-src 'self'` admits, and the
+0.4 header test fails the build if it ever stops being extracted. Per-row state reaches
+the CSS as a `data-status` attribute selected on in the stylesheet, and meter geometry
+as SVG presentation attributes, so neither needs a style attribute.
 
 ---
 

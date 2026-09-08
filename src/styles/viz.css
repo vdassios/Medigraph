@@ -1,0 +1,165 @@
+/*
+ * The visualisation palette, declared once (docs/plan.md, "Theming").
+ *
+ * Every colour a chart or meter uses is a custom property on `.viz-root`, so
+ * the dark palette is a redefinition of the same names rather than a second
+ * set of rules to keep in step. Dark is declared under both
+ * `prefers-color-scheme` and `[data-theme="dark"]`: the media query is the
+ * default the operating system asks for, and the attribute is the choice a
+ * user makes over it (Task 4.6 owns the control).
+ *
+ * Status is never carried by colour alone — every row states its status in
+ * words and in an icon as well, which is what keeps it readable in monochrome
+ * and forced-colours mode (Task 5.4 is the gate on that).
+ *
+ * Loaded by importing this file from the island, so it ships as an external
+ * stylesheet: `style-src 'self'` admits it, and nothing here needs a style
+ * attribute or an inline block.
+ */
+
+.viz-root {
+  --viz-surface: #ffffff;
+  --viz-text: #1a1c1f;
+  --viz-text-quiet: #4a5058;
+  --viz-line: #c9ced6;
+  --viz-rail: #e6e9ee;
+  --viz-band: #cfe0f5;
+  --viz-within: #1f6f43;
+  --viz-outside: #a4341c;
+  --viz-unknown: #4a5058;
+  --viz-series: #2a78d6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .viz-root {
+    --viz-surface: #14171a;
+    --viz-text: #e8eaed;
+    --viz-text-quiet: #b0b6be;
+    --viz-line: #3c434c;
+    --viz-rail: #262b31;
+    --viz-band: #23405f;
+    --viz-within: #5cc98d;
+    --viz-outside: #ff8f74;
+    --viz-unknown: #b0b6be;
+    --viz-series: #3987e5;
+  }
+}
+
+:root[data-theme='dark'] .viz-root {
+  --viz-surface: #14171a;
+  --viz-text: #e8eaed;
+  --viz-text-quiet: #b0b6be;
+  --viz-line: #3c434c;
+  --viz-rail: #262b31;
+  --viz-band: #23405f;
+  --viz-within: #5cc98d;
+  --viz-outside: #ff8f74;
+  --viz-unknown: #b0b6be;
+  --viz-series: #3987e5;
+}
+
+.panel {
+  background: var(--viz-surface);
+  color: var(--viz-text);
+}
+
+.panel-reports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.panel-reports button {
+  min-height: 44px;
+  padding: 0 0.75rem;
+}
+
+.panel-reports button[aria-current='true'] {
+  border-color: var(--viz-series);
+  font-weight: 600;
+}
+
+.panel-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* A row is one 44 px target, whatever it wraps to on a narrow screen. */
+.panel-row {
+  display: grid;
+  gap: 0.25rem 0.75rem;
+  grid-template-areas: 'name' 'result';
+  min-height: 44px;
+  text-align: start;
+  width: 100%;
+}
+
+@media (min-width: 40rem) {
+  .panel-row {
+    align-items: center;
+    grid-template-areas: 'name result';
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
+
+.panel-row-name {
+  grid-area: name;
+}
+
+.panel-row-result {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  grid-area: result;
+}
+
+.panel-value {
+  font-variant-numeric: tabular-nums;
+  margin-inline-start: auto;
+}
+
+.panel-range {
+  color: var(--viz-text-quiet);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel-status[data-status='within'] {
+  color: var(--viz-within);
+}
+
+.panel-status[data-status='below'],
+.panel-status[data-status='above'] {
+  color: var(--viz-outside);
+}
+
+.panel-status[data-status='unavailable'] {
+  color: var(--viz-unknown);
+}
+
+.panel-meter-rail {
+  fill: var(--viz-rail);
+}
+
+.panel-meter-band {
+  fill: var(--viz-band);
+}
+
+.panel-meter-bound {
+  fill: var(--viz-line);
+}
+
+.panel-meter-dot[data-status='within'] {
+  fill: var(--viz-within);
+}
+
+.panel-meter-dot[data-status='below'],
+.panel-meter-dot[data-status='above'] {
+  fill: var(--viz-outside);
+}
+
+.panel-disclaimer {
+  border-top: 1px solid var(--viz-line);
+  color: var(--viz-text-quiet);
+  font-size: 0.8125rem;
+}

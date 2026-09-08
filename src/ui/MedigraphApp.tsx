@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'preact/hooks';
 import { canConfirm, beginReview } from '../domain/review';
 import { applyProfileChange, buildProfileChange } from '../domain/profile';
 import { buildSeries } from '../domain/series';
@@ -9,6 +9,7 @@ import { routeFiles } from '../io/fileRouter';
 import { loadProfile, replaceProfile, saveProfile } from '../io/storage';
 import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
 import { FileDrop } from './FileDrop';
+import { PanelView } from './PanelView';
 import { ReviewTable } from './ReviewTable';
 import type { EvidenceLookup, EvidenceResource } from './appState';
 
@@ -29,7 +30,8 @@ import type { EvidenceLookup, EvidenceResource } from './appState';
  *
  * The regions below are Task 3.8's minimal shell, less the two that have been
  * replaced: attach is `FileDrop` (4.1) and review is `ReviewTable` (4.2);
- * charts and data management are still placeholders for Tasks 4.3–4.5. What
+ * the panel is `PanelView` (4.3); the trend view and data management are
+ * still placeholders for Tasks 4.4 and 4.5. What
  * survives each replacement is the order the calls happen in, and the fact
  * that no child makes any of them.
  */
@@ -37,6 +39,11 @@ import type { EvidenceLookup, EvidenceResource } from './appState';
 export function MedigraphApp(): JSX.Element {
   const [state, dispatch] = useReducer(appReducer, initialState);
   const { phase, profile, review, progress, routeFailures, error } = state;
+  // Which Report and which Series are on screen. View state, not transaction
+  // state: it survives no reload, decides nothing, and is deliberately outside
+  // the reducer that owns what may be written.
+  const [reportId, setReportId] = useState<string | null>(null);
+  const [seriesId, setSeriesId] = useState<string | null>(null);
   const aborterRef = useRef<AbortController | null>(null);
   const evidenceRef = useRef<Map<string, EvidenceResource>>(new Map());
 
@@ -177,19 +184,33 @@ export function MedigraphApp(): JSX.Element {
       )}
 
       {phase === 'viewing' && profile !== null && (
-        <Charts profile={profile} series={series} onImport={(file) => void importProfile(file)} />
+        <>
+          <PanelView
+            profile={profile}
+            reportId={reportId ?? profile.reports.at(-1)?.id ?? ''}
+            onSelectReport={setReportId}
+            onSelectSeries={setSeriesId}
+          />
+          <Charts
+            profile={profile}
+            series={series.filter((each) => seriesId === null || each.id === seriesId)}
+            onImport={(file) => void importProfile(file)}
+          />
+        </>
       )}
     </div>
   );
 }
 
 /**
- * The panel and trend primitives, and nothing beyond them (D13).
+ * What is left of Task 3.8's chart primitive: the trend a panel row opens, and
+ * the export/import controls Task 4.5 replaces.
  *
  * Every series prints its marker key, its normalised unit and the values the
  * laboratory reported, in collection order. No range is drawn, no point is
- * coloured, and nothing is described as high, low or improving: this shows
- * what was measured and says nothing about it.
+ * coloured, and nothing is described as high, low or improving (D13). Task 4.4
+ * replaces this list with `TrendView`, which is why the panel already hands it
+ * one series rather than all of them.
  */
 function Charts({
   profile,

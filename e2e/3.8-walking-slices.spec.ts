@@ -116,7 +116,11 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   // Confirmed: one Report charted, the same Report persisted, evidence gone.
   await expect(page.getByTestId('charts')).toBeVisible();
   await expect(page.getByTestId('report-count')).toHaveText('1');
-  await expect(page.getByTestId('series').locator('> li').first()).toBeVisible();
+  await expect(page.getByTestId('panel-rows').locator('> li').first()).toBeVisible();
+
+  // The panel opens one marker's history: a row is the way into the trend.
+  await page.locator('[data-testid^="panel-row-"]').first().click();
+  await expect(page.getByTestId('point').first()).toBeVisible();
   await expect(page.getByTestId('review')).toHaveCount(0);
 
   const stored = (await storedProfile(page)) as Record<string, unknown> | null;

@@ -73,7 +73,7 @@ test('a document the parser is sure of costs no row-level action', async ({ page
   // the Report, not merely absent from the screen.
   await expect(page.getByTestId('charts')).toBeVisible();
   await expect(page.getByTestId('report-count')).toHaveText('1');
-  await expect(page.getByTestId('series').locator('> li')).toHaveCount(rowCount);
+  await expect(page.getByTestId('panel-rows').locator('> li')).toHaveCount(rowCount);
 });
 
 test('a document with rows worth reading keeps them on screen, and Confirm shut', async ({
