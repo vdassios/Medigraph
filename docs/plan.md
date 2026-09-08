@@ -840,9 +840,12 @@ src/
     trendGeometry.ts     pure: time-proportional x, stepped bands, line runs
     TrendView.tsx        one marker over time, as SVG and as a table
     DataManager.tsx      export, import preview, and the two ways to delete
+    i18n.ts              the el/en string tables, and the language in force
   styles/
     viz.css              the visualisation palette, light and dark (Theming)
   pages/              Astro routes: index (landing), app, privacy
+                      index and privacy render both languages and hydrate
+                      nothing; only app carries the island and its toggle
 scripts/
   corpus-score.ts      parser-corpus runner and aggregate/per-lab reporting
 public/

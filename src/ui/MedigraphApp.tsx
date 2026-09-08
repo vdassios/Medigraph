@@ -22,6 +22,8 @@ import {
 import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
 import { FileDrop } from './FileDrop';
 import { DataManager } from './DataManager';
+import type { Language } from './i18n';
+import { COPY, LanguageContext, detectLanguage, loadLanguage, saveLanguage } from './i18n';
 import { PanelView } from './PanelView';
 import { TrendView } from './TrendView';
 import { ReviewTable } from './ReviewTable';
@@ -61,6 +63,9 @@ export function MedigraphApp(): JSX.Element {
   const [preview, setPreview] = useState<ImportPreview | null>(null);
   const [importError, setImportError] = useState<MedigraphReadError | null>(null);
   const [persistenceGranted, setPersistenceGranted] = useState<boolean | null>(null);
+  // Greek until the browser is asked, which happens on mount: a stored choice
+  // if the reader has made one, otherwise whatever their browser asks for.
+  const [language, setLanguage] = useState<Language>('el');
   const aborterRef = useRef<AbortController | null>(null);
   const evidenceRef = useRef<Map<string, EvidenceResource>>(new Map());
 
@@ -81,6 +86,8 @@ export function MedigraphApp(): JSX.Element {
     // Asked once, at the only moment the answer is actionable: a user the
     // browser refuses to persist for is one who needs the export nudge.
     void requestStoragePersistence().then(setPersistenceGranted);
+
+    setLanguage(loadLanguage() ?? detectLanguage(navigator.languages));
 
     return release;
   }, [release]);
@@ -274,66 +281,97 @@ export function MedigraphApp(): JSX.Element {
   );
   const selectedSeries = series.find((each) => each.id === seriesId) ?? null;
 
+  const copy = COPY[language];
+
   return (
-    <div class="medigraph-app" data-testid="app" data-phase={phase}>
-      <FileDrop
-        disabled={phase === 'extracting' || phase === 'reviewing' || phase === 'committing'}
-        progress={progress}
-        failures={routeFailures}
-        onFiles={(files) => void attach(files)}
-        onCancel={cancel}
-      />
+    <LanguageContext.Provider value={language}>
+      <div class="medigraph-app" data-testid="app" data-phase={phase} lang={language}>
+        <p>
+          <button
+            type="button"
+            data-testid="switch-language"
+            lang={language === 'el' ? 'en' : 'el'}
+            onClick={() => {
+              const next: Language = language === 'el' ? 'en' : 'el';
+              setLanguage(next);
+              saveLanguage(next);
+            }}
+          >
+            {copy.switchTo}
+          </button>
+        </p>
 
-      {error !== null && <p data-testid="error">{error}</p>}
-
-      {review !== null && (
-        <ReviewTable
-          session={review}
-          existingProfile={profile}
-          onChange={(next) => {
-            dispatch({ type: 'review-updated', review: next });
-          }}
-          onInspectSource={inspect}
-          onConfirm={() => void confirm()}
+        <FileDrop
+          disabled={phase === 'extracting' || phase === 'reviewing' || phase === 'committing'}
+          progress={progress}
+          failures={routeFailures}
+          onFiles={(files) => void attach(files)}
           onCancel={cancel}
         />
-      )}
 
-      {phase === 'viewing' && profile !== null && (
-        <>
-          {selectedSeries === null ? (
-            <PanelView
-              profile={profile}
-              reportId={reportId ?? profile.reports.at(-1)?.id ?? ''}
-              onSelectReport={setReportId}
-              onSelectSeries={setSeriesId}
-            />
-          ) : (
-            <TrendView
-              series={selectedSeries}
-              onBack={() => {
-                setSeriesId(null);
-              }}
-            />
-          )}
-          <DataManager
-            profile={profile}
-            persistenceGranted={persistenceGranted}
-            preview={preview}
-            importError={importError}
-            onExport={exportProfile}
-            onImport={(file) => void readImport(file)}
-            onCancelImport={() => {
-              setPreview(null);
-              setImportError(null);
+        {error !== null && <p data-testid="error">{error}</p>}
+
+        {review !== null && (
+          <ReviewTable
+            session={review}
+            existingProfile={profile}
+            onChange={(next) => {
+              dispatch({ type: 'review-updated', review: next });
             }}
-            onReplace={() => void acceptImport()}
-            onMerge={(plan) => void mergeImport(plan)}
-            onDeleteReport={(id) => void deleteReport(id)}
-            onClearAll={() => void clearEverything()}
+            onInspectSource={inspect}
+            onConfirm={() => void confirm()}
+            onCancel={cancel}
           />
-        </>
-      )}
-    </div>
+        )}
+
+        {phase === 'viewing' && profile !== null && (
+          <>
+            {selectedSeries === null ? (
+              <PanelView
+                profile={profile}
+                reportId={reportId ?? profile.reports.at(-1)?.id ?? ''}
+                onSelectReport={setReportId}
+                onSelectSeries={setSeriesId}
+              />
+            ) : (
+              <TrendView
+                series={selectedSeries}
+                onBack={() => {
+                  setSeriesId(null);
+                }}
+              />
+            )}
+            <DataManager
+              profile={profile}
+              persistenceGranted={persistenceGranted}
+              preview={preview}
+              importError={importError}
+              onExport={exportProfile}
+              onImport={(file) => void readImport(file)}
+              onCancelImport={() => {
+                setPreview(null);
+                setImportError(null);
+              }}
+              onReplace={() => void acceptImport()}
+              onMerge={(plan) => void mergeImport(plan)}
+              onDeleteReport={(id) => void deleteReport(id)}
+              onClearAll={() => void clearEverything()}
+            />
+          </>
+        )}
+
+        {/*
+          The standing D1/D13 notice, inside the island so it follows the
+          language toggle. It is always visible and never dismissible: it is
+          what keeps the product a display of the user's own record rather
+          than an opinion about it.
+        */}
+        <footer class="app-disclaimer" data-testid="app-disclaimer">
+          <p>{copy.disclaimer.dataStays}</p>
+          <p>{copy.disclaimer.plaintext}</p>
+          <p>{copy.disclaimer.displayOnly}</p>
+        </footer>
+      </div>
+    </LanguageContext.Provider>
   );
 }

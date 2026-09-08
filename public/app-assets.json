@@ -1,16 +1,17 @@
 {
-  "revision": "c52111a7fd41",
+  "revision": "780aa7d5b707",
   "assets": [
     "/",
     "/app/",
-    "/_astro/MedigraphApp.DN80HrLH.js",
+    "/_astro/MedigraphApp.BVYclrAu.js",
     "/_astro/app.Dbjcp0zN.css",
-    "/_astro/client.WrkwNyc5.js",
-    "/_astro/hooks.module.XfJ5h9wj.js",
-    "/_astro/index.DtUY6pRL.css",
+    "/_astro/client.hHNMHZTJ.js",
+    "/_astro/hooks.module.UOLdEh9G.js",
+    "/_astro/index.FnsnvXUl.css",
     "/_astro/pdf.HehH3weH.js",
-    "/_astro/preload-helper.BV6FBT56.js",
-    "/_astro/signals.module.BhX571_I.js",
+    "/_astro/preload-helper.mW8NN4Aj.js",
+    "/_astro/privacy.DNtReqNo.css",
+    "/_astro/signals.module.CtdIeXtu.js",
     "/pdf/pdf.worker.min.mjs"
   ]
 }

@@ -5,6 +5,8 @@ import { buildSeries } from '../domain/series';
 import type { Measurement, Profile, ReferenceRange, Report, Series } from '../domain/types';
 import type { Meter, RangeStatus } from './panelMeter';
 import { meterOf, rangeStatus } from './panelMeter';
+import type { Copy } from './i18n';
+import { localisedDate, useCopy, useLanguage } from './i18n';
 import '../styles/viz.css';
 
 /**
@@ -23,8 +25,7 @@ import '../styles/viz.css';
  * the fact that status is stated three ways at once: in words, in an icon and
  * in colour, so nothing is carried by hue alone.
  *
- * The copy is Greek and inline until Task 4.6's `el`/`en` toggle; every string
- * a person reads is a whole sentence in `TEXT` or in the JSX below.
+ * Every string it shows comes from `i18n.ts`, in the reader's language.
  */
 
 export interface PanelViewProps {
@@ -33,25 +34,6 @@ export interface PanelViewProps {
   onSelectReport(reportId: string): void;
   onSelectSeries(seriesId: string): void;
 }
-
-const TEXT = {
-  heading: 'Αποτελέσματα εξέτασης',
-  reports: 'Επιλογή εξέτασης',
-  empty: 'Δεν υπάρχει καμία αποθηκευμένη εξέταση.',
-  emptyReport: 'Η εξέταση αυτή δεν περιέχει κανένα αποτέλεσμα.',
-  missing: '—',
-  noRange: 'Το εργαστήριο δεν τύπωσε τιμές αναφοράς.',
-  splitUnit: 'Ο δείκτης αυτός έχει καταγραφεί και σε άλλη μονάδα· οι δύο σειρές δεν συγχωνεύονται.',
-  disclaimer:
-    'Το Medigraph εμφανίζει όσα ανέφερε το εργαστήριό σας, μαζί με τις τιμές αναφοράς που τύπωσε το ίδιο. Δεν τα ερμηνεύει και δεν αποτελεί ιατρική συμβουλή.',
-} as const;
-
-const STATUS_TEXT: Record<RangeStatus, string> = {
-  within: 'εντός των τιμών αναφοράς που ανέφερε το εργαστήριο',
-  below: 'κάτω από τις τιμές αναφοράς που ανέφερε το εργαστήριο',
-  above: 'πάνω από τις τιμές αναφοράς που ανέφερε το εργαστήριο',
-  unavailable: 'χωρίς σύγκριση με τιμές αναφοράς',
-};
 
 /** Direction, not judgement: an arrow says which side of a printed bound. */
 const STATUS_ICON: Record<RangeStatus, string> = {
@@ -68,12 +50,12 @@ function markerName(measurement: Measurement): string {
 }
 
 /** The value as the laboratory reported it, in its own unit. */
-function printedValue(measurement: Measurement): string {
+function printedValue(measurement: Measurement, copy: Copy['panel']): string {
   if (measurement.status === 'categorical') {
-    return measurement.textValue ?? TEXT.missing;
+    return measurement.textValue ?? copy.missing;
   }
   if (measurement.status === 'missing' || measurement.value === null) {
-    return TEXT.missing;
+    return copy.missing;
   }
 
   return `${measurement.comparator ?? ''}${String(measurement.value)}`;
@@ -99,13 +81,13 @@ function printedRange(range: ReferenceRange | null): string {
  * beside `Αρνητικό` — and a row with neither says so, rather than leaving a
  * blank a reader would have to interpret.
  */
-function printedReference(measurement: Measurement): string {
+function printedReference(measurement: Measurement, copy: Copy['panel']): string {
   const range = printedRange(measurement.referenceRange);
   if (range !== '') {
     return range;
   }
 
-  return measurement.categoricalReference ?? TEXT.noRange;
+  return measurement.categoricalReference ?? copy.noRange;
 }
 
 interface PanelRow {
@@ -139,6 +121,9 @@ function panelOrder(a: PanelRow, b: PanelRow): number {
 
 export function PanelView(props: PanelViewProps): JSX.Element {
   const { profile, reportId } = props;
+  const copy = useCopy().panel;
+  const disclaimer = useCopy().disclaimer.displayOnly;
+  const language = useLanguage();
   const series = useMemo(() => buildSeries(profile), [profile]);
   const report: Report | undefined = profile.reports.find((each) => each.id === reportId);
 
@@ -162,15 +147,15 @@ export function PanelView(props: PanelViewProps): JSX.Element {
 
   return (
     <section class="viz-root panel" data-testid="panel" aria-labelledby="panel-heading">
-      <h2 id="panel-heading">{TEXT.heading}</h2>
+      <h2 id="panel-heading">{copy.heading}</h2>
 
       {profile.reports.length === 0 ? (
-        <p data-testid="panel-empty">{TEXT.empty}</p>
+        <p data-testid="panel-empty">{copy.empty}</p>
       ) : (
         <div
           class="panel-reports"
           role="group"
-          aria-label={TEXT.reports}
+          aria-label={copy.reports}
           data-testid="panel-reports"
         >
           {profile.reports.map((each) => (
@@ -183,7 +168,7 @@ export function PanelView(props: PanelViewProps): JSX.Element {
                 props.onSelectReport(each.id);
               }}
             >
-              {each.collectedAt.date}
+              {localisedDate(each.collectedAt.date, language)}
               {each.collectedAt.time === null ? '' : ` ${each.collectedAt.time}`}
             </button>
           ))}
@@ -191,7 +176,7 @@ export function PanelView(props: PanelViewProps): JSX.Element {
       )}
 
       {report !== undefined && rows.length === 0 && (
-        <p data-testid="panel-empty-report">{TEXT.emptyReport}</p>
+        <p data-testid="panel-empty-report">{copy.emptyReport}</p>
       )}
 
       <ul class="panel-rows" data-testid="panel-rows">
@@ -205,7 +190,7 @@ export function PanelView(props: PanelViewProps): JSX.Element {
         display of the user's own record rather than an opinion about it (D13).
       */}
       <p class="panel-disclaimer" data-testid="panel-disclaimer">
-        {TEXT.disclaimer}
+        {disclaimer}
       </p>
     </section>
   );
@@ -221,6 +206,7 @@ export function PanelView(props: PanelViewProps): JSX.Element {
  * reason: it says nothing the sentence does not.
  */
 function PanelRowView(props: PanelViewProps & { row: PanelRow }): JSX.Element {
+  const copy = useCopy().panel;
   const { measurement, status, meter, series, splitUnit } = props.row;
   const unit = measurement.unit ?? '';
 
@@ -243,19 +229,19 @@ function PanelRowView(props: PanelViewProps & { row: PanelRow }): JSX.Element {
             {markerName(measurement)}
             {splitUnit && unit !== '' ? ` (${unit})` : ''}
           </span>
-          {splitUnit && <span data-testid="row-split-unit"> {TEXT.splitUnit}</span>}
+          {splitUnit && <span data-testid="row-split-unit"> {copy.splitUnit}</span>}
         </span>
 
         <span class="panel-row-result">
           <span class="panel-value" data-testid="row-value">
-            {printedValue(measurement)} {unit}
+            {printedValue(measurement, copy)} {unit}
           </span>
           <span class="panel-range" data-testid="row-range">
-            {printedReference(measurement)}
+            {printedReference(measurement, copy)}
           </span>
           {meter !== null && <MeterBar meter={meter} status={status} />}
           <span class="panel-status" data-testid="row-status" data-status={status}>
-            <span aria-hidden="true">{STATUS_ICON[status]}</span> {STATUS_TEXT[status]}
+            <span aria-hidden="true">{STATUS_ICON[status]}</span> {copy.status[status]}
           </span>
         </span>
       </button>

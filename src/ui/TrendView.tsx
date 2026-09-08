@@ -2,9 +2,10 @@ import type { JSX, TargetedPointerEvent } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { MARKERS } from '../domain/registry';
 import type { Series, SeriesPoint } from '../domain/types';
-import type { RangeStatus } from './panelMeter';
 import type { TrendPoint } from './trendGeometry';
 import { trendGeometry } from './trendGeometry';
+import type { Copy } from './i18n';
+import { useCopy } from './i18n';
 import '../styles/viz.css';
 
 /**
@@ -24,38 +25,13 @@ import '../styles/viz.css';
  * from and is the primary path for assistive technology, which is why the SVG
  * is a labelled `<figure>` and never the only place a value appears.
  *
- * The copy is Greek and inline until Task 4.6's `el`/`en` toggle.
+ * Every string it shows comes from `i18n.ts`, in the reader's language.
  */
 
 export interface TrendViewProps {
   series: Series;
   onBack(): void;
 }
-
-const TEXT = {
-  back: 'Πίσω στα αποτελέσματα',
-  showTable: 'Εμφάνιση ως πίνακα',
-  hideTable: 'Εμφάνιση ως διάγραμμα',
-  noValues: 'Καμία καταγεγραμμένη τιμή.',
-  censored:
-    'Το εργαστήριο ανέφερε ότι η τιμή είναι κάτω ή πάνω από αυτό το όριο· η ακριβής τιμή είναι άγνωστη.',
-  disclaimer:
-    'Το Medigraph εμφανίζει όσα ανέφερε το εργαστήριό σας, μαζί με τις τιμές αναφοράς που τύπωσε το ίδιο. Δεν τα ερμηνεύει και δεν αποτελεί ιατρική συμβουλή.',
-  columns: {
-    date: 'Ημερομηνία',
-    value: 'Τιμή που αναφέρθηκε',
-    unit: 'Μονάδα',
-    range: 'Τιμές αναφοράς',
-    status: 'Σύγκριση',
-  },
-} as const;
-
-const STATUS_TEXT: Record<RangeStatus, string> = {
-  within: 'εντός των τιμών αναφοράς που ανέφερε το εργαστήριο',
-  below: 'κάτω από τις τιμές αναφοράς που ανέφερε το εργαστήριο',
-  above: 'πάνω από τις τιμές αναφοράς που ανέφερε το εργαστήριο',
-  unavailable: 'χωρίς σύγκριση με τιμές αναφοράς',
-};
 
 /** The plot box, in user units. The SVG scales; these numbers never do. */
 const PLOT = { width: 320, height: 160, padLeft: 8, padRight: 8, padTop: 8, padBottom: 8 } as const;
@@ -108,6 +84,9 @@ function toY(fraction: number): number {
 
 export function TrendView(props: TrendViewProps): JSX.Element {
   const { series } = props;
+  const copy = useCopy().trend;
+  const disclaimer = useCopy().disclaimer.displayOnly;
+  const statusText = useCopy().panel.status;
   const geometry = useMemo(() => trendGeometry(series), [series]);
   const [tabular, setTabular] = useState(false);
   const [focused, setFocused] = useState<number | null>(null);
@@ -121,8 +100,8 @@ export function TrendView(props: TrendViewProps): JSX.Element {
   const last = series.points.at(-1);
   const summary =
     first === undefined || last === undefined
-      ? 'Καμία καταγραφή.'
-      : `${String(series.points.length)} καταγραφές, από ${printedDate(first)} έως ${printedDate(last)}.`;
+      ? copy.noRecords
+      : copy.summary(series.points.length, printedDate(first), printedDate(last));
 
   return (
     <section class="viz-root trend" data-testid="trend" aria-labelledby="trend-title">
@@ -134,7 +113,7 @@ export function TrendView(props: TrendViewProps): JSX.Element {
             props.onBack();
           }}
         >
-          {TEXT.back}
+          {copy.back}
         </button>{' '}
         <button
           type="button"
@@ -144,7 +123,7 @@ export function TrendView(props: TrendViewProps): JSX.Element {
             setTabular(!tabular);
           }}
         >
-          {tabular ? TEXT.hideTable : TEXT.showTable}
+          {tabular ? copy.hideTable : copy.showTable}
         </button>
       </p>
 
@@ -153,7 +132,7 @@ export function TrendView(props: TrendViewProps): JSX.Element {
       </h2>
       <p data-testid="trend-summary">{summary}</p>
 
-      {geometry.empty && <p data-testid="trend-no-values">{TEXT.noValues}</p>}
+      {geometry.empty && <p data-testid="trend-no-values">{copy.noValues}</p>}
 
       {!tabular && (
         <figure data-testid="trend-figure" aria-labelledby="trend-title trend-summary">
@@ -208,8 +187,8 @@ export function TrendView(props: TrendViewProps): JSX.Element {
 
           <figcaption data-testid="trend-caption">
             {focused === null
-              ? TEXT.disclaimer
-              : describe(series.points[focused], geometry.points[focused])}
+              ? disclaimer
+              : describe(series.points[focused], geometry.points[focused], copy, statusText)}
           </figcaption>
         </figure>
       )}
@@ -224,11 +203,11 @@ export function TrendView(props: TrendViewProps): JSX.Element {
           <caption>{title}</caption>
           <thead>
             <tr>
-              <th scope="col">{TEXT.columns.date}</th>
-              <th scope="col">{TEXT.columns.value}</th>
-              <th scope="col">{TEXT.columns.unit}</th>
-              <th scope="col">{TEXT.columns.range}</th>
-              <th scope="col">{TEXT.columns.status}</th>
+              <th scope="col">{copy.columns.date}</th>
+              <th scope="col">{copy.columns.value}</th>
+              <th scope="col">{copy.columns.unit}</th>
+              <th scope="col">{copy.columns.range}</th>
+              <th scope="col">{copy.columns.status}</th>
             </tr>
           </thead>
           <tbody>
@@ -238,7 +217,7 @@ export function TrendView(props: TrendViewProps): JSX.Element {
                 <td>{printedValue(point)}</td>
                 <td>{point.nativeUnit ?? series.unit ?? ''}</td>
                 <td>{printedRange(point)}</td>
-                <td>{STATUS_TEXT[geometry.points[index]?.status ?? 'unavailable']}</td>
+                <td>{statusText[geometry.points[index]?.status ?? 'unavailable']}</td>
               </tr>
             ))}
           </tbody>
@@ -246,7 +225,7 @@ export function TrendView(props: TrendViewProps): JSX.Element {
       )}
 
       <p class="panel-disclaimer" data-testid="trend-disclaimer">
-        {TEXT.disclaimer}
+        {disclaimer}
       </p>
     </section>
   );
@@ -269,6 +248,8 @@ function Mark({
   reported: SeriesPoint | undefined;
   focused: boolean;
 }): JSX.Element | null {
+  const copy = useCopy().trend;
+
   if (point.y === null || reported === undefined) {
     return null;
   }
@@ -284,7 +265,7 @@ function Mark({
           <text class="trend-caret" x={x} y={y + 3} text-anchor="middle">
             {reported.comparator ?? ''}
           </text>
-          <title>{TEXT.censored}</title>
+          <title>{copy.censored}</title>
         </>
       ) : (
         <circle class="trend-mark" data-status={point.status} cx={x} cy={y} r="5" />
@@ -341,12 +322,17 @@ function nearest(
 }
 
 /** What the focused point says, in the same words the table uses. */
-function describe(reported: SeriesPoint | undefined, placed: TrendPoint | undefined): string {
+function describe(
+  reported: SeriesPoint | undefined,
+  placed: TrendPoint | undefined,
+  copy: Copy['trend'],
+  statusText: Copy['panel']['status'],
+): string {
   if (reported === undefined || placed === undefined) {
-    return TEXT.disclaimer;
+    return '';
   }
 
-  const censored = placed.kind === 'censored' ? ` ${TEXT.censored}` : '';
+  const censored = placed.kind === 'censored' ? ` ${copy.censored}` : '';
 
-  return `${printedDate(reported)}: ${printedValue(reported)} ${reported.nativeUnit ?? ''} — ${STATUS_TEXT[placed.status]}.${censored}`;
+  return `${printedDate(reported)}: ${printedValue(reported)} ${reported.nativeUnit ?? ''} — ${statusText[placed.status]}.${censored}`;
 }

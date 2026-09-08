@@ -1,0 +1,52 @@
+---
+import { COPY, LANGUAGES } from '../ui/i18n';
+
+// Zero-hydration privacy route (D2). The copy lives in the string table with
+// every other string, which is what lets `i18n.test.ts` assert what it may not
+// say: no promise of an empty Network tab, no origin allowlist (ADR-0015), and
+// no absolute claim of safety.
+---
+
+<html lang="el">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Medigraph</title>
+  </head>
+  <body>
+    <main class="privacy">
+      {
+        LANGUAGES.map((language) => (
+          <section lang={language} class="privacy-block">
+            <h1>{COPY[language].privacy.heading}</h1>
+            <p>{COPY[language].privacy.local}</p>
+            <p>{COPY[language].privacy.noServer}</p>
+            <p>{COPY[language].privacy.plaintext}</p>
+            <p>{COPY[language].privacy.eviction}</p>
+            <p>{COPY[language].privacy.device}</p>
+            <p>{COPY[language].privacy.xss}</p>
+            <p>{COPY[language].privacy.networkTab}</p>
+            <p>{COPY[language].privacy.displayOnly}</p>
+            <p>
+              <a href="/">{COPY[language].privacy.back}</a>
+            </p>
+          </section>
+        ))
+      }
+    </main>
+  </body>
+</html>
+
+<style>
+  .privacy {
+    margin: 0 auto;
+    max-width: 40rem;
+    padding: 2rem 1rem;
+  }
+
+  .privacy-block + .privacy-block {
+    border-top: 1px solid currentColor;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+  }
+</style>

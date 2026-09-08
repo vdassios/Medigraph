@@ -1,7 +1,9 @@
 import type { JSX, TargetedDragEvent } from 'preact';
 import { useState } from 'preact/hooks';
-import type { FileRouteErrorCode, RouteFailure, RouteProgress } from '../io/fileRouter';
+import type { RouteFailure, RouteProgress } from '../io/fileRouter';
 import { ROUTE_LIMITS } from '../io/fileRouter';
+import type { Copy } from './i18n';
+import { useCopy } from './i18n';
 
 /**
  * The attach surface: the one place a document enters the app.
@@ -21,13 +23,9 @@ import { ROUTE_LIMITS } from '../io/fileRouter';
  * no `capture` attribute and the product asks for no camera permission: on a
  * phone this opens the file picker, which is where a downloaded ΑΗΦΥ PDF is.
  *
- * **The copy is Greek and inline, and is not staying that way.** Task 4.6 puts
- * every string in `el` and `en` behind the language toggle. Until it lands, each
- * user-facing string in this component sits in one of three places —
- * `FAILURE_TEXT`, `describeProgress` or the JSX below — so lifting them is a
- * move rather than a hunt. Each is a whole sentence: a message assembled from
- * clauses cannot be translated, because word order is the first thing another
- * language changes.
+ * Every string it shows comes from `i18n.ts`, in the reader's language. Each
+ * is a whole sentence: a message assembled from clauses cannot be translated,
+ * because word order is the first thing another language changes.
  */
 
 export interface FileDropProps {
@@ -39,29 +37,6 @@ export interface FileDropProps {
 }
 
 const MEGABYTES = ROUTE_LIMITS.maxBytes / (1024 * 1024);
-
-/**
- * What each refusal says to the person who attached the file.
- *
- * A rejected source is told what Medigraph accepts and where that document
- * comes from, and is never told its own file is broken: the paper history and
- * the loose laboratory PDF are outside this product's scope, not defective
- * (ADR-0013). The two batch limits and a cancellation say what survived,
- * because a source already read is kept and a message implying otherwise would
- * send the user to re-attach documents that are already in the review.
- */
-const FAILURE_TEXT: Record<FileRouteErrorCode, string> = {
-  'too-many-files': `Επισυνάψατε περισσότερα από ${String(ROUTE_LIMITS.maxFiles)} αρχεία, οπότε δεν διαβάστηκε κανένα. Δοκιμάστε ξανά με λιγότερα.`,
-  'too-many-pages': `Η επισύναψη ξεπέρασε τις ${String(ROUTE_LIMITS.maxPages)} σελίδες και σταμάτησε εδώ. Όσα έγγραφα διαβάστηκαν πριν από αυτό παραμένουν.`,
-  cancelled: 'Η ανάγνωση διακόπηκε. Όσα έγγραφα είχαν ήδη διαβαστεί παραμένουν.',
-  'unsupported-type':
-    'Δεν είναι αρχείο PDF. Το Medigraph διαβάζει μόνο το PDF των εξετάσεων που κατεβάζετε από τον Ατομικό Ηλεκτρονικό Φάκελο Υγείας (myhealth.gov.gr).',
-  'file-too-large': `Ξεπερνά τα ${String(MEGABYTES)} MB και δεν διαβάστηκε.`,
-  'decode-failed':
-    'Το PDF δεν άνοιξε. Κατεβάστε το ξανά από το myhealth.gov.gr και επισυνάψτε το όπως είναι.',
-  'not-ahfy-document':
-    'Δεν είναι έγγραφο ΑΗΦΥ. Κατεβάστε τις εξετάσεις σας σε PDF από το myhealth.gov.gr και επισυνάψτε το αρχείο χωρίς αλλαγές.',
-};
 
 /** One key per failure, so two refusals of the same kind both render. */
 function failureKey(failure: RouteFailure): string {
@@ -78,19 +53,17 @@ function failureKey(failure: RouteFailure): string {
  * has been decoded — and printing a page number the router has not reached
  * would be a progress bar that invents its own progress.
  */
-function describeProgress(progress: RouteProgress): string {
-  const source = String(progress.sourceIndex + 1);
-  const count = String(progress.sourceCount);
+function describeProgress(progress: RouteProgress, copy: Copy['attach']): string {
+  const source = progress.sourceIndex + 1;
 
-  // Two whole sentences rather than a shared prefix and two endings: Task 4.6
-  // has to be able to translate each of these as a unit.
   return progress.pageCount === 0
-    ? `Ανάγνωση εγγράφου ${source} από ${count}…`
-    : `Έγγραφο ${source} από ${count}: ${String(progress.page)} από ${String(progress.pageCount)} σελίδες`;
+    ? copy.reading(source, progress.sourceCount)
+    : copy.pages(source, progress.sourceCount, progress.page, progress.pageCount);
 }
 
 export function FileDrop(props: FileDropProps): JSX.Element {
   const { disabled, progress, failures } = props;
+  const copy = useCopy().attach;
   const [dragging, setDragging] = useState(false);
 
   // Held as plain functions rather than `useCallback`: nothing below this
@@ -146,18 +119,14 @@ export function FileDrop(props: FileDropProps): JSX.Element {
       }}
       onDrop={drop}
     >
-      <h2 id="file-drop-heading">Επισύναψη εγγράφου</h2>
-      <p data-testid="attach-instructions">
-        Σύρετε εδώ το PDF των εξετάσεών σας ή επιλέξτε το από τη συσκευή σας. Το Medigraph διαβάζει
-        μόνο τα έγγραφα που κατεβάζετε από τον Ατομικό Ηλεκτρονικό Φάκελο Υγείας (myhealth.gov.gr).
-      </p>
+      <h2 id="file-drop-heading">{copy.heading}</h2>
+      <p data-testid="attach-instructions">{copy.instructions}</p>
       <p data-testid="attach-limits">
-        Έως {ROUTE_LIMITS.maxFiles} αρχεία κάθε φορά, {ROUTE_LIMITS.maxPages} σελίδες συνολικά, έως{' '}
-        {MEGABYTES} MB ανά αρχείο.
+        {copy.limits(ROUTE_LIMITS.maxFiles, ROUTE_LIMITS.maxPages, MEGABYTES)}
       </p>
       <p>
         <label>
-          Επιλογή αρχείων{' '}
+          {copy.choose}{' '}
           <input
             data-testid="attach"
             type="file"
@@ -180,7 +149,7 @@ export function FileDrop(props: FileDropProps): JSX.Element {
       */}
       <p class="file-drop-progress">
         <span data-testid="attach-progress" role="status">
-          {progress === null ? '' : describeProgress(progress)}
+          {progress === null ? '' : describeProgress(progress, copy)}
         </span>{' '}
         {progress !== null && (
           <button
@@ -190,7 +159,7 @@ export function FileDrop(props: FileDropProps): JSX.Element {
               props.onCancel();
             }}
           >
-            Διακοπή
+            {copy.stop}
           </button>
         )}
       </p>
@@ -204,11 +173,36 @@ export function FileDrop(props: FileDropProps): JSX.Element {
                   <span data-testid="failure-file">{failure.fileName}</span>:{' '}
                 </>
               )}
-              {FAILURE_TEXT[failure.code]}
+              <FailureText code={failure.code} />
             </li>
           ))}
         </ul>
       )}
     </section>
   );
+}
+
+/**
+ * What one refusal says to the person who attached the file.
+ *
+ * A rejected source is told what Medigraph accepts and where that document
+ * comes from, and is never told its own file is broken: the paper history and
+ * the loose laboratory PDF are outside this product's scope, not defective
+ * (ADR-0013). The batch limits and a cancellation say what survived, because a
+ * source already read is kept and a message implying otherwise would send the
+ * user to re-attach documents that are already in the review.
+ */
+function FailureText({ code }: { code: RouteFailure['code'] }): JSX.Element {
+  const copy = useCopy().attach.failures;
+
+  switch (code) {
+    case 'too-many-files':
+      return <>{copy['too-many-files'](ROUTE_LIMITS.maxFiles)}</>;
+    case 'too-many-pages':
+      return <>{copy['too-many-pages'](ROUTE_LIMITS.maxPages)}</>;
+    case 'file-too-large':
+      return <>{copy['file-too-large'](MEGABYTES)}</>;
+    default:
+      return <>{copy[code]()}</>;
+  }
 }

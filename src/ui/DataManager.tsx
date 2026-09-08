@@ -2,7 +2,9 @@ import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import { resolveSameDayPrecision } from '../domain/profile';
 import type { Profile, ProfileMergePlan, Report } from '../domain/types';
+import type { Language } from './i18n';
 import type { ImportPreview, MedigraphReadError } from '../io/fileFormat';
+import { localisedDate, useCopy, useLanguage } from './i18n';
 import '../styles/viz.css';
 
 /**
@@ -20,7 +22,7 @@ import '../styles/viz.css';
  * preselected Replace would let a mis-tap end a history that has no backup by
  * design — the export nudge exists precisely because we do not keep one.
  *
- * The copy is Greek and inline until Task 4.6's `el`/`en` toggle.
+ * Every string it shows comes from `i18n.ts`, in the reader's language.
  */
 
 export interface DataManagerProps {
@@ -39,73 +41,26 @@ export interface DataManagerProps {
   onClearAll(): void;
 }
 
-const TEXT = {
-  heading: 'Τα δεδομένα σας',
-  exportHeading: 'Αντίγραφο των δεδομένων σας',
-  exportWarning:
-    'Το αρχείο που κατεβάζετε είναι απλό κείμενο και περιέχει ολόκληρο το ιατρικό σας ιστορικό, χωρίς κρυπτογράφηση. Όποιος το ανοίξει το διαβάζει. Φυλάξτε το όπως θα φυλάγατε τα ίδια τα χαρτιά των εξετάσεων.',
-  exportAction: 'Λήψη αρχείου .medigraph',
-  importHeading: 'Εισαγωγή αρχείου .medigraph',
-  importAction: 'Επιλογή αρχείου',
-  previewHeading: 'Τι περιέχει το αρχείο',
-  cancel: 'Ακύρωση',
-  importEmpty: 'Εισαγωγή',
-  replace: 'Αντικατάσταση όλων',
-  merge: 'Συγχώνευση με τα υπάρχοντα',
-  replaceConfirmPrefix: 'Η αντικατάσταση διαγράφει οριστικά ',
-  replaceConfirmSuffix:
-    ' αποθηκευμένες εξετάσεις από αυτή τη συσκευή. Δεν υπάρχει αντίγραφο εκτός συσκευής.',
-  replaceConfirmAction: 'Ναι, αντικατάσταση',
-  samePerson: 'Το αρχείο αφορά το ίδιο πρόσωπο με το ιστορικό που είναι ήδη αποθηκευμένο.',
-  mergeBlocked:
-    'Το αρχείο περιέχει εξέταση με το ίδιο αναγνωριστικό αλλά διαφορετικό περιεχόμενο. Η συγχώνευση δεν μπορεί να αποφασίσει ποια ισχύει.',
-  sameDay:
-    'Δύο εξετάσεις πέφτουν την ίδια ημέρα. Δώστε διαφορετική ώρα στην καθεμία για να ξεχωρίζουν.',
-  storedTime: 'Ώρα της αποθηκευμένης',
-  incomingTime: 'Ώρα αυτής που εισάγετε',
-  reportsHeading: 'Αποθηκευμένες εξετάσεις',
-  deleteReport: 'Διαγραφή',
-  deleteReportConfirm: 'Ναι, διαγραφή αυτής της εξέτασης',
-  clearAll: 'Διαγραφή όλων από αυτή τη συσκευή',
-  clearAllConfirm:
-    'Διαγράφονται οριστικά όλες οι εξετάσεις, η τοπική βάση και η προσωρινή μνήμη της εφαρμογής από αυτή τη συσκευή.',
-  clearAllAction: 'Ναι, διαγραφή όλων',
-  empty:
-    'Δεν υπάρχει τίποτα αποθηκευμένο ακόμη. Επισυνάψτε ένα έγγραφο ΑΗΦΥ από το myhealth.gov.gr ή εισαγάγετε ένα αρχείο .medigraph.',
-  persistenceDenied:
-    'Ο browser δεν εγγυάται τη διατήρηση των δεδομένων: μπορεί να τα διαγράψει όταν χρειαστεί χώρο. Κρατήστε ένα αντίγραφο με τη Λήψη παραπάνω.',
-  persistenceGranted:
-    'Ο browser έχει σημειώσει τα δεδομένα ως μόνιμα. Μπορούν και πάλι να χαθούν αν διαγράψετε τα δεδομένα περιήγησης, οπότε κρατήστε ένα αντίγραφο.',
-  persistenceUnknown:
-    'Ο browser δεν απάντησε αν θα διατηρήσει τα δεδομένα. Κρατήστε ένα αντίγραφο με τη Λήψη παραπάνω.',
-} as const;
-
-const ERROR_TEXT: Record<MedigraphReadError, string> = {
-  'file-too-large': 'Το αρχείο είναι πολύ μεγάλο για αρχείο .medigraph.',
-  'malformed-json': 'Το αρχείο δεν διαβάζεται· δεν είναι έγκυρο JSON.',
-  'not-medigraph': 'Δεν είναι αρχείο .medigraph.',
-  'unsupported-version': 'Το αρχείο γράφτηκε από νεότερη έκδοση του Medigraph.',
-  'invalid-profile': 'Τα περιεχόμενα δεν είναι έγκυρο ιστορικό Medigraph.',
-};
-
-function reportDate(report: Report): string {
+function reportDate(report: Report, language: Language): string {
   const { date, time } = report.collectedAt;
+  const localised = localisedDate(date, language);
 
-  return time === null ? date : `${date} ${time}`;
+  return time === null ? localised : `${localised} ${time}`;
 }
 
 export function DataManager(props: DataManagerProps): JSX.Element {
   const { profile, persistenceGranted, preview, importError } = props;
+  const copy = useCopy().data;
   const reports = profile?.reports ?? [];
 
   return (
     <section class="viz-root data-manager" data-testid="data-manager">
-      <h2>{TEXT.heading}</h2>
+      <h2>{copy.heading}</h2>
 
-      {reports.length === 0 && <p data-testid="data-empty">{TEXT.empty}</p>}
+      {reports.length === 0 && <p data-testid="data-empty">{copy.empty}</p>}
 
-      <h3>{TEXT.exportHeading}</h3>
-      <p data-testid="export-warning">{TEXT.exportWarning}</p>
+      <h3>{copy.exportHeading}</h3>
+      <p data-testid="export-warning">{copy.exportWarning}</p>
       <p>
         <button
           type="button"
@@ -115,21 +70,21 @@ export function DataManager(props: DataManagerProps): JSX.Element {
             props.onExport();
           }}
         >
-          {TEXT.exportAction}
+          {copy.exportAction}
         </button>
       </p>
       <p data-testid="persistence">
         {persistenceGranted === true
-          ? TEXT.persistenceGranted
+          ? copy.persistence.granted
           : persistenceGranted === false
-            ? TEXT.persistenceDenied
-            : TEXT.persistenceUnknown}
+            ? copy.persistence.denied
+            : copy.persistence.unknown}
       </p>
 
-      <h3>{TEXT.importHeading}</h3>
+      <h3>{copy.importHeading}</h3>
       <p>
         <label>
-          {TEXT.importAction}{' '}
+          {copy.importAction}{' '}
           <input
             type="file"
             data-testid="import"
@@ -144,13 +99,13 @@ export function DataManager(props: DataManagerProps): JSX.Element {
         </label>
       </p>
 
-      {importError !== null && <p data-testid="import-error">{ERROR_TEXT[importError]}</p>}
+      {importError !== null && <p data-testid="import-error">{copy.errors[importError]}</p>}
 
       {preview !== null && <ImportDecision {...props} preview={preview} />}
 
       {reports.length > 0 && (
         <>
-          <h3>{TEXT.reportsHeading}</h3>
+          <h3>{copy.reportsHeading}</h3>
           <ul data-testid="stored-reports">
             {reports.map((report) => (
               <StoredReport key={report.id} report={report} {...props} />
@@ -174,6 +129,8 @@ export function DataManager(props: DataManagerProps): JSX.Element {
  */
 function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): JSX.Element {
   const { profile, preview } = props;
+  const copy = useCopy().data;
+  const language = useLanguage();
   const [confirmingReplace, setConfirmingReplace] = useState(false);
   const [samePerson, setSamePerson] = useState(false);
   const [plan, setPlan] = useState<ProfileMergePlan | null>(preview.plan);
@@ -186,11 +143,13 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
 
   return (
     <div class="import-preview" data-testid="import-preview">
-      <h3>{TEXT.previewHeading}</h3>
+      <h3>{copy.previewHeading}</h3>
       <p data-testid="preview-summary">
-        Το αρχείο περιέχει {preview.profile.reports.length} εξετάσεις, από{' '}
-        {preview.profile.reports.at(0)?.collectedAt.date ?? '—'} έως{' '}
-        {preview.profile.reports.at(-1)?.collectedAt.date ?? '—'}.
+        {copy.previewSummary(
+          preview.profile.reports.length,
+          localisedDate(preview.profile.reports.at(0)?.collectedAt.date ?? '', language),
+          localisedDate(preview.profile.reports.at(-1)?.collectedAt.date ?? '', language),
+        )}
       </p>
 
       {existing.length > 0 && (
@@ -204,16 +163,16 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
                 setSamePerson(event.currentTarget.checked);
               }}
             />{' '}
-            {TEXT.samePerson}
+            {copy.samePerson}
           </label>
         </p>
       )}
 
-      {idConflicts.length > 0 && <p data-testid="merge-blocked">{TEXT.mergeBlocked}</p>}
+      {idConflicts.length > 0 && <p data-testid="merge-blocked">{copy.mergeBlocked}</p>}
 
       {sameDayConflicts.length > 0 && (
         <div data-testid="same-day-conflicts">
-          <p>{TEXT.sameDay}</p>
+          <p>{copy.sameDay}</p>
           {sameDayConflicts.map((conflict) => (
             <SameDayFields
               key={`${conflict.existing.id}:${conflict.incoming.id}`}
@@ -244,7 +203,7 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
             props.onCancelImport();
           }}
         >
-          {TEXT.cancel}
+          {copy.cancel}
         </button>{' '}
         {existing.length === 0 ? (
           <button
@@ -254,7 +213,7 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
               props.onReplace();
             }}
           >
-            {TEXT.importEmpty}
+            {copy.importEmpty}
           </button>
         ) : (
           <>
@@ -273,7 +232,7 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
                 }
               }}
             >
-              {TEXT.merge}
+              {copy.merge}
             </button>{' '}
             <button
               type="button"
@@ -283,7 +242,7 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
                 setConfirmingReplace(true);
               }}
             >
-              {TEXT.replace}
+              {copy.replace}
             </button>
           </>
         )}
@@ -291,9 +250,7 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
 
       {confirmingReplace && (
         <p data-testid="replace-confirm">
-          {TEXT.replaceConfirmPrefix}
-          {existing.length}
-          {TEXT.replaceConfirmSuffix}{' '}
+          {copy.replaceConfirm(existing.length)}{' '}
           <button
             type="button"
             data-testid="replace-confirmed"
@@ -301,7 +258,7 @@ function ImportDecision(props: DataManagerProps & { preview: ImportPreview }): J
               props.onReplace();
             }}
           >
-            {TEXT.replaceConfirmAction}
+            {copy.replaceConfirmAction}
           </button>
         </p>
       )}
@@ -317,13 +274,14 @@ function SameDayFields({
   conflict: { existing: Report; incoming: Report };
   onResolve: (existingTime: string, incomingTime: string) => void;
 }): JSX.Element {
+  const copy = useCopy().data;
   const [stored, setStored] = useState(conflict.existing.collectedAt.time ?? '');
   const [incoming, setIncoming] = useState(conflict.incoming.collectedAt.time ?? '');
 
   return (
     <p data-testid={`same-day-${conflict.existing.id}`}>
       <label>
-        {TEXT.storedTime}{' '}
+        {copy.storedTime}{' '}
         <input
           type="time"
           data-testid={`same-day-stored-${conflict.existing.id}`}
@@ -337,7 +295,7 @@ function SameDayFields({
         />
       </label>{' '}
       <label>
-        {TEXT.incomingTime}{' '}
+        {copy.incomingTime}{' '}
         <input
           type="time"
           data-testid={`same-day-incoming-${conflict.incoming.id}`}
@@ -357,11 +315,13 @@ function SameDayFields({
 /** One stored Report, and the two taps it takes to remove it. */
 function StoredReport(props: DataManagerProps & { report: Report }): JSX.Element {
   const { report } = props;
+  const copy = useCopy().data;
+  const language = useLanguage();
   const [confirming, setConfirming] = useState(false);
 
   return (
     <li data-testid={`stored-report-${report.id}`}>
-      {reportDate(report)} — {report.measurements.length} αποτελέσματα{' '}
+      {copy.reportLine(reportDate(report, language), report.measurements.length)}{' '}
       {confirming ? (
         <button
           type="button"
@@ -370,7 +330,7 @@ function StoredReport(props: DataManagerProps & { report: Report }): JSX.Element
             props.onDeleteReport(report.id);
           }}
         >
-          {TEXT.deleteReportConfirm}
+          {copy.deleteReportConfirm}
         </button>
       ) : (
         <button
@@ -380,7 +340,7 @@ function StoredReport(props: DataManagerProps & { report: Report }): JSX.Element
             setConfirming(true);
           }}
         >
-          {TEXT.deleteReport}
+          {copy.deleteReport}
         </button>
       )}
     </li>
@@ -395,13 +355,14 @@ function StoredReport(props: DataManagerProps & { report: Report }): JSX.Element
  * registered would serve the app to a device its owner has just cleared.
  */
 function ClearEverything(props: DataManagerProps): JSX.Element {
+  const copy = useCopy().data;
   const [confirming, setConfirming] = useState(false);
 
   return (
     <p>
       {confirming ? (
         <span data-testid="clear-all-confirm">
-          {TEXT.clearAllConfirm}{' '}
+          {copy.clearAllConfirm}{' '}
           <button
             type="button"
             data-testid="clear-all-confirmed"
@@ -409,7 +370,7 @@ function ClearEverything(props: DataManagerProps): JSX.Element {
               props.onClearAll();
             }}
           >
-            {TEXT.clearAllAction}
+            {copy.clearAllAction}
           </button>
         </span>
       ) : (
@@ -420,7 +381,7 @@ function ClearEverything(props: DataManagerProps): JSX.Element {
             setConfirming(true);
           }}
         >
-          {TEXT.clearAll}
+          {copy.clearAll}
         </button>
       )}
     </p>

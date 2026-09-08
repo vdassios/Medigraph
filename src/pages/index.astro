@@ -1,7 +1,10 @@
 ---
-// Zero-hydration landing route (D2). Task 4.6 writes the full copy in both
-// languages; the disclaimer below is the D1/D13 minimum and is bound by D13:
-// capability, never clinical insight.
+import { COPY, LANGUAGES } from '../ui/i18n';
+
+// Zero-hydration landing route (D2): no island, no client script. Both
+// languages are rendered rather than toggled, because a toggle needs
+// JavaScript and this page ships none — each block carries its own `lang`, so
+// a screen reader announces each in the right voice.
 ---
 
 <html lang="el">
@@ -13,23 +16,25 @@
   <body>
     <main class="landing">
       <h1>Medigraph</h1>
-      <p>Δείτε τα δικά σας εργαστηριακά αποτελέσματα στον χρόνο.</p>
 
-      <section class="disclaimer" aria-label="Ιδιωτικότητα και όρια χρήσης">
-        <p>
-          <strong>Τα δεδομένα σας παραμένουν στη συσκευή σας.</strong> Τα έγγραφα, το κείμενο που εξάγεται
-          από αυτά και τα αποτελέσματά σας δεν αποστέλλονται πουθενά — ούτε σε εμάς, ούτε σε τρίτους.
-          Δεν αποθηκεύουμε κανένα δεδομένο σας σε διακομιστές μας.
-        </p>
-        <p>
-          Το ιστορικό σας αποθηκεύεται τοπικά στον browser <strong>χωρίς κρυπτογράφηση</strong>,
-          όπως και τα αρχεία που εξάγετε. Προστατέψτε τα όπως τα πρωτότυπα αποτελέσματά σας.
-        </p>
-        <p>
-          Το Medigraph εμφανίζει όσα ανέφερε το εργαστήριό σας και τα εύρη αναφοράς που το ίδιο
-          τύπωσε. <strong>Δεν τα ερμηνεύει και δεν αποτελεί ιατρική συμβουλή.</strong>
-        </p>
-      </section>
+      {
+        LANGUAGES.map((language) => (
+          <section lang={language} class="landing-block">
+            <p class="tagline">{COPY[language].landing.tagline}</p>
+            <p>{COPY[language].landing.what}</p>
+            <p>
+              <a href="/app/">{COPY[language].landing.open}</a> ·{' '}
+              <a href="/privacy/">{COPY[language].landing.privacy}</a>
+            </p>
+
+            <div class="disclaimer">
+              <p>{COPY[language].disclaimer.dataStays}</p>
+              <p>{COPY[language].disclaimer.plaintext}</p>
+              <p>{COPY[language].disclaimer.displayOnly}</p>
+            </div>
+          </section>
+        ))
+      }
     </main>
   </body>
 </html>
@@ -41,11 +46,18 @@
     padding: 2rem 1rem;
   }
 
-  .disclaimer {
+  .landing-block + .landing-block {
     border-top: 1px solid currentColor;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .tagline {
+    font-size: 1.25rem;
+  }
+
+  .disclaimer {
     font-size: 0.875rem;
     line-height: 1.5;
-    margin-top: 2.5rem;
-    padding-top: 1rem;
   }
 </style>

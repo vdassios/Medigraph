@@ -19,7 +19,6 @@ import { normaliseUnit } from '../domain/units';
 import type {
   CollectedAt,
   Conflict,
-  IdentifierCandidate,
   MarkerDef,
   ParsedRow,
   Profile,
@@ -29,6 +28,8 @@ import type {
   SourceRef,
 } from '../domain/types';
 import type { EvidenceLookup } from './appState';
+import type { Copy } from './i18n';
+import { localisedDate, useCopy, useLanguage } from './i18n';
 
 /**
  * The review transaction, on screen: every gate D6, D7 and D8 raise, and every
@@ -46,8 +47,10 @@ import type { EvidenceLookup } from './appState';
  * of the session when it is saved, and until then it exists nowhere else, so
  * abandoning it costs the record nothing.
  *
- * The copy is Greek and inline until Task 4.6's `el`/`en` toggle; every string
- * a person reads is a whole sentence in `TEXT` or in the JSX below.
+ * Every string it shows comes from `i18n.ts`, in the reader's language, and a
+ * date is always shown with its ISO form beside it: `05/04` is April in one
+ * country and May in another, and this screen is where a user confirms which
+ * day a sample was taken.
  */
 
 export interface ReviewTableProps {
@@ -58,63 +61,6 @@ export interface ReviewTableProps {
   onConfirm(): void;
   onCancel(): void;
 }
-
-const TEXT = {
-  identifiers: 'Προσωπικά στοιχεία που βρέθηκαν στο έγγραφο',
-  identifiersEmpty: 'Δεν βρέθηκαν προσωπικά στοιχεία στο έγγραφο.',
-  identifiersHelp:
-    'Τίποτα δεν αποθηκεύεται πριν απαντήσετε για καθένα από αυτά. Η διαγραφή αφαιρεί το κείμενο και από τις γραμμές που το περιέχουν.',
-  freeText: 'Ελεύθερο κείμενο που θα αποθηκευτεί',
-  freeTextHelp:
-    'Οι ετικέτες των άγνωστων δεικτών αποθηκεύονται όπως τις τύπωσε το εργαστήριο. Ελέγξτε ότι δεν περιέχουν προσωπικά στοιχεία.',
-  samePerson: 'Το έγγραφο αφορά το ίδιο πρόσωπο με το ιστορικό που είναι ήδη αποθηκευμένο.',
-  samePersonHelp:
-    'Το Medigraph δεν διαβάζει τον ΑΜΚΑ για να το απαντήσει αυτό· τον διαγράφει και ρωτάει εσάς.',
-  dateLabel: 'Ημερομηνία λήψης δείγματος',
-  timeLabel: 'Ώρα (μόνο αν χρειάζεται να ξεχωρίσει από άλλη εξέταση της ίδιας ημέρας)',
-  confirmDate: 'Επιβεβαίωση ημερομηνίας',
-  dateConfirmed: 'Η ημερομηνία επιβεβαιώθηκε.',
-  targetLabel: 'Καταχώριση',
-  targetNew: 'Νέα εξέταση',
-  unknownMarker: 'Άγνωστος δείκτης',
-  approve: 'Αποδοχή ως έχει',
-  reassign: 'Αλλαγή δείκτη',
-  edit: 'Διόρθωση',
-  save: 'Αποθήκευση',
-  cancelEdit: 'Ακύρωση',
-  remove: 'Διαγραφή γραμμής',
-  inspect: 'Πηγή',
-  confirm: 'Οριστικοποίηση',
-  cancel: 'Ακύρωση',
-  blockersTitle: 'Πριν την οριστικοποίηση μένουν:',
-  nothingToConfirm: 'Δεν υπάρχει τίποτα προς οριστικοποίηση.',
-} as const;
-
-const IDENTIFIER_KIND: Record<IdentifierCandidate['kind'], string> = {
-  name: 'Όνομα',
-  'national-id': 'ΑΜΚΑ',
-  'patient-id': 'Κωδικός ασθενούς',
-  phone: 'Τηλέφωνο',
-  email: 'Διεύθυνση email',
-  address: 'Διεύθυνση',
-  other: 'Άλλο στοιχείο',
-};
-
-const STATUS_LABEL = {
-  value: 'Αριθμητικό',
-  categorical: 'Περιγραφικό',
-  missing: 'Δεν διαβάστηκε',
-} as const;
-
-const FLAG_TEXT: Record<ParsedRow['flags'][number], string> = {
-  'ambiguous-thousands': 'Ασαφής υποδιαστολή',
-  'ambiguous-role': 'Ασαφής στήλη',
-  'implausible-value': 'Τιμή εκτός αναμενόμενου εύρους',
-  'unrecognised-unit': 'Άγνωστη μονάδα',
-  'unparsed-range': 'Αδιάβαστο εύρος αναφοράς',
-  'competing-anchor': 'Δύο πιθανοί δείκτες',
-  'low-ocr-confidence': 'Χαμηλή βεβαιότητα ανάγνωσης',
-};
 
 /** The text of one row's result, as it stands in the session. */
 function printedValue(row: ParsedRow): string {
@@ -218,7 +164,11 @@ function rowsCarrying(session: ReviewSession, text: string): ParsedRow[] {
  * deliberately separate. A checklist that could enable the button would be a
  * second gate, and the gate that shipped first would be the one nobody read.
  */
-function blockers(session: ReviewSession, existing: Profile | null): string[] {
+function blockers(
+  session: ReviewSession,
+  existing: Profile | null,
+  copy: Copy['review'],
+): string[] {
   const reasons: string[] = [];
   const unconfirmedDates = session.reportDrafts.filter((draft) => !draft.dateConfirmed).length;
   const unresolvedConflicts = session.reportDrafts.flatMap((draft) =>
@@ -236,22 +186,22 @@ function blockers(session: ReviewSession, existing: Profile | null): string[] {
   ).length;
 
   if (unconfirmedDates > 0) {
-    reasons.push(`${String(unconfirmedDates)} ημερομηνίες προς επιβεβαίωση.`);
+    reasons.push(copy.blockers.dates(unconfirmedDates));
   }
   if (openIdentifiers > 0) {
-    reasons.push(`${String(openIdentifiers)} προσωπικά στοιχεία χωρίς απάντηση.`);
+    reasons.push(copy.blockers.identifiers(openIdentifiers));
   }
   if (unresolvedConflicts > 0) {
-    reasons.push(`${String(unresolvedConflicts)} δείκτες που εμφανίζονται δύο φορές.`);
+    reasons.push(copy.blockers.conflicts(unresolvedConflicts));
   }
   if (unapproved > 0) {
-    reasons.push(`${String(unapproved)} άγνωστοι δείκτες προς αποδοχή.`);
+    reasons.push(copy.blockers.unknowns(unapproved));
   }
   if ((existing?.reports.length ?? 0) > 0 && session.samePersonConfirmed !== true) {
-    reasons.push('Η επιβεβαίωση ότι πρόκειται για το ίδιο πρόσωπο.');
+    reasons.push(copy.blockers.samePerson);
   }
   if (session.reportDrafts.length === 0) {
-    reasons.push(TEXT.nothingToConfirm);
+    reasons.push(copy.blockers.nothing);
   }
 
   // Everything above is answered and Confirm is still shut: the remaining
@@ -259,9 +209,7 @@ function blockers(session: ReviewSession, existing: Profile | null): string[] {
   // calendar day, two exams sharing a day with no distinct time, a draft aimed
   // at a Report that already holds one of its markers.
   if (reasons.length === 0 && !canConfirm(session, existing)) {
-    reasons.push(
-      'Δύο εξετάσεις με την ίδια ημερομηνία χρειάζονται διαφορετική ώρα, ή μια ημερομηνία δεν είναι έγκυρη.',
-    );
+    reasons.push(copy.blockers.calendar);
   }
 
   return reasons;
@@ -287,6 +235,7 @@ interface RegionProps {
 
 export function ReviewTable(props: ReviewTableProps): JSX.Element {
   const { session, existingProfile } = props;
+  const copy = useCopy().review;
   const [pending, setPending] = useState<readonly string[]>([]);
 
   const onPending = (key: string, dirty: boolean): void => {
@@ -313,9 +262,9 @@ export function ReviewTable(props: ReviewTableProps): JSX.Element {
     },
     onPending,
   };
-  const reasons = blockers(session, existingProfile);
+  const reasons = blockers(session, existingProfile, copy);
   if (pending.length > 0) {
-    reasons.push(`${String(pending.length)} αλλαγές δεν έχουν αποθηκευτεί.`);
+    reasons.push(copy.blockers.unsaved(pending.length));
   }
 
   return (
@@ -327,7 +276,7 @@ export function ReviewTable(props: ReviewTableProps): JSX.Element {
       // result carrying a different vocabulary is a different result.
       data-registry-version={session.results.map((result) => result.registryVersion).join(',')}
     >
-      <h2 id="review-heading">Έλεγχος πριν την αποθήκευση</h2>
+      <h2 id="review-heading">{copy.heading}</h2>
 
       <IdentifierPanel {...region} />
 
@@ -340,7 +289,7 @@ export function ReviewTable(props: ReviewTableProps): JSX.Element {
       <footer class="review-actions">
         {reasons.length > 0 && (
           <div data-testid="blockers">
-            <p>{TEXT.blockersTitle}</p>
+            <p>{copy.blockersTitle}</p>
             <ul>
               {reasons.map((reason) => (
                 <li key={reason}>{reason}</li>
@@ -356,7 +305,7 @@ export function ReviewTable(props: ReviewTableProps): JSX.Element {
             props.onConfirm();
           }}
         >
-          {TEXT.confirm}
+          {copy.confirm}
         </button>{' '}
         <button
           type="button"
@@ -365,7 +314,7 @@ export function ReviewTable(props: ReviewTableProps): JSX.Element {
             props.onCancel();
           }}
         >
-          {TEXT.cancel}
+          {copy.cancel}
         </button>
       </footer>
     </section>
@@ -386,6 +335,7 @@ export function ReviewTable(props: ReviewTableProps): JSX.Element {
  * the identifiers, not buried in a table of numbers.
  */
 function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
+  const copy = useCopy().review;
   const candidates = session.results.flatMap((result) => result.identifierCandidates);
   const unknownRows = session.reportDrafts.flatMap((draft) =>
     draft.rows.filter((row) => isUnknown(row.markerKey)),
@@ -393,10 +343,10 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
 
   return (
     <section class="review-identifiers" data-testid="identifiers">
-      <h3>{TEXT.identifiers}</h3>
-      <p>{TEXT.identifiersHelp}</p>
+      <h3>{copy.identifiers}</h3>
+      <p>{copy.identifiersHelp}</p>
 
-      {candidates.length === 0 && <p data-testid="identifiers-empty">{TEXT.identifiersEmpty}</p>}
+      {candidates.length === 0 && <p data-testid="identifiers-empty">{copy.identifiersEmpty}</p>}
 
       <ul>
         {candidates.map((candidate) => {
@@ -405,7 +355,7 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
 
           return (
             <li key={candidate.id} data-testid={`identifier-${candidate.id}`} data-answer={answer}>
-              <span data-testid="identifier-kind">{IDENTIFIER_KIND[candidate.kind]}</span>:{' '}
+              <span data-testid="identifier-kind">{copy.identifierKinds[candidate.kind]}</span>:{' '}
               <span data-testid="identifier-text">{candidate.text}</span>{' '}
               {answer === undefined ? (
                 <>
@@ -416,7 +366,7 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
                       onChange(resolveIdentifier(session, candidate.id, 'redacted'));
                     }}
                   >
-                    Αφαίρεση από τα δεδομένα
+                    {copy.redact}
                   </button>{' '}
                   <button
                     type="button"
@@ -429,7 +379,7 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
                       onChange(resolveIdentifier(cleared, candidate.id, 'deleted-row'));
                     }}
                   >
-                    Διαγραφή {affected.length} γραμμών που το περιέχουν
+                    {copy.deleteRows(affected.length)}
                   </button>{' '}
                   <button
                     type="button"
@@ -438,17 +388,11 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
                       onChange(resolveIdentifier(session, candidate.id, 'false-positive'));
                     }}
                   >
-                    Δεν είναι προσωπικό στοιχείο
+                    {copy.dismiss}
                   </button>
                 </>
               ) : (
-                <span data-testid="identifier-answer">
-                  {answer === 'redacted'
-                    ? 'Αφαιρέθηκε από τα δεδομένα. Το κείμενο δεν επανέρχεται.'
-                    : answer === 'deleted-row'
-                      ? 'Οι γραμμές που το περιείχαν διαγράφηκαν.'
-                      : 'Καταγράφηκε ότι δεν είναι προσωπικό στοιχείο.'}
-                </span>
+                <span data-testid="identifier-answer">{copy.answered[answer]}</span>
               )}
             </li>
           );
@@ -457,8 +401,8 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
 
       {unknownRows.length > 0 && (
         <div data-testid="free-text">
-          <h4>{TEXT.freeText}</h4>
-          <p>{TEXT.freeTextHelp}</p>
+          <h4>{copy.freeText}</h4>
+          <p>{copy.freeTextHelp}</p>
           <ul>
             {unknownRows.map((row) => (
               <li key={row.id} data-testid="free-text-label">
@@ -474,14 +418,18 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
 
 /** D8: an explicit, unverified question, asked of the user and never of the document. */
 function SamePersonGate({ session, existingProfile, onChange }: RegionProps): JSX.Element {
+  const copy = useCopy().review;
+  const language = useLanguage();
   const reports = existingProfile?.reports ?? [];
   const latest = [...reports].sort((a, b) => a.collectedAt.date.localeCompare(b.collectedAt.date));
 
   return (
     <section class="review-same-person" data-testid="same-person">
       <p>
-        Το αρχείο σας έχει ήδη {reports.length} εξετάσεις, με πιο πρόσφατη την{' '}
-        {latest.at(-1)?.collectedAt.date ?? ''}.
+        {copy.stored(
+          reports.length,
+          localisedDate(latest.at(-1)?.collectedAt.date ?? '', language),
+        )}
       </p>
       <label>
         <input
@@ -492,9 +440,9 @@ function SamePersonGate({ session, existingProfile, onChange }: RegionProps): JS
             onChange(confirmSamePerson(session, event.currentTarget.checked ? true : null));
           }}
         />{' '}
-        {TEXT.samePerson}
+        {copy.samePerson}
       </label>
-      <p>{TEXT.samePersonHelp}</p>
+      <p>{copy.samePersonHelp}</p>
     </section>
   );
 }
@@ -515,6 +463,8 @@ function collectedAtOf(date: string, time: string): CollectedAt {
  */
 function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft }): JSX.Element {
   const { session, existingProfile, onChange, onPending } = props;
+  const copy = useCopy().review;
+  const language = useLanguage();
   const [date, setDate] = useState(draft.collectedAt?.date ?? '');
   const [time, setTime] = useState(draft.collectedAt?.time ?? '');
 
@@ -532,11 +482,11 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
       <h3>
         <SourceName draft={draft} {...props} />
       </h3>
-      <p data-testid="draft-rows">{String(draft.rows.length)} γραμμές</p>
+      <p data-testid="draft-rows">{copy.rowCount(draft.rows.length)}</p>
 
       <p class="review-date">
         <label>
-          {TEXT.dateLabel}{' '}
+          {copy.dateLabel}{' '}
           <input
             type="date"
             data-testid="draft-date"
@@ -548,7 +498,7 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
           />
         </label>{' '}
         <label>
-          {TEXT.timeLabel}{' '}
+          {copy.timeLabel}{' '}
           <input
             type="time"
             data-testid="draft-time"
@@ -568,24 +518,23 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
             onPending(`${draft.id}:date`, false);
           }}
         >
-          {TEXT.confirmDate}
+          {copy.confirmDate}
         </button>{' '}
         {draft.dateConfirmed && !dirty && (
-          <span data-testid="date-confirmed">{TEXT.dateConfirmed}</span>
+          <span data-testid="date-confirmed">
+            {copy.dateConfirmed} {localisedDate(date, language)}
+          </span>
         )}
       </p>
 
       {sameDay.length > 0 && (
         <div data-testid="same-day">
-          <p>
-            Το αρχείο σας έχει ήδη εξέταση στις {date}. Δώστε διαφορετική ώρα σε καθεμία για να
-            ξεχωρίζουν.
-          </p>
+          <p>{copy.sameDay(localisedDate(date, language))}</p>
           <ul>
             {sameDay.map((report) => (
               <li key={report.id}>
                 <label>
-                  Ώρα της αποθηκευμένης εξέτασης{' '}
+                  {copy.storedTime}{' '}
                   <input
                     type="time"
                     data-testid={`stage-time-${report.id}`}
@@ -614,7 +563,7 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
       {(existingProfile?.reports.length ?? 0) > 0 && (
         <p>
           <label>
-            {TEXT.targetLabel}{' '}
+            {copy.targetLabel}{' '}
             <select
               data-testid="draft-target"
               value={draft.targetReportId ?? ''}
@@ -623,10 +572,10 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
                 onChange(targetExistingReport(session, draft.id, chosen === '' ? null : chosen));
               }}
             >
-              <option value="">{TEXT.targetNew}</option>
+              <option value="">{copy.targetNew}</option>
               {(existingProfile?.reports ?? []).map((report: Report) => (
                 <option key={report.id} value={report.id}>
-                  Προσθήκη στην εξέταση της {report.collectedAt.date}
+                  {copy.targetExisting(localisedDate(report.collectedAt.date, language))}
                 </option>
               ))}
             </select>
@@ -641,14 +590,14 @@ function DraftView({ draft, ...props }: RegionProps & { draft: ReviewReportDraft
       {rows.length > 0 ? (
         <RowTable rows={rows} triage="expanded" {...props} />
       ) : (
-        <p data-testid="nothing-to-review">Καμία γραμμή δεν χρειάζεται έλεγχο.</p>
+        <p data-testid="nothing-to-review">{copy.nothingToReview}</p>
       )}
 
       {preAccepted.length > 0 && (
         <details class="review-pre-accepted" data-testid="pre-accepted">
           <summary>
-            <span data-testid="pre-accepted-count">{preAccepted.length}</span> γραμμές διαβάστηκαν
-            χωρίς επιφύλαξη και θα αποθηκευτούν όπως είναι. Δείτε τες κι αυτές.
+            <span data-testid="pre-accepted-count">{preAccepted.length}</span>{' '}
+            {copy.preAccepted(preAccepted.length).replace(`${String(preAccepted.length)} `, '')}
           </summary>
           <RowTable rows={preAccepted} triage="pre-accepted" {...props} />
         </details>
@@ -662,12 +611,13 @@ function SourceName({
   draft,
   onInspectSource,
 }: RegionProps & { draft: ReviewReportDraft }): JSX.Element {
+  const copy = useCopy().review;
   const ref = draft.rows.find((row) => row.sourceRef !== undefined)?.sourceRef;
   const found = ref === undefined ? null : onInspectSource(ref);
 
   return (
     <span data-testid="draft-source">
-      {found?.kind === 'evidence' ? found.resource.file.name : 'Έγγραφο'}
+      {found?.kind === 'evidence' ? found.resource.file.name : copy.document}
     </span>
   );
 }
@@ -686,15 +636,13 @@ function ConflictView({
   session,
   onChange,
 }: RegionProps & { conflict: Conflict; draft: ReviewReportDraft }): JSX.Element {
+  const copy = useCopy().review;
   const candidates = draft.rows.filter((row) => conflict.candidateRowIds.includes(row.id));
   const { resolution } = conflict;
 
   return (
     <div class="review-conflict" data-testid={`conflict-${conflict.markerKey}`}>
-      <p>
-        Ο δείκτης {markerName(conflict.markerKey, conflict.markerKey)} εμφανίζεται{' '}
-        {candidates.length} φορές. Κρατήστε ένα αποτέλεσμα.
-      </p>
+      <p>{copy.conflict(markerName(conflict.markerKey, conflict.markerKey), candidates.length)}</p>
 
       {resolution === null ? (
         <ul>
@@ -710,14 +658,14 @@ function ConflictView({
                   );
                 }}
               >
-                Κράτηση αυτού
+                {copy.keepThis}
               </button>
             </li>
           ))}
         </ul>
       ) : (
         <p>
-          <span data-testid="conflict-answer">Επιλέχθηκε ένα αποτέλεσμα.</span>{' '}
+          <span data-testid="conflict-answer">{copy.conflictAnswered}</span>{' '}
           <button
             type="button"
             data-testid="change-conflict"
@@ -725,7 +673,7 @@ function ConflictView({
               onChange(resolveConflict(session, conflict.id, null));
             }}
           >
-            Αλλαγή επιλογής
+            {copy.changeConflict}
           </button>
         </p>
       )}
@@ -740,6 +688,7 @@ function RowView({
   ...props
 }: RegionProps & { row: ParsedRow; triage: 'expanded' | 'pre-accepted' }): JSX.Element {
   const { session, onChange, onPending } = props;
+  const copy = useCopy().review;
   const [editing, setEditing] = useState(false);
   const [reassigning, setReassigning] = useState(false);
   const [inspecting, setInspecting] = useState(false);
@@ -759,14 +708,14 @@ function RowView({
         {unknown && (
           <>
             {' '}
-            <span data-testid="row-unknown">{TEXT.unknownMarker}</span>
-            {approved && <span data-testid="row-approved"> — αποδεκτός</span>}
+            <span data-testid="row-unknown">{copy.unknownMarker}</span>
+            {approved && <span data-testid="row-approved"> — {copy.approvedMarker}</span>}
           </>
         )}
         {row.flags.map((flag) => (
           <span key={flag} data-testid={`row-flag-${flag}`}>
             {' '}
-            {FLAG_TEXT[flag]}
+            {copy.flags[flag]}
           </span>
         ))}
       </th>
@@ -783,7 +732,7 @@ function RowView({
                 onChange(approveUnknownMarker(session, row.id));
               }}
             >
-              {TEXT.approve}
+              {copy.approve}
             </button>{' '}
           </>
         )}
@@ -794,7 +743,7 @@ function RowView({
             setReassigning(!reassigning);
           }}
         >
-          {TEXT.reassign}
+          {copy.reassign}
         </button>{' '}
         <button
           type="button"
@@ -804,7 +753,7 @@ function RowView({
             onPending(`${row.id}:edit`, false);
           }}
         >
-          {TEXT.edit}
+          {copy.edit}
         </button>{' '}
         <button
           type="button"
@@ -813,7 +762,7 @@ function RowView({
             onChange(deleteRow(session, row.id));
           }}
         >
-          {TEXT.remove}
+          {copy.remove}
         </button>{' '}
         {row.sourceRef !== undefined && (
           <button
@@ -823,7 +772,7 @@ function RowView({
               setInspecting(!inspecting);
             }}
           >
-            {TEXT.inspect}
+            {copy.inspect}
           </button>
         )}
         {reassigning && (
@@ -873,13 +822,14 @@ function ReassignPanel({
   onChange,
   onDone,
 }: RegionProps & { row: ParsedRow; onDone: () => void }): JSX.Element {
+  const copy = useCopy().review;
   const [query, setQuery] = useState('');
   const matches = searchMarkers(query);
 
   return (
     <div class="review-reassign" data-testid="reassign-panel">
       <label>
-        Αναζήτηση δείκτη{' '}
+        {copy.reassignSearch}{' '}
         <input
           type="search"
           data-testid="reassign-search"
@@ -926,6 +876,7 @@ function RowEditor({
   onPending,
   onDone,
 }: RegionProps & { row: ParsedRow; onDone: () => void }): JSX.Element {
+  const copy = useCopy().review;
   const [status, setStatus] = useState<ParsedRow['status']>(row.status);
   const [value, setValue] = useState(row.value === null ? '' : String(row.value));
   const [text, setText] = useState(row.textValue ?? '');
@@ -947,7 +898,7 @@ function RowEditor({
   return (
     <div class="review-editor" data-testid="row-editor">
       <label>
-        Είδος αποτελέσματος{' '}
+        {copy.resultKind}{' '}
         <select
           data-testid="edit-status"
           value={status}
@@ -958,7 +909,7 @@ function RowEditor({
         >
           {(['value', 'categorical', 'missing'] as const).map((each) => (
             <option key={each} value={each}>
-              {STATUS_LABEL[each]}
+              {copy.kinds[each]}
             </option>
           ))}
         </select>
@@ -966,7 +917,7 @@ function RowEditor({
       {status === 'value' && (
         <>
           <label>
-            Τιμή{' '}
+            {copy.valueLabel}{' '}
             <input
               type="text"
               inputMode="decimal"
@@ -979,7 +930,7 @@ function RowEditor({
             />
           </label>
           <label>
-            Μονάδα{' '}
+            {copy.unitLabel}{' '}
             <input
               type="text"
               data-testid="edit-unit"
@@ -991,7 +942,7 @@ function RowEditor({
             />
           </label>
           <label>
-            Τιμές αναφοράς{' '}
+            {copy.rangeLabel}{' '}
             <input
               type="text"
               data-testid="edit-range"
@@ -1007,7 +958,7 @@ function RowEditor({
       )}
       {status === 'categorical' && (
         <label>
-          Αποτέλεσμα{' '}
+          {copy.textLabel}{' '}
           <input
             type="text"
             data-testid="edit-text"
@@ -1038,7 +989,7 @@ function RowEditor({
           onDone();
         }}
       >
-        {TEXT.save}
+        {copy.save}
       </button>{' '}
       <button
         type="button"
@@ -1047,7 +998,7 @@ function RowEditor({
           onDone();
         }}
       >
-        {TEXT.cancelEdit}
+        {copy.cancelEdit}
       </button>
     </div>
   );
@@ -1071,6 +1022,7 @@ function EvidenceView({
   session,
   onInspectSource,
 }: RegionProps & { sourceRef: SourceRef }): JSX.Element {
+  const copy = useCopy().review;
   const found = onInspectSource(sourceRef);
   const page = session.results.find((result) => result.sourceId === sourceRef.sourceId)
     ?.evidencePages?.[sourceRef.page - 1];
@@ -1090,17 +1042,17 @@ function EvidenceView({
       {found.kind === 'evidence' ? (
         <>
           <p data-testid="evidence-source">
-            {found.resource.file.name}, σελίδα {found.page}
+            {copy.evidencePage(found.resource.file.name, found.page)}
           </p>
           {line.length > 0 && <p data-testid="evidence-line">{line.join(' ')}</p>}
         </>
       ) : (
         <p data-testid="evidence-unavailable">
           {found.kind === 'unavailable'
-            ? 'Δεν υπάρχει διαθέσιμη προεπισκόπηση της πηγής.'
+            ? copy.evidenceUnavailable
             : found.kind === 'unknown-page'
-              ? 'Η σελίδα αυτή δεν υπάρχει στο έγγραφο.'
-              : 'Το έγγραφο αυτό δεν είναι πλέον ανοιχτό.'}
+              ? copy.evidenceUnknownPage
+              : copy.evidenceClosed}
         </p>
       )}
     </div>
@@ -1120,15 +1072,17 @@ function RowTable({
   triage,
   ...props
 }: RegionProps & { rows: readonly ParsedRow[]; triage: 'expanded' | 'pre-accepted' }): JSX.Element {
+  const copy = useCopy().review;
+
   return (
     <table class="review-rows" data-testid={`rows-${triage}`}>
       <thead>
         <tr>
-          <th scope="col">Δείκτης</th>
-          <th scope="col">Αποτέλεσμα</th>
-          <th scope="col">Μονάδα</th>
-          <th scope="col">Τιμές αναφοράς</th>
-          <th scope="col">Ενέργειες</th>
+          <th scope="col">{copy.columns.marker}</th>
+          <th scope="col">{copy.columns.result}</th>
+          <th scope="col">{copy.columns.unit}</th>
+          <th scope="col">{copy.columns.range}</th>
+          <th scope="col">{copy.columns.actions}</th>
         </tr>
       </thead>
       <tbody>
