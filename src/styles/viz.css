@@ -17,7 +17,8 @@
  * attribute or an inline block.
  */
 
-.viz-root {
+.viz-root,
+.medigraph-app {
   --viz-surface: #ffffff;
   --viz-text: #1a1c1f;
   --viz-text-quiet: #4a5058;
@@ -31,7 +32,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .viz-root {
+  .viz-root,
+  .medigraph-app {
     --viz-surface: #14171a;
     --viz-text: #e8eaed;
     --viz-text-quiet: #b0b6be;
@@ -45,7 +47,8 @@
   }
 }
 
-:root[data-theme='dark'] .viz-root {
+:root[data-theme='dark'] .viz-root,
+:root[data-theme='dark'] .medigraph-app {
   --viz-surface: #14171a;
   --viz-text: #e8eaed;
   --viz-text-quiet: #b0b6be;
@@ -58,7 +61,15 @@
   --viz-series: #3987e5;
 }
 
-.panel {
+/*
+ * Every region paints its own ground.
+ *
+ * A palette that sets only text colours borrows whatever background it lands
+ * on, which in a dark browser is still a white canvas — light grey on white,
+ * and a contrast failure in every quiet line on the page.
+ */
+.viz-root,
+.medigraph-app {
   background: var(--viz-surface);
   color: var(--viz-text);
 }
@@ -220,4 +231,46 @@
   border-bottom: 1px solid var(--viz-line);
   padding: 0.25rem 0.5rem;
   text-align: start;
+}
+
+/*
+ * Controls take the palette too.
+ *
+ * A `<button>` keeps the platform's own light button face unless it is told
+ * otherwise, so in a dark browser the app's light text was landing on it —
+ * unreadable, and a contrast failure on every row of the panel.
+ */
+.viz-root button,
+.medigraph-app button,
+.viz-root select,
+.medigraph-app select,
+.viz-root input:not([type='checkbox']),
+.medigraph-app input:not([type='checkbox']) {
+  background: var(--viz-surface);
+  border: 1px solid var(--viz-line);
+  color: var(--viz-text);
+}
+
+/*
+ * A target big enough to hit, everywhere in the app (Task 5.4).
+ *
+ * 44 px is the smallest reliable touch target, and review is a screen of
+ * small decisions taken on a phone. Applied to the app root rather than to
+ * each component, so a control added later inherits it instead of being
+ * remembered.
+ */
+.medigraph-app button,
+.medigraph-app select,
+.medigraph-app summary {
+  min-height: 44px;
+}
+
+/* Forced-colours mode replaces every colour: status must survive without them,
+   which it does, because status is a sentence and an icon before it is a hue. */
+@media (forced-colors: active) {
+  .panel-meter-dot,
+  .trend-mark,
+  .trend-mark-hollow {
+    forced-color-adjust: none;
+  }
 }

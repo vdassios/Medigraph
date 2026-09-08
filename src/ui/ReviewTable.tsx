@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import { parseNumber } from '../domain/numbers';
 import { parseRange } from '../domain/ranges';
 import { setReportDate, targetExistingReport, stageExistingReportDate } from '../domain/profile';
@@ -692,6 +692,11 @@ function RowView({
   const [editing, setEditing] = useState(false);
   const [reassigning, setReassigning] = useState(false);
   const [inspecting, setInspecting] = useState(false);
+  // Where focus goes when a panel this row opened closes again. A keyboard
+  // user who cancels an edit must land back on the control they opened it
+  // with, not on the document body with their place in the table lost.
+  const editRef = useRef<HTMLButtonElement | null>(null);
+  const reassignRef = useRef<HTMLButtonElement | null>(null);
 
   const unknown = isUnknown(row.markerKey);
   const approved = session.approvedUnknownRowIds.includes(row.id);
@@ -739,6 +744,7 @@ function RowView({
         <button
           type="button"
           data-testid="reassign-row"
+          ref={reassignRef}
           onClick={() => {
             setReassigning(!reassigning);
           }}
@@ -748,6 +754,7 @@ function RowView({
         <button
           type="button"
           data-testid="edit-row"
+          ref={editRef}
           onClick={() => {
             setEditing(!editing);
             onPending(`${row.id}:edit`, false);
@@ -781,6 +788,7 @@ function RowView({
             {...props}
             onDone={() => {
               setReassigning(false);
+              reassignRef.current?.focus();
             }}
           />
         )}
@@ -791,6 +799,7 @@ function RowView({
             onDone={() => {
               setEditing(false);
               onPending(`${row.id}:edit`, false);
+              editRef.current?.focus();
             }}
           />
         )}
