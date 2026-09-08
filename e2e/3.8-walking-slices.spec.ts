@@ -24,23 +24,37 @@ async function storedProfile(page: Page): Promise<unknown> {
   return page.evaluate(
     async () =>
       new Promise((resolve, reject) => {
+        // Opening a database that does not exist creates it — an empty one,
+        // with none of the app's stores — and the next real open would find a
+        // current version with nothing in it. An inspection must not create
+        // what it is inspecting, so one that did is deleted again.
         const open = indexedDB.open('medigraph');
+        let created = false;
+        open.onupgradeneeded = () => {
+          created = true;
+        };
         open.onerror = () => {
           reject(new Error('indexeddb open failed'));
         };
         open.onsuccess = () => {
           const db = open.result;
-          if (!db.objectStoreNames.contains('profile')) {
+          if (created || !db.objectStoreNames.contains('profile')) {
+            db.close();
+            if (created) {
+              indexedDB.deleteDatabase('medigraph');
+            }
             resolve(null);
             return;
           }
-          const read = db.transaction('profile').objectStore('profile').get('current');
-          read.onsuccess = () => {
-            resolve(read.result ?? null);
-          };
-          read.onerror = () => {
-            reject(new Error('indexeddb read failed'));
-          };
+          {
+            const read = db.transaction('profile').objectStore('profile').get('current');
+            read.onsuccess = () => {
+              resolve(read.result ?? null);
+            };
+            read.onerror = () => {
+              reject(new Error('indexeddb read failed'));
+            };
+          }
         };
       }),
   );
@@ -91,7 +105,7 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   // Review: the batch extracted, and nothing has been written or drawn.
   await expect(page.getByTestId('review')).toBeVisible();
   await expect(page.getByTestId('review')).toHaveAttribute('data-registry-version', /^\d+$/u);
-  await expect(page.getByTestId('data-manager')).toHaveCount(0);
+  await expect(page.getByTestId('panel')).toHaveCount(0);
   expect(await storedProfile(page)).toBeNull();
 
   // The island resolves a row's SourceRef through the evidence it is holding
@@ -193,7 +207,7 @@ test('a non-ΑΗΦΥ PDF is refused at its own source, and writes nothing', asyn
   // rather than the adapter failing to read it.
   await expect(page.getByTestId('failure-not-ahfy-document')).toBeVisible();
   await expect(page.getByTestId('review')).toHaveCount(0);
-  await expect(page.getByTestId('data-manager')).toHaveCount(0);
+  await expect(page.getByTestId('panel')).toHaveCount(0);
   expect(await storedProfile(page)).toBeNull();
   await expect(page.getByTestId('app')).toHaveAttribute('data-phase', 'idle');
 });

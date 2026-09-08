@@ -278,3 +278,27 @@ describe('clearAll', () => {
     expect(await loadProfile()).toEqual(fresh);
   });
 });
+
+describe('a database that exists without this module’s store', () => {
+  it('is repaired rather than fatal', async () => {
+    // Reachable in a real browser: a "delete everything" that races an open,
+    // or anything opening this name with no version, leaves the database at a
+    // current version with no object stores. Every later read and write throws
+    // `NotFoundError`, and no amount of reopening fixes it.
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open('medigraph');
+      request.onsuccess = () => {
+        request.result.close();
+        resolve();
+      };
+      request.onerror = () => {
+        reject(new Error('open failed'));
+      };
+    });
+
+    const profile: Profile = { schemaVersion: 1, id: 'p-repair', reports: [] };
+    await replaceProfile(profile);
+
+    expect(await loadProfile()).toEqual(profile);
+  });
+});

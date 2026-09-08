@@ -59,14 +59,46 @@ function caching(): CacheStorage | undefined {
   return platform().caches as CacheStorage | undefined;
 }
 
-function database(): Promise<IDBPDatabase> {
-  return openDB(DATABASE, DATABASE_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE);
-      }
-    },
-  });
+function createStore(db: IDBPDatabase): void {
+  if (!db.objectStoreNames.contains(STORE)) {
+    db.createObjectStore(STORE);
+  }
+}
+
+/**
+ * Open the database, and make sure it is one this module can use.
+ *
+ * A version upgrade is the only event allowed to create an object store, so a
+ * database that already sits at our version without our store can never be
+ * repaired by opening it again — every read and write against it throws
+ * `NotFoundError`, permanently. That state is reachable: a "delete everything"
+ * racing an open leaves it behind in Chromium, and so does anything else that
+ * opens this name without a version, which creates an empty database at
+ * whatever version it finds.
+ *
+ * So the store is checked rather than assumed, and a missing one is created by
+ * reopening one version higher — the smallest step that runs `upgrade`. The
+ * alternative is an app that is bricked until its user clears site data.
+ *
+ * `DATABASE_VERSION` is the schema this module writes and is the floor a
+ * repair opens at. There is one version and its upgrade only creates the
+ * store, so "open what is there" and "open version 1" are the same thing
+ * today; a second version, with a real migration, would need the explicit
+ * ladder back.
+ */
+async function database(): Promise<IDBPDatabase> {
+  // Opened at whatever version is already there. Naming a version and finding
+  // a higher one is a `VersionError`, and this module must not be the thing
+  // that fails when a browser — or a previous repair — has moved on.
+  const opened = await openDB(DATABASE, undefined, { upgrade: createStore });
+  if (opened.objectStoreNames.contains(STORE)) {
+    return opened;
+  }
+
+  const next = Math.max(opened.version + 1, DATABASE_VERSION);
+  opened.close();
+
+  return openDB(DATABASE, next, { upgrade: createStore });
 }
 
 /**

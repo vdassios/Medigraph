@@ -324,16 +324,24 @@ export function MedigraphApp(): JSX.Element {
           />
         )}
 
-        {phase === 'viewing' && profile !== null && (
+        {/*
+          The data screen is offered at rest as well as after a commit: empty
+          storage still has to offer the two ways in, attaching a document and
+          importing a file (Task 4.5). The panel and the trend need a Profile;
+          this does not.
+        */}
+        {(phase === 'idle' || phase === 'viewing') && (
           <>
-            {selectedSeries === null ? (
+            {phase === 'viewing' && profile !== null && selectedSeries === null && (
               <PanelView
                 profile={profile}
                 reportId={reportId ?? profile.reports.at(-1)?.id ?? ''}
                 onSelectReport={setReportId}
                 onSelectSeries={setSeriesId}
               />
-            ) : (
+            )}
+
+            {phase === 'viewing' && selectedSeries !== null && (
               <TrendView
                 series={selectedSeries}
                 onBack={() => {
