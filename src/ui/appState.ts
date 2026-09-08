@@ -51,6 +51,7 @@ export type AppAction =
   | { type: 'commit-started' }
   | { type: 'commit-succeeded'; profile: Profile }
   | { type: 'cancelled' }
+  | { type: 'cleared' }
   | { type: 'failed'; error: AppErrorCode };
 
 export const initialState: AppState = {
@@ -163,6 +164,13 @@ export function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'cancelled':
       return ended(state, null, false);
+
+    // Everything stored on this device is gone, so the app is what it was
+    // before anything was ever attached. Returning `initialState` rather than
+    // clearing fields one at a time is the point: a field forgotten here would
+    // be a fragment of a record its owner has just deleted.
+    case 'cleared':
+      return initialState;
 
     case 'failed':
       // The committed Profile is untouched. The review goes with the evidence

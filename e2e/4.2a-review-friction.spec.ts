@@ -71,8 +71,8 @@ test('a document the parser is sure of costs no row-level action', async ({ page
 
   // Accepted as a batch means written as a batch: every pre-accepted row is in
   // the Report, not merely absent from the screen.
-  await expect(page.getByTestId('charts')).toBeVisible();
-  await expect(page.getByTestId('report-count')).toHaveText('1');
+  await expect(page.getByTestId('data-manager')).toBeVisible();
+  await expect(page.getByTestId('stored-reports').locator('> li')).toHaveCount(1);
   await expect(page.getByTestId('panel-rows').locator('> li')).toHaveCount(rowCount);
 });
 

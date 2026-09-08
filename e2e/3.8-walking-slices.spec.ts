@@ -91,7 +91,7 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   // Review: the batch extracted, and nothing has been written or drawn.
   await expect(page.getByTestId('review')).toBeVisible();
   await expect(page.getByTestId('review')).toHaveAttribute('data-registry-version', /^\d+$/u);
-  await expect(page.getByTestId('charts')).toHaveCount(0);
+  await expect(page.getByTestId('data-manager')).toHaveCount(0);
   expect(await storedProfile(page)).toBeNull();
 
   // The island resolves a row's SourceRef through the evidence it is holding
@@ -114,8 +114,8 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   await page.getByTestId('confirm').click();
 
   // Confirmed: one Report charted, the same Report persisted, evidence gone.
-  await expect(page.getByTestId('charts')).toBeVisible();
-  await expect(page.getByTestId('report-count')).toHaveText('1');
+  await expect(page.getByTestId('data-manager')).toBeVisible();
+  await expect(page.getByTestId('stored-reports').locator('> li')).toHaveCount(1);
   await expect(page.getByTestId('panel-rows').locator('> li').first()).toBeVisible();
 
   // The panel opens one marker's history: a row is the way into the trend.
@@ -150,8 +150,17 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
     buffer: Buffer.from(JSON.stringify({ format: 'medigraph', v: 1, profile: emptied }), 'utf8'),
   });
 
+  // Nothing is written by arriving: the file becomes a preview and waits for
+  // a decision that names what it costs (Task 4.5).
+  await expect(page.getByTestId('import-preview')).toBeVisible();
+  await expect(page.getByTestId('stored-reports').locator('> li')).toHaveCount(1);
+
+  await page.getByTestId('import-same-person').check();
+  await page.getByTestId('replace-import').click();
+  await page.getByTestId('replace-confirmed').click();
+
   // Parsed, validated, written and shown, from the file alone.
-  await expect(page.getByTestId('report-count')).toHaveText('0');
+  await expect(page.getByTestId('stored-reports')).toHaveCount(0);
   await expect(page.getByTestId('error')).toHaveCount(0);
   expect(await storedProfile(page)).toEqual(emptied);
 
@@ -167,13 +176,13 @@ test('a confirmed Profile is charted again when the tab is reloaded', async ({ p
   await expect(page.getByTestId('review')).toBeVisible();
   await answerEveryGate(page);
   await page.getByTestId('confirm').click();
-  await expect(page.getByTestId('report-count')).toHaveText('1');
+  await expect(page.getByTestId('stored-reports').locator('> li')).toHaveCount(1);
 
   await page.reload();
 
   // Read back from IndexedDB alone: charting, with no document attached.
   await expect(page.getByTestId('app')).toHaveAttribute('data-phase', 'viewing');
-  await expect(page.getByTestId('report-count')).toHaveText('1');
+  await expect(page.getByTestId('stored-reports').locator('> li')).toHaveCount(1);
   await expect(page.getByTestId('review')).toHaveCount(0);
 });
 
@@ -184,7 +193,7 @@ test('a non-ΑΗΦΥ PDF is refused at its own source, and writes nothing', asyn
   // rather than the adapter failing to read it.
   await expect(page.getByTestId('failure-not-ahfy-document')).toBeVisible();
   await expect(page.getByTestId('review')).toHaveCount(0);
-  await expect(page.getByTestId('charts')).toHaveCount(0);
+  await expect(page.getByTestId('data-manager')).toHaveCount(0);
   expect(await storedProfile(page)).toBeNull();
   await expect(page.getByTestId('app')).toHaveAttribute('data-phase', 'idle');
 });

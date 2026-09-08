@@ -720,7 +720,12 @@ export type AppAction =
   | { type: 'commit-started' }
   | { type: 'commit-succeeded'; profile: Profile }
   | { type: 'cancelled' }
+  | { type: 'cleared' }
   | { type: 'failed'; error: AppErrorCode };
+// `cleared` returns `initialState`: everything stored on this device is gone,
+// so the app is what it was before anything was attached. Task 4.5 added it —
+// clearing fields one at a time would eventually leave a fragment of a record
+// its owner has just deleted.
 export function appReducer(state: AppState, action: AppAction): AppState;
 
 // Preact child-component boundaries; MedigraphApp owns all I/O and persistence
@@ -756,11 +761,23 @@ export function TrendView(props: TrendViewProps): JSX.Element;
 export interface DataManagerProps {
   profile: Profile | null;
   persistenceGranted: boolean | null;
+  preview: ImportPreview | null;
+  importError: MedigraphReadError | null;
   onExport(): void;
   onImport(file: File): void;
+  onCancelImport(): void;
+  onReplace(): void;
+  onMerge(plan: ProfileMergePlan): void;
   onDeleteReport(reportId: string): void;
   onClearAll(): void;
 }
+// The preview and its three answers are props because the island owns every
+// read and every write (D2): `onImport` hands over a File, the island turns it
+// into an `ImportPreview`, and the screen asks the question. Task 4.5 added
+// them; a component that parsed the file itself would be the second module
+// allowed to decide what a valid Profile is. The merge plan travels back
+// resolved, since `resolveSameDayPrecision` is pure and the answer is the
+// user's.
 export function DataManager(props: DataManagerProps): JSX.Element;
 export interface EvidenceResource {
   file: File;
@@ -822,6 +839,7 @@ src/
     PanelView.tsx        one Report, one row per marker, factual meters
     trendGeometry.ts     pure: time-proportional x, stepped bands, line runs
     TrendView.tsx        one marker over time, as SVG and as a table
+    DataManager.tsx      export, import preview, and the two ways to delete
   styles/
     viz.css              the visualisation palette, light and dark (Theming)
   pages/              Astro routes: index (landing), app, privacy

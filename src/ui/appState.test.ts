@@ -325,3 +325,23 @@ describe('the evidence the reducer never holds', () => {
     });
   });
 });
+
+describe('cleared', () => {
+  it('returns the app to what it was before anything was attached', () => {
+    const viewing = appReducer(
+      state({ phase: 'viewing', profile: profile(), error: 'commit-failed' }),
+      { type: 'cleared' },
+    );
+
+    expect(viewing).toEqual(initialState);
+  });
+
+  it('takes an open review with it, since its evidence is gone too', () => {
+    const reviewing = appReducer(
+      state({ phase: 'reviewing', review: review(), profile: profile() }),
+      { type: 'cleared' },
+    );
+
+    expect(reviewing).toEqual(initialState);
+  });
+});

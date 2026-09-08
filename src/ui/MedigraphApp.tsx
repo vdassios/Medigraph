@@ -1,14 +1,27 @@
 import type { JSX } from 'preact';
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'preact/hooks';
 import { canConfirm, beginReview } from '../domain/review';
-import { applyProfileChange, buildProfileChange } from '../domain/profile';
+import {
+  applyProfileChange,
+  applyProfileMerge,
+  buildProfileChange,
+  removeReport,
+} from '../domain/profile';
 import { buildSeries } from '../domain/series';
-import type { Profile, SourceRef } from '../domain/types';
-import { parseMedigraph, serialiseMedigraph } from '../io/fileFormat';
+import type { ProfileMergePlan, SourceRef } from '../domain/types';
+import { previewImport, serialiseMedigraph } from '../io/fileFormat';
+import type { ImportPreview, MedigraphReadError } from '../io/fileFormat';
 import { routeFiles } from '../io/fileRouter';
-import { loadProfile, replaceProfile, saveProfile } from '../io/storage';
+import {
+  clearAll,
+  loadProfile,
+  replaceProfile,
+  requestStoragePersistence,
+  saveProfile,
+} from '../io/storage';
 import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
 import { FileDrop } from './FileDrop';
+import { DataManager } from './DataManager';
 import { PanelView } from './PanelView';
 import { TrendView } from './TrendView';
 import { ReviewTable } from './ReviewTable';
@@ -31,8 +44,8 @@ import type { EvidenceLookup, EvidenceResource } from './appState';
  *
  * The regions below are Task 3.8's minimal shell, less the two that have been
  * replaced: attach is `FileDrop` (4.1) and review is `ReviewTable` (4.2);
- * the panel is `PanelView` (4.3) and the trend is `TrendView` (4.4); data
- * management is still a placeholder for Task 4.5. What
+ * the panel is `PanelView` (4.3), the trend is `TrendView` (4.4) and the data
+ * screen is `DataManager` (4.5). What
  * survives each replacement is the order the calls happen in, and the fact
  * that no child makes any of them.
  */
@@ -45,6 +58,9 @@ export function MedigraphApp(): JSX.Element {
   // the reducer that owns what may be written.
   const [reportId, setReportId] = useState<string | null>(null);
   const [seriesId, setSeriesId] = useState<string | null>(null);
+  const [preview, setPreview] = useState<ImportPreview | null>(null);
+  const [importError, setImportError] = useState<MedigraphReadError | null>(null);
+  const [persistenceGranted, setPersistenceGranted] = useState<boolean | null>(null);
   const aborterRef = useRef<AbortController | null>(null);
   const evidenceRef = useRef<Map<string, EvidenceResource>>(new Map());
 
@@ -61,6 +77,10 @@ export function MedigraphApp(): JSX.Element {
         dispatch({ type: 'profile-loaded', profile: stored });
       }
     });
+
+    // Asked once, at the only moment the answer is actionable: a user the
+    // browser refuses to persist for is one who needs the export nudge.
+    void requestStoragePersistence().then(setPersistenceGranted);
 
     return release;
   }, [release]);
@@ -130,16 +150,110 @@ export function MedigraphApp(): JSX.Element {
     dispatch({ type: 'cancelled' });
   }, [release]);
 
-  const importProfile = useCallback(async (file: File) => {
-    const parsed = parseMedigraph(new Uint8Array(await file.arrayBuffer()));
-    if (!parsed.ok) {
-      dispatch({ type: 'failed', error: parsed.error });
+  /**
+   * Read a `.medigraph` file into a preview, and write nothing.
+   *
+   * The decision belongs to the user and the screen that asks for it; this
+   * only turns bytes into something they can be asked about.
+   */
+  const readImport = useCallback(
+    async (file: File) => {
+      const result = previewImport(new Uint8Array(await file.arrayBuffer()), profile);
+      setImportError(result.ok ? null : result.error);
+      setPreview(result.ok ? result.value : null);
+    },
+    [profile],
+  );
+
+  /** Take the imported Profile whole, which is what Replace means. */
+  const acceptImport = useCallback(async () => {
+    if (preview === null) {
       return;
     }
 
-    await replaceProfile(parsed.value);
-    dispatch({ type: 'profile-loaded', profile: parsed.value });
-  }, []);
+    await replaceProfile(preview.profile);
+    setPreview(null);
+    setImportError(null);
+    dispatch({ type: 'profile-loaded', profile: preview.profile });
+  }, [preview]);
+
+  /** Apply a merge plan the user has resolved, or report why it cannot apply. */
+  const mergeImport = useCallback(
+    async (plan: ProfileMergePlan) => {
+      if (profile === null) {
+        return;
+      }
+
+      const merged = applyProfileMerge(profile, plan);
+      if (!merged.ok) {
+        dispatch({ type: 'failed', error: merged.error });
+        return;
+      }
+
+      await replaceProfile(merged.profile);
+      setPreview(null);
+      setImportError(null);
+      dispatch({ type: 'profile-loaded', profile: merged.profile });
+    },
+    [profile],
+  );
+
+  /**
+   * Write the Profile to a file the user keeps, and let go of the URL at once.
+   *
+   * The blob holds the whole history in plaintext; a URL left alive is a
+   * readable handle to it for as long as the document lives, so it is revoked
+   * on the same tick the download starts.
+   */
+  const exportProfile = useCallback(() => {
+    if (profile === null) {
+      return;
+    }
+
+    const url = URL.createObjectURL(
+      new Blob([serialiseMedigraph(profile)], { type: 'application/json' }),
+    );
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'medigraph.medigraph';
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [profile]);
+
+  const deleteReport = useCallback(
+    async (id: string) => {
+      const next = profile === null ? null : removeReport(profile, id);
+      if (next === null) {
+        return;
+      }
+
+      await replaceProfile(next);
+      dispatch({ type: 'profile-loaded', profile: next });
+    },
+    [profile],
+  );
+
+  /**
+   * Delete everything this device holds, including the code that serves it.
+   *
+   * The service worker goes with the data: one left registered would keep
+   * serving the app — and its cached assets — to a device whose owner has just
+   * asked for all of it to be gone.
+   */
+  const clearEverything = useCallback(async () => {
+    await clearAll();
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const registration of registrations) {
+      await registration.unregister();
+    }
+
+    release();
+    setPreview(null);
+    setImportError(null);
+    setReportId(null);
+    setSeriesId(null);
+    dispatch({ type: 'cleared' });
+  }, [release]);
 
   /**
    * Resolve a row's `SourceRef` to the page it came from.
@@ -202,58 +316,24 @@ export function MedigraphApp(): JSX.Element {
               }}
             />
           )}
-          <Charts profile={profile} onImport={(file) => void importProfile(file)} />
+          <DataManager
+            profile={profile}
+            persistenceGranted={persistenceGranted}
+            preview={preview}
+            importError={importError}
+            onExport={exportProfile}
+            onImport={(file) => void readImport(file)}
+            onCancelImport={() => {
+              setPreview(null);
+              setImportError(null);
+            }}
+            onReplace={() => void acceptImport()}
+            onMerge={(plan) => void mergeImport(plan)}
+            onDeleteReport={(id) => void deleteReport(id)}
+            onClearAll={() => void clearEverything()}
+          />
         </>
       )}
     </div>
-  );
-}
-
-/**
- * All that is left of Task 3.8's chart primitive: the export and import
- * controls, and the count of what is stored.
- *
- * Task 4.5 replaces this with `DataManager`, which owns the export warning,
- * the import preview and its merge gates. Until then these two controls are
- * what the walking slice uses to prove a Profile survives a round trip.
- */
-function Charts({
-  profile,
-  onImport,
-}: {
-  profile: Profile;
-  onImport: (file: File) => void;
-}): JSX.Element {
-  const exported = useMemo(() => serialiseMedigraph(profile), [profile]);
-  const href = useMemo(
-    () => URL.createObjectURL(new Blob([exported], { type: 'application/json' })),
-    [exported],
-  );
-
-  return (
-    <section data-testid="charts">
-      <p data-testid="report-count">{profile.reports.length}</p>
-
-      <p>
-        <a href={href} download="medigraph.medigraph" data-testid="export">
-          Εξαγωγή
-        </a>
-      </p>
-      <p>
-        <label>
-          Εισαγωγή αρχείου{' '}
-          <input
-            data-testid="import"
-            type="file"
-            onChange={(event) => {
-              const [file] = [...(event.currentTarget.files ?? [])];
-              if (file !== undefined) {
-                onImport(file);
-              }
-            }}
-          />
-        </label>
-      </p>
-    </section>
   );
 }
