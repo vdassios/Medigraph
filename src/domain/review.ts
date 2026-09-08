@@ -158,7 +158,7 @@ export function beginReview(results: readonly ExtractionResult[]): ReviewSession
     }),
   );
 
-  return {
+  const opened: ReviewSession = {
     id: `review:${results.map((result) => result.sourceId).join('+')}`,
     results: [...results],
     reportDrafts,
@@ -167,6 +167,19 @@ export function beginReview(results: readonly ExtractionResult[]): ReviewSession
     existingReportDateUpdates: {},
     samePersonConfirmed: null,
   };
+
+  // The container's own labelled fields are pre-resolved as `redacted`
+  // (ADR-0020): the document put its ΑΜΚΑ, its names and its order ids in
+  // fixed positions that Pass V has already validated, so there is no question
+  // to ask about them — and asking one for every document would bury the
+  // candidates that genuinely need a person's judgement. This runs through
+  // `resolveIdentifier` rather than seeding the map, so the text leaves the
+  // rows exactly as it would had the user answered. The answer stays theirs to
+  // change; the text does not come back, which is true of every redaction.
+  return results
+    .flatMap((result) => result.identifierCandidates)
+    .filter((candidate) => candidate.knownPosition)
+    .reduce((session, candidate) => resolveIdentifier(session, candidate.id, 'redacted'), opened);
 }
 
 /**

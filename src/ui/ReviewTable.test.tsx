@@ -248,6 +248,7 @@ describe('the identifier gate (D7)', () => {
     id: 'cand-1',
     kind: 'national-id',
     text: '12345678901',
+    knownPosition: false,
   };
 
   function withCandidate(rows: ParsedRow[] = [row('r1', 'glucose')]): ReviewSession {

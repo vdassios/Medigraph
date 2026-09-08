@@ -117,15 +117,6 @@ test.describe('the review gates', () => {
     await page.getByTestId('attach').setInputFiles(AHFY);
     await expect(page.getByTestId('review')).toBeVisible();
 
-    await page.getByTestId('redact-identifier').first().click();
-    for (;;) {
-      const control = page.getByTestId('redact-identifier').first();
-      if ((await control.count()) === 0) {
-        break;
-      }
-      await control.click();
-    }
-
     await expect(page.getByTestId('confirm')).toBeDisabled();
     await expect(page.getByTestId('blockers')).toContainText(/ημερομην|dates/u);
 
@@ -161,17 +152,18 @@ test.describe('the review gates', () => {
     await expect(page.getByTestId('confirm')).toBeEnabled();
   });
 
-  test('a redacted identifier leaves the review entirely', async ({ page }) => {
+  test('an identifier the container labelled is answered, and never displayed', async ({
+    page,
+  }) => {
     await page.getByTestId('attach').setInputFiles(AHFY_FULL);
     await expect(page.getByTestId('review')).toBeVisible();
 
-    const identifier = (await page.getByTestId('identifier-text').first().textContent()) ?? '';
-    expect(identifier.length).toBeGreaterThan(3);
-
-    await page.getByTestId('redact-identifier').first().click();
-
-    // Not merely answered: the text is gone from every derived field it reached.
-    await expect(page.getByTestId('review')).not.toContainText(identifier);
+    // Pre-resolved as redacted (ADR-0020): the gate is discharged, the text is
+    // out of every derived field, and the screen does not echo it back.
+    await expect(page.getByTestId('identifier-answer').first()).toBeVisible();
+    await expect(page.getByTestId('review')).not.toContainText('01018099901');
+    await expect(page.getByTestId('review')).not.toContainText('ΠΑΠΑΔΟΠΟΥΛΟΣ');
+    await expect(page.getByTestId('blockers')).not.toContainText(/προσωπικά|personal/u);
   });
 
   test('an unapproved unknown marker holds Confirm on its own', async ({ page }) => {

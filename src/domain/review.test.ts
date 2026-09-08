@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { setReportDate } from './profile';
 import {
   approveUnknownMarker,
   beginReview,
@@ -172,7 +173,7 @@ describe('immutability', () => {
     ['resolveConflict', (s: ReviewSession) => resolveConflict(s, 'k1', null)],
   ])('%s leaves the session it was given untouched', (_name, edit) => {
     const before = session({
-      results: [result([{ id: 'c1', kind: 'name', text: 'label r1' }])],
+      results: [result([{ id: 'c1', kind: 'name', text: 'label r1', knownPosition: false }])],
       reportDrafts: [draft({ rows: [row('r1', 'x:old')] })],
     });
     const snapshot = structuredClone(before);
@@ -370,7 +371,12 @@ describe('deleteRow', () => {
 });
 
 describe('resolveIdentifier', () => {
-  const candidate: IdentifierCandidate = { id: 'c1', kind: 'name', text: 'ΠΑΠΑΔΟΠΟΥΛΟΣ' };
+  const candidate: IdentifierCandidate = {
+    id: 'c1',
+    kind: 'name',
+    text: 'ΠΑΠΑΔΟΠΟΥΛΟΣ',
+    knownPosition: false,
+  };
 
   function withCandidate(rows: ParsedRow[]): ReviewSession {
     return session({ results: [result([candidate])], reportDrafts: [draft({ rows })] });
@@ -512,7 +518,9 @@ describe('canConfirm', () => {
       ],
       [
         'an unresolved identifier',
-        session({ results: [result([{ id: 'c1', kind: 'name', text: 'ΕΛΕΝΗ' }])] }),
+        session({
+          results: [result([{ id: 'c1', kind: 'name', text: 'ΕΛΕΝΗ', knownPosition: false }])],
+        }),
       ],
       [
         'an unapproved unknown marker',
@@ -648,6 +656,57 @@ describe('canConfirm', () => {
 function rowsOf(session: ReviewSession): readonly ParsedRow[] {
   return session.reportDrafts[0]?.rows ?? [];
 }
+
+describe('beginReview pre-resolves what the container itself labelled', () => {
+  const labelled = {
+    id: 'c-known',
+    kind: 'national-id',
+    text: '01018099901',
+    knownPosition: true,
+  } as const satisfies IdentifierCandidate;
+  const scanned = {
+    id: 'c-scanned',
+    kind: 'phone',
+    text: '2101234567',
+    knownPosition: false,
+  } as const satisfies IdentifierCandidate;
+
+  function extracted(candidates: IdentifierCandidate[], rows: ParsedRow[]): ExtractionResult {
+    return { ...result(candidates), rows };
+  }
+
+  it('answers a labelled position, and leaves a scanned shape to the user', () => {
+    const opened = beginReview([extracted([labelled, scanned], [row('r1', 'glucose')])]);
+
+    expect(opened.identifierResolutions).toEqual({ 'c-known': 'redacted' });
+  });
+
+  it('removes the pre-resolved text from the rows, exactly as an answer would', () => {
+    const opened = beginReview([
+      extracted([labelled], [row('r1', 'x:kappa', { label: 'Ασθενής 01018099901' })]),
+    ]);
+
+    expect(opened.reportDrafts[0]?.rows[0]?.label).toBe('Ασθενής');
+  });
+
+  it('leaves the D7 gate standing for everything it did not answer', () => {
+    const opened = beginReview([extracted([labelled, scanned], [row('r1', 'glucose')])]);
+    const confirmed = setReportDate(opened, opened.reportDrafts[0]?.id ?? '', DAY);
+
+    expect(canConfirm(confirmed, null)).toBe(false);
+    expect(canConfirm(resolveIdentifier(confirmed, 'c-scanned', 'false-positive'), null)).toBe(
+      true,
+    );
+  });
+
+  it('lets the user change the answer it made for them', () => {
+    const opened = beginReview([extracted([labelled], [row('r1', 'glucose')])]);
+
+    const changed = resolveIdentifier(opened, 'c-known', 'false-positive');
+
+    expect(changed.identifierResolutions['c-known']).toBe('false-positive');
+  });
+});
 
 describe('editRowMeasurement', () => {
   const NUMERIC = {

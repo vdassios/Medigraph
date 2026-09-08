@@ -189,6 +189,8 @@ function sourceRefFor(line: Line, sourceId: string, start: number, end: number):
 interface Found {
   kind: IdentifierKind;
   text: string;
+  /** Whether the document's own fixed label named it (ADR-0020). */
+  knownPosition: boolean;
   sourceRef: SourceRef;
 }
 
@@ -218,7 +220,13 @@ function labelledValue(line: Line, sourceId: string): Found | undefined {
   }
 
   const start = colon + 1 + after.indexOf(text);
-  return { kind, text, sourceRef: sourceRefFor(line, sourceId, start, start + text.length) };
+
+  return {
+    kind,
+    text,
+    knownPosition: true,
+    sourceRef: sourceRefFor(line, sourceId, start, start + text.length),
+  };
 }
 
 function scannedValues(line: Line, sourceId: string): Found[] {
@@ -231,6 +239,10 @@ function scannedValues(line: Line, sourceId: string): Found[] {
       found.push({
         kind,
         text,
+        // Found by shape rather than by label: an eleven-digit number in a
+        // free-text line may be an ΑΜΚΑ or may be something else, and this
+        // module does not get to decide which.
+        knownPosition: false,
         sourceRef: sourceRefFor(line, sourceId, start, start + text.length),
       });
     }
@@ -264,7 +276,7 @@ export function findIdentifierCandidates(
       const found = labelled === undefined ? [] : [labelled];
       found.push(...scannedValues(line, sourceId));
 
-      for (const { kind, text, sourceRef } of found) {
+      for (const { kind, text, knownPosition, sourceRef } of found) {
         const key = `${kind} ${text}`;
         if (seen.has(key)) {
           continue;
@@ -275,6 +287,7 @@ export function findIdentifierCandidates(
           id: `${sourceId}:identifier:${String(candidates.length + 1)}`,
           kind,
           text,
+          knownPosition,
           sourceRef,
         });
       }

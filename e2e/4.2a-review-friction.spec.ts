@@ -62,9 +62,13 @@ test('a document the parser is sure of costs no row-level action', async ({ page
   await page.getByTestId('pre-accepted').locator('summary').click();
   await expect(page.getByTestId('pre-accepted').getByTestId('edit-row').first()).toBeVisible();
 
-  // The gates that remain are the ones the user, not the parser, must answer.
+  // One action, and it is the one D6 insists on: a document whose rows the
+  // parser was sure of, and whose identifiers all sat in the container's own
+  // labelled positions (ADR-0020), asks the user to confirm the date and
+  // nothing else.
   await expect(page.getByTestId('confirm')).toBeDisabled();
-  await answerEveryGate(page);
+  await expect(page.getByTestId('redact-identifier')).toHaveCount(0);
+  await page.getByTestId('confirm-date').click();
   await expect(page.getByTestId('confirm')).toBeEnabled();
 
   await page.getByTestId('confirm').click();
@@ -104,10 +108,10 @@ test('a document with rows worth reading keeps them on screen, and Confirm shut'
   ).toBeVisible();
   await expect(page.getByTestId('pre-accepted').getByTestId('approve-unknown')).toHaveCount(0);
 
-  // An unapproved unknown marker holds Confirm on its own.
+  // An unapproved unknown marker holds Confirm on its own, with every
+  // identifier already answered by the container's own labelling.
   await expect(page.getByTestId('confirm')).toBeDisabled();
-  await page.getByTestId('redact-identifier').first().click();
-  await expect(page.getByTestId('confirm')).toBeDisabled();
+  await expect(page.getByTestId('approve-unknown').first()).toBeVisible();
 
   await answerEveryGate(page);
 

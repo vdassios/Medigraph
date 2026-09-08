@@ -148,6 +148,13 @@ export interface IdentifierCandidate {
   id: string;
   kind: 'name' | 'national-id' | 'patient-id' | 'phone' | 'email' | 'address' | 'other'; // AMKA is national-id
   text: string; // transient; never copied into Profile
+  /**
+   * True when the ΑΗΦΥ container itself put this text under a fixed label,
+   * false when it was scanned out of a line by shape (ADR-0020). `beginReview`
+   * pre-resolves the first kind as `redacted`; the second is the user's to
+   * answer, because only they know whether a shape is an identifier.
+   */
+  knownPosition: boolean;
   sourceRef?: SourceRef;
 }
 
