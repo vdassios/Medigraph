@@ -5,6 +5,6 @@ export default defineConfig({
     globals: true,
     // domain/ is pure TypeScript with zero DOM and zero I/O.
     environment: 'node',
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
   },
 });

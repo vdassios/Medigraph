@@ -14,6 +14,7 @@ import { parseMedigraph, serialiseMedigraph } from '../io/fileFormat';
 import { routeFiles } from '../io/fileRouter';
 import { loadProfile, replaceProfile, saveProfile } from '../io/storage';
 import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
+import { FileDrop } from './FileDrop';
 import type { EvidenceLookup, EvidenceResource } from './appState';
 
 /**
@@ -31,14 +32,15 @@ import type { EvidenceLookup, EvidenceResource } from './appState';
  * Cancel, any failure and unmount — so a page crop can never outlive the review
  * that opened it.
  *
- * The regions below are still Task 3.8's minimal shell. Tasks 4.1–4.5 replace
- * each with a real component; what survives is the order the calls happen in,
- * and the fact that no child makes any of them.
+ * The regions below are Task 3.8's minimal shell, less the one Task 4.1 has
+ * replaced: attach is now `FileDrop`, and review, charts and data management
+ * are still placeholders for Tasks 4.2–4.5. What survives each replacement is
+ * the order the calls happen in, and the fact that no child makes any of them.
  */
 
 export function MedigraphApp(): JSX.Element {
   const [state, dispatch] = useReducer(appReducer, initialState);
-  const { phase, profile, review, routeFailures, error } = state;
+  const { phase, profile, review, progress, routeFailures, error } = state;
   const aborterRef = useRef<AbortController | null>(null);
   const evidenceRef = useRef<Map<string, EvidenceResource>>(new Map());
 
@@ -155,17 +157,13 @@ export function MedigraphApp(): JSX.Element {
 
   return (
     <div class="medigraph-app" data-testid="app" data-phase={phase}>
-      <Attach onFiles={attach} disabled={phase === 'extracting' || phase === 'reviewing'} />
-
-      {routeFailures.length > 0 && (
-        <ul data-testid="failures">
-          {routeFailures.map((failure) => (
-            <li key={`${failure.scope}:${failure.code}`} data-testid={`failure-${failure.code}`}>
-              {failure.scope === 'source' ? failure.fileName : 'batch'}: {failure.code}
-            </li>
-          ))}
-        </ul>
-      )}
+      <FileDrop
+        disabled={phase === 'extracting' || phase === 'reviewing' || phase === 'committing'}
+        progress={progress}
+        failures={routeFailures}
+        onFiles={(files) => void attach(files)}
+        onCancel={cancel}
+      />
 
       {error !== null && <p data-testid="error">{error}</p>}
 
@@ -186,35 +184,6 @@ export function MedigraphApp(): JSX.Element {
         <Charts profile={profile} series={series} onImport={(file) => void importProfile(file)} />
       )}
     </div>
-  );
-}
-
-function Attach({
-  onFiles,
-  disabled,
-}: {
-  onFiles: (files: File[]) => Promise<void>;
-  disabled: boolean;
-}): JSX.Element {
-  return (
-    <p>
-      <label>
-        Επισύναψη εγγράφου{' '}
-        <input
-          data-testid="attach"
-          type="file"
-          accept="application/pdf"
-          multiple
-          disabled={disabled}
-          onChange={(event) => {
-            const chosen = [...(event.currentTarget.files ?? [])];
-            if (chosen.length > 0) {
-              void onFiles(chosen);
-            }
-          }}
-        />
-      </label>
-    </p>
   );
 }
 

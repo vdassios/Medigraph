@@ -19,10 +19,18 @@ import { extractPdfText, pdfTextAdapter } from './pdfText';
  * an empty screen.
  */
 
-/** The batch caps. Attaching more is a mistake worth naming, not throttling. */
-const MAX_FILES = 20;
-const MAX_PAGES = 100;
-const MAX_BYTES = 50 * 1024 * 1024;
+/**
+ * The batch caps. Attaching more is a mistake worth naming, not throttling.
+ *
+ * Exported because the attach screen states them before a file is chosen, and
+ * a screen that stated its own numbers would eventually state different ones
+ * from the gate that applies them.
+ */
+export const ROUTE_LIMITS = {
+  maxFiles: 20,
+  maxPages: 100,
+  maxBytes: 50 * 1024 * 1024,
+} as const;
 
 /** Every PDF opens with this, whatever a file picker claims about its type. */
 const PDF_MAGIC = '%PDF-';
@@ -115,7 +123,7 @@ export async function routeFiles(
   const results: ExtractionResult[] = [];
   const failures: RouteFailure[] = [];
 
-  if (files.length > MAX_FILES) {
+  if (files.length > ROUTE_LIMITS.maxFiles) {
     return { results, failures: [{ scope: 'batch', code: 'too-many-files' }] };
   }
 
@@ -137,7 +145,7 @@ export async function routeFiles(
       failures.push(sourceFailure(sourceIndex, file, 'unsupported-type'));
       continue;
     }
-    if (file.size > MAX_BYTES) {
+    if (file.size > ROUTE_LIMITS.maxBytes) {
       failures.push(sourceFailure(sourceIndex, file, 'file-too-large'));
       continue;
     }
@@ -158,7 +166,7 @@ export async function routeFiles(
     // The page budget is spent by what was actually decoded, so a single
     // enormous document stops the batch at itself and the sources already
     // read survive.
-    if (pagesRead + pages.length > MAX_PAGES) {
+    if (pagesRead + pages.length > ROUTE_LIMITS.maxPages) {
       failures.push({ scope: 'batch', code: 'too-many-pages' });
       return { results, failures };
     }
