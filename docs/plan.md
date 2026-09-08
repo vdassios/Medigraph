@@ -820,6 +820,8 @@ src/
     ReviewTable.tsx      every D6/D7/D8 gate, and none of the deciding
     panelMeter.ts        pure: range status and meter geometry, zero DOM
     PanelView.tsx        one Report, one row per marker, factual meters
+    trendGeometry.ts     pure: time-proportional x, stepped bands, line runs
+    TrendView.tsx        one marker over time, as SVG and as a table
   styles/
     viz.css              the visualisation palette, light and dark (Theming)
   pages/              Astro routes: index (landing), app, privacy

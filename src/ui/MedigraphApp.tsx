@@ -3,13 +3,14 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'p
 import { canConfirm, beginReview } from '../domain/review';
 import { applyProfileChange, buildProfileChange } from '../domain/profile';
 import { buildSeries } from '../domain/series';
-import type { Profile, Series, SourceRef } from '../domain/types';
+import type { Profile, SourceRef } from '../domain/types';
 import { parseMedigraph, serialiseMedigraph } from '../io/fileFormat';
 import { routeFiles } from '../io/fileRouter';
 import { loadProfile, replaceProfile, saveProfile } from '../io/storage';
 import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
 import { FileDrop } from './FileDrop';
 import { PanelView } from './PanelView';
+import { TrendView } from './TrendView';
 import { ReviewTable } from './ReviewTable';
 import type { EvidenceLookup, EvidenceResource } from './appState';
 
@@ -30,8 +31,8 @@ import type { EvidenceLookup, EvidenceResource } from './appState';
  *
  * The regions below are Task 3.8's minimal shell, less the two that have been
  * replaced: attach is `FileDrop` (4.1) and review is `ReviewTable` (4.2);
- * the panel is `PanelView` (4.3); the trend view and data management are
- * still placeholders for Tasks 4.4 and 4.5. What
+ * the panel is `PanelView` (4.3) and the trend is `TrendView` (4.4); data
+ * management is still a placeholder for Task 4.5. What
  * survives each replacement is the order the calls happen in, and the fact
  * that no child makes any of them.
  */
@@ -157,6 +158,7 @@ export function MedigraphApp(): JSX.Element {
     () => (phase === 'viewing' && profile !== null ? buildSeries(profile) : []),
     [phase, profile],
   );
+  const selectedSeries = series.find((each) => each.id === seriesId) ?? null;
 
   return (
     <div class="medigraph-app" data-testid="app" data-phase={phase}>
@@ -185,17 +187,22 @@ export function MedigraphApp(): JSX.Element {
 
       {phase === 'viewing' && profile !== null && (
         <>
-          <PanelView
-            profile={profile}
-            reportId={reportId ?? profile.reports.at(-1)?.id ?? ''}
-            onSelectReport={setReportId}
-            onSelectSeries={setSeriesId}
-          />
-          <Charts
-            profile={profile}
-            series={series.filter((each) => seriesId === null || each.id === seriesId)}
-            onImport={(file) => void importProfile(file)}
-          />
+          {selectedSeries === null ? (
+            <PanelView
+              profile={profile}
+              reportId={reportId ?? profile.reports.at(-1)?.id ?? ''}
+              onSelectReport={setReportId}
+              onSelectSeries={setSeriesId}
+            />
+          ) : (
+            <TrendView
+              series={selectedSeries}
+              onBack={() => {
+                setSeriesId(null);
+              }}
+            />
+          )}
+          <Charts profile={profile} onImport={(file) => void importProfile(file)} />
         </>
       )}
     </div>
@@ -203,22 +210,18 @@ export function MedigraphApp(): JSX.Element {
 }
 
 /**
- * What is left of Task 3.8's chart primitive: the trend a panel row opens, and
- * the export/import controls Task 4.5 replaces.
+ * All that is left of Task 3.8's chart primitive: the export and import
+ * controls, and the count of what is stored.
  *
- * Every series prints its marker key, its normalised unit and the values the
- * laboratory reported, in collection order. No range is drawn, no point is
- * coloured, and nothing is described as high, low or improving (D13). Task 4.4
- * replaces this list with `TrendView`, which is why the panel already hands it
- * one series rather than all of them.
+ * Task 4.5 replaces this with `DataManager`, which owns the export warning,
+ * the import preview and its merge gates. Until then these two controls are
+ * what the walking slice uses to prove a Profile survives a round trip.
  */
 function Charts({
   profile,
-  series,
   onImport,
 }: {
   profile: Profile;
-  series: readonly Series[];
   onImport: (file: File) => void;
 }): JSX.Element {
   const exported = useMemo(() => serialiseMedigraph(profile), [profile]);
@@ -230,21 +233,6 @@ function Charts({
   return (
     <section data-testid="charts">
       <p data-testid="report-count">{profile.reports.length}</p>
-
-      <ul data-testid="series">
-        {series.map((each) => (
-          <li key={each.id} data-testid={`series-${each.markerKey}`}>
-            <span data-testid="series-unit">{each.unit ?? ''}</span>
-            <ol>
-              {each.points.map((point) => (
-                <li key={`${point.reportId}:${point.collectedAt.date}`} data-testid="point">
-                  {point.collectedAt.date} {point.value ?? point.textValue ?? ''}
-                </li>
-              ))}
-            </ol>
-          </li>
-        ))}
-      </ul>
 
       <p>
         <a href={href} download="medigraph.medigraph" data-testid="export">

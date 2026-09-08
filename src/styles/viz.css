@@ -163,3 +163,61 @@
   color: var(--viz-text-quiet);
   font-size: 0.8125rem;
 }
+
+.trend-plot {
+  height: auto;
+  max-width: 100%;
+  touch-action: pan-y;
+  width: 100%;
+}
+
+.trend-band {
+  fill: var(--viz-band);
+}
+
+.trend-line {
+  stroke: var(--viz-series);
+  stroke-width: 2;
+}
+
+.trend-mark {
+  fill: var(--viz-series);
+  stroke: var(--viz-surface);
+  stroke-width: 2;
+}
+
+.trend-mark[data-status='below'],
+.trend-mark[data-status='above'] {
+  fill: var(--viz-outside);
+}
+
+/* A reported bound, drawn hollow: the value itself was never measured. */
+.trend-mark-hollow {
+  fill: var(--viz-surface);
+  stroke: var(--viz-series);
+  stroke-width: 2;
+}
+
+.trend-caret,
+.trend-label {
+  fill: var(--viz-text);
+  font-size: 10px;
+}
+
+.trend-crosshair {
+  stroke: var(--viz-line);
+  stroke-dasharray: 2 2;
+  stroke-width: 1;
+}
+
+.trend-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.trend-table th,
+.trend-table td {
+  border-bottom: 1px solid var(--viz-line);
+  padding: 0.25rem 0.5rem;
+  text-align: start;
+}

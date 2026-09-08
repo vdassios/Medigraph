@@ -120,7 +120,9 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
 
   // The panel opens one marker's history: a row is the way into the trend.
   await page.locator('[data-testid^="panel-row-"]').first().click();
-  await expect(page.getByTestId('point').first()).toBeVisible();
+  await expect(page.getByTestId('trend-plot')).toBeVisible();
+  await page.getByTestId('trend-back').click();
+  await expect(page.getByTestId('panel-rows')).toBeVisible();
   await expect(page.getByTestId('review')).toHaveCount(0);
 
   const stored = (await storedProfile(page)) as Record<string, unknown> | null;
