@@ -66,3 +66,6 @@ jobs:
         with: { node-version-file: .nvmrc, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      # Task 5.3: the initial download stays under budget, and the heavy chunk
+      # stays out of it. Exits non-zero over budget or on a leaked lazy chunk.
+      - run: pnpm check:bundle

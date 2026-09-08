@@ -21,6 +21,7 @@
     "e2e": "playwright test",
     "corpus:score": "node scripts/corpus-score.ts",
     "verify:static": "pnpm lint && pnpm format:check && pnpm typecheck",
+    "check:bundle": "node scripts/check-bundle-budget.mjs",
     "sync:pdf-worker": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdf/pdf.worker.min.mjs"
   },
   "lint-staged": {
