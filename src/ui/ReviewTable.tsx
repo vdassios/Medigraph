@@ -355,8 +355,18 @@ function IdentifierPanel({ session, onChange }: RegionProps): JSX.Element {
 
           return (
             <li key={candidate.id} data-testid={`identifier-${candidate.id}`} data-answer={answer}>
-              <span data-testid="identifier-kind">{copy.identifierKinds[candidate.kind]}</span>:{' '}
-              <span data-testid="identifier-text">{candidate.text}</span>{' '}
+              <span data-testid="identifier-kind">{copy.identifierKinds[candidate.kind]}</span>
+              {/*
+                Once it has been called real and removed, the screen stops
+                echoing it. Leaving it on display would contradict the answer
+                the user just gave and keep the text in the one place they
+                asked for it to be gone from.
+              */}
+              {answer === 'redacted' ? null : (
+                <>
+                  : <span data-testid="identifier-text">{candidate.text}</span>
+                </>
+              )}{' '}
               {answer === undefined ? (
                 <>
                   <button
