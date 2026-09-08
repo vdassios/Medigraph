@@ -3,7 +3,9 @@ import {
   approveUnknownMarker,
   beginReview,
   canConfirm,
+  confirmSamePerson,
   deleteRow,
+  editRowMeasurement,
   reassignMarker,
   resolveConflict,
   resolveIdentifier,
@@ -639,5 +641,179 @@ describe('canConfirm', () => {
 
       expect(canConfirm(open, profile([report('report-1', DAY)]))).toBe(true);
     });
+  });
+});
+
+/** The rows of the session's only draft, for the edit tables below. */
+function rowsOf(session: ReviewSession): readonly ParsedRow[] {
+  return session.reportDrafts[0]?.rows ?? [];
+}
+
+describe('editRowMeasurement', () => {
+  const NUMERIC = {
+    status: 'value',
+    value: 4.2,
+    comparator: null,
+    textValue: null,
+    unit: 'g/dL',
+    referenceRange: null,
+    categoricalReference: null,
+  } as const;
+
+  it('rewrites what was measured and nothing else', () => {
+    const before = session({
+      reportDrafts: [
+        draft({
+          rows: [
+            row('r1', 'glucose', {
+              flags: ['implausible-value'],
+              confidence: 'low',
+              sourceRef: { sourceId: 's1', page: 2 },
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const [edited] = rowsOf(editRowMeasurement(before, 'r1', NUMERIC));
+
+    expect(edited).toMatchObject({
+      id: 'r1',
+      markerKey: 'glucose',
+      label: 'label r1',
+      value: 4.2,
+      unit: 'g/dL',
+      // A flag describes the parse that happened, not the value now standing.
+      flags: ['implausible-value'],
+      confidence: 'low',
+      sourceRef: { sourceId: 's1', page: 2 },
+    });
+  });
+
+  it('drops the fields a numeric status cannot carry', () => {
+    const before = session({
+      reportDrafts: [
+        draft({
+          rows: [
+            row('r1', 'urine-ph', {
+              status: 'categorical',
+              value: null,
+              textValue: 'Όξινη',
+              categoricalReference: 'Αρνητικό',
+            }),
+          ],
+        }),
+      ],
+    });
+
+    const [edited] = rowsOf(editRowMeasurement(before, 'r1', NUMERIC));
+
+    expect(edited).toMatchObject({ status: 'value', value: 4.2 });
+    expect(edited?.textValue).toBeNull();
+    expect(edited?.categoricalReference).toBeNull();
+  });
+
+  it('drops the fields a categorical status cannot carry, and keeps the printed range', () => {
+    const [edited] = rowsOf(
+      editRowMeasurement(session(), 'r1', {
+        status: 'categorical',
+        value: 9,
+        comparator: '<',
+        textValue: 'Αρνητικό',
+        unit: 'mg/dL',
+        referenceRange: { kind: 'closed', min: 1, max: 2 },
+        categoricalReference: 'Αρνητικό',
+      }),
+    );
+
+    expect(edited).toMatchObject({ status: 'categorical', textValue: 'Αρνητικό' });
+    expect(edited?.value).toBeNull();
+    expect(edited?.comparator).toBeNull();
+    // The schema forbids both on a categorical Measurement, so an editor that
+    // offered them must not be able to persist them.
+    expect(edited?.unit).toBeNull();
+    expect(edited?.referenceRange).toBeNull();
+  });
+
+  it('empties a row recorded as missing', () => {
+    const [edited] = rowsOf(
+      editRowMeasurement(session(), 'r1', {
+        status: 'missing',
+        value: 5,
+        comparator: '>',
+        textValue: 'x',
+        unit: 'mg/dL',
+        referenceRange: { kind: 'closed', min: 1, max: 2 },
+        categoricalReference: 'y',
+      }),
+    );
+
+    expect(edited).toMatchObject({
+      status: 'missing',
+      value: null,
+      comparator: null,
+      textValue: null,
+      categoricalReference: null,
+      // What the laboratory printed beside an unread value is still what it printed.
+      unit: 'mg/dL',
+      referenceRange: { kind: 'closed', min: 1, max: 2 },
+    });
+  });
+
+  it('leaves a conflict resolution that names the edited row standing', () => {
+    const conflict: Conflict = {
+      id: 'c1',
+      markerKey: 'glucose',
+      candidateRowIds: ['r1', 'r2'],
+      resolution: { kind: 'choose', rowId: 'r1' },
+    };
+    const before = session({
+      reportDrafts: [
+        draft({ rows: [row('r1', 'glucose'), row('r2', 'glucose')], conflicts: [conflict] }),
+      ],
+    });
+
+    const after = editRowMeasurement(before, 'r1', NUMERIC);
+
+    expect(after.reportDrafts[0]?.conflicts).toEqual([conflict]);
+  });
+
+  it('returns the same session for a row it does not hold', () => {
+    const before = session();
+
+    expect(editRowMeasurement(before, 'nope', NUMERIC)).toBe(before);
+  });
+});
+
+describe('confirmSamePerson', () => {
+  it('answers the D8 question and unblocks Confirm against an existing Profile', () => {
+    const existing = profile([
+      report('rep-1', { date: '2025-01-02', time: null, precision: 'day' }),
+    ]);
+    const before = session();
+    expect(canConfirm(before, existing)).toBe(false);
+
+    const after = confirmSamePerson(before, true);
+
+    expect(after.samePersonConfirmed).toBe(true);
+    expect(canConfirm(after, existing)).toBe(true);
+  });
+
+  it('withdraws the answer, and blocks Confirm again', () => {
+    const existing = profile([
+      report('rep-1', { date: '2025-01-02', time: null, precision: 'day' }),
+    ]);
+    const confirmed = confirmSamePerson(session(), true);
+
+    const withdrawn = confirmSamePerson(confirmed, null);
+
+    expect(withdrawn.samePersonConfirmed).toBeNull();
+    expect(canConfirm(withdrawn, existing)).toBe(false);
+  });
+
+  it('returns the same session when the answer is unchanged', () => {
+    const confirmed = confirmSamePerson(session(), true);
+
+    expect(confirmSamePerson(confirmed, true)).toBe(confirmed);
   });
 });

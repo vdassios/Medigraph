@@ -94,9 +94,12 @@ test('an ΑΗΦΥ document crosses attach, review, Confirm, storage, chart and e
   await expect(page.getByTestId('charts')).toHaveCount(0);
   expect(await storedProfile(page)).toBeNull();
 
-  // The island resolved a row's SourceRef through the evidence it is holding
-  // for this batch — the map it releases when the transaction ends.
-  await expect(page.getByTestId('evidence')).toHaveAttribute('data-kind', 'evidence');
+  // The island resolves a row's SourceRef through the evidence it is holding
+  // for this batch — the map it releases when the transaction ends. Since Task
+  // 4.2 the crop opens beside the row that asked for it, so the assertion asks
+  // for it too rather than expecting it on screen unbidden.
+  await page.getByTestId('inspect-source').first().click();
+  await expect(page.getByTestId('evidence').first()).toHaveAttribute('data-kind', 'evidence');
 
   // Confirm is the one irreversible action, and it stays shut until asked for.
   await expect(page.getByTestId('confirm')).toBeDisabled();

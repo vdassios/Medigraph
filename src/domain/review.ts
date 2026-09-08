@@ -211,6 +211,102 @@ export function approveUnknownMarker(session: ReviewSession, rowId: string): Rev
     : session;
 }
 
+/**
+ * The part of a row a user may rewrite: what was measured, not what it is.
+ *
+ * `label`, `markerKey` and `sourceRef` are deliberately outside it. Renaming
+ * the quantity is `reassignMarker`'s question, and a row that could be pointed
+ * at a different page while its value changed would make evidence unfalsifiable.
+ */
+export type MeasurementFields = Pick<
+  ParsedRow,
+  | 'status'
+  | 'value'
+  | 'comparator'
+  | 'textValue'
+  | 'unit'
+  | 'referenceRange'
+  | 'categoricalReference'
+>;
+
+/**
+ * Drop the fields a status cannot carry.
+ *
+ * D15 says a Measurement is numeric **or** categorical, and the persisted
+ * schema enforces it. A review screen offering both sets of inputs will
+ * eventually hand over both, so the contradiction is resolved here rather than
+ * at Confirm, where the only available answer would be to refuse the whole
+ * batch. A `missing` row keeps its unit and its reference range — what the
+ * laboratory printed beside a value nobody could read is still what it printed
+ * — while a categorical row keeps neither, because the schema forbids both.
+ */
+function consistent(fields: MeasurementFields): MeasurementFields {
+  if (fields.status === 'value') {
+    return { ...fields, textValue: null, categoricalReference: null };
+  }
+  if (fields.status === 'categorical') {
+    // D15 and the persisted schema agree: a categorical result is a printed
+    // string and nothing else, so it carries no number, no unit and no numeric
+    // range. Leaving a unit behind here would be caught only at Confirm, by a
+    // validator whose only available answer is to refuse the whole batch.
+    return { ...fields, value: null, comparator: null, unit: null, referenceRange: null };
+  }
+
+  return { ...fields, value: null, comparator: null, textValue: null, categoricalReference: null };
+}
+
+/**
+ * Correct one row's measurement, leaving its identity alone.
+ *
+ * This is the user overruling the parser about a value it read from their own
+ * document, which review exists to make possible: a misread decimal is worth
+ * more corrected than deleted. The row keeps its id, its marker key, its
+ * printed label, its `sourceRef` and its `flags` — a flag describes the parse
+ * that happened, not the value now standing, and erasing it would quietly
+ * remove the reason the row was worth looking at. What the screen shows beside
+ * a corrected row is the screen's business (Task 4.2).
+ *
+ * No conflict rebuild: the marker key cannot move through here, so no duplicate
+ * can appear or disappear, and a `choose` resolution naming this row still
+ * names it.
+ */
+export function editRowMeasurement(
+  session: ReviewSession,
+  rowId: string,
+  fields: MeasurementFields,
+): ReviewSession {
+  const measurement = consistent(fields);
+
+  return editDrafts(session, (draft) => {
+    if (!draft.rows.some((each) => each.id === rowId)) {
+      return draft;
+    }
+
+    return {
+      ...draft,
+      rows: draft.rows.map((row) => (row.id === rowId ? { ...row, ...measurement } : row)),
+    };
+  });
+}
+
+/**
+ * Answer D8: this batch belongs to the person whose history is already here.
+ *
+ * `null` withdraws the answer, which is what an unconfirmed session starts
+ * with, and `canConfirm` blocks on anything but `true` while the Profile holds
+ * Reports. The question is asked of the user and never of the document: its
+ * ΑΜΚΑ could answer it and is redacted at the D7 gate instead, because never
+ * processing a national id is worth more than a verified answer (ADR-0013).
+ */
+export function confirmSamePerson(
+  session: ReviewSession,
+  confirmed: boolean | null,
+): ReviewSession {
+  return session.samePersonConfirmed === confirmed
+    ? session
+    : { ...session, samePersonConfirmed: confirmed };
+}
+
 /** Drop one row from its draft, withdrawing its approval and rebuilding conflicts. */
 export function deleteRow(session: ReviewSession, rowId: string): ReviewSession {
   return editRow(session, rowId, false, (rows) => rows.filter((row) => row.id !== rowId));

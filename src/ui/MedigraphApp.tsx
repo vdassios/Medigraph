@@ -1,20 +1,15 @@
 import type { JSX } from 'preact';
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'preact/hooks';
-import {
-  canConfirm,
-  beginReview,
-  approveUnknownMarker,
-  resolveConflict,
-  resolveIdentifier,
-} from '../domain/review';
-import { applyProfileChange, buildProfileChange, setReportDate } from '../domain/profile';
+import { canConfirm, beginReview } from '../domain/review';
+import { applyProfileChange, buildProfileChange } from '../domain/profile';
 import { buildSeries } from '../domain/series';
-import type { ParsedRow, Profile, ReviewSession, Series, SourceRef } from '../domain/types';
+import type { Profile, Series, SourceRef } from '../domain/types';
 import { parseMedigraph, serialiseMedigraph } from '../io/fileFormat';
 import { routeFiles } from '../io/fileRouter';
 import { loadProfile, replaceProfile, saveProfile } from '../io/storage';
 import { appReducer, initialState, inspectSource, releaseEvidence } from './appState';
 import { FileDrop } from './FileDrop';
+import { ReviewTable } from './ReviewTable';
 import type { EvidenceLookup, EvidenceResource } from './appState';
 
 /**
@@ -32,10 +27,11 @@ import type { EvidenceLookup, EvidenceResource } from './appState';
  * Cancel, any failure and unmount — so a page crop can never outlive the review
  * that opened it.
  *
- * The regions below are Task 3.8's minimal shell, less the one Task 4.1 has
- * replaced: attach is now `FileDrop`, and review, charts and data management
- * are still placeholders for Tasks 4.2–4.5. What survives each replacement is
- * the order the calls happen in, and the fact that no child makes any of them.
+ * The regions below are Task 3.8's minimal shell, less the two that have been
+ * replaced: attach is `FileDrop` (4.1) and review is `ReviewTable` (4.2);
+ * charts and data management are still placeholders for Tasks 4.3–4.5. What
+ * survives each replacement is the order the calls happen in, and the fact
+ * that no child makes any of them.
  */
 
 export function MedigraphApp(): JSX.Element {
@@ -168,9 +164,9 @@ export function MedigraphApp(): JSX.Element {
       {error !== null && <p data-testid="error">{error}</p>}
 
       {review !== null && (
-        <Review
-          review={review}
-          profile={profile}
+        <ReviewTable
+          session={review}
+          existingProfile={profile}
           onChange={(next) => {
             dispatch({ type: 'review-updated', review: next });
           }}
@@ -184,163 +180,6 @@ export function MedigraphApp(): JSX.Element {
         <Charts profile={profile} series={series} onImport={(file) => void importProfile(file)} />
       )}
     </div>
-  );
-}
-
-/**
- * Every gate D6 and D7 name, one control each.
- *
- * Deliberately unstyled and ungrouped: this is the list of answers the user
- * owes before Confirm may run, and Task 4.2 turns it into a table. What the
- * slice proves is that no gate can be skipped, so each renders even when there
- * is nothing to answer.
- */
-function Review({
-  review,
-  profile,
-  onChange,
-  onInspectSource,
-  onConfirm,
-  onCancel,
-}: {
-  review: ReviewSession;
-  profile: Profile | null;
-  onChange: (session: ReviewSession) => void;
-  onInspectSource: (ref: SourceRef) => EvidenceLookup;
-  onConfirm: () => void;
-  onCancel: () => void;
-}): JSX.Element {
-  const unknownRows = review.reportDrafts.flatMap((draft) =>
-    draft.rows.filter(
-      (row) => row.markerKey.startsWith('x:') && !review.approvedUnknownRowIds.includes(row.id),
-    ),
-  );
-
-  return (
-    <section
-      data-testid="review"
-      // Surfaced so the walking slice can assert it from outside the app: a
-      // result carrying a different vocabulary is a different result, and
-      // nothing else in the DOM would show it.
-      data-registry-version={review.results.map((result) => result.registryVersion).join(',')}
-    >
-      {review.reportDrafts.map((draft) => (
-        <article key={draft.id} data-testid={`draft-${draft.sourceIds.join('+')}`}>
-          <p data-testid="draft-rows">{draft.rows.length}</p>
-          <Evidence rows={draft.rows} onInspectSource={onInspectSource} />
-          <p>
-            <span data-testid="draft-date">{draft.collectedAt?.date ?? ''}</span>{' '}
-            <button
-              type="button"
-              data-testid="confirm-date"
-              disabled={draft.dateConfirmed || draft.collectedAt === null}
-              onClick={() => {
-                if (draft.collectedAt !== null) {
-                  onChange(setReportDate(review, draft.id, draft.collectedAt));
-                }
-              }}
-            >
-              Επιβεβαίωση ημερομηνίας
-            </button>
-          </p>
-
-          {draft.conflicts
-            .filter((conflict) => conflict.resolution === null)
-            .map((conflict) => (
-              <button
-                key={conflict.id}
-                type="button"
-                data-testid={`resolve-conflict-${conflict.markerKey}`}
-                onClick={() => {
-                  const [rowId] = conflict.candidateRowIds;
-                  if (rowId !== undefined) {
-                    onChange(resolveConflict(review, conflict.id, { kind: 'choose', rowId }));
-                  }
-                }}
-              >
-                {conflict.markerKey}
-              </button>
-            ))}
-        </article>
-      ))}
-
-      {review.results.flatMap((result) =>
-        result.identifierCandidates
-          .filter((candidate) => review.identifierResolutions[candidate.id] === undefined)
-          .map((candidate) => (
-            <button
-              key={candidate.id}
-              type="button"
-              data-testid="redact-identifier"
-              onClick={() => {
-                onChange(resolveIdentifier(review, candidate.id, 'redacted'));
-              }}
-            >
-              {candidate.kind}
-            </button>
-          )),
-      )}
-
-      {unknownRows.map((row) => (
-        <button
-          key={row.id}
-          type="button"
-          data-testid="approve-unknown"
-          onClick={() => {
-            onChange(approveUnknownMarker(review, row.id));
-          }}
-        >
-          {row.label}
-        </button>
-      ))}
-
-      <p>
-        <button
-          type="button"
-          data-testid="confirm"
-          disabled={!canConfirm(review, profile)}
-          onClick={onConfirm}
-        >
-          Οριστικοποίηση
-        </button>{' '}
-        <button type="button" data-testid="cancel" onClick={onCancel}>
-          Ακύρωση
-        </button>
-      </p>
-    </section>
-  );
-}
-
-/**
- * What the review can show of the document a row came from.
- *
- * Every refusal is rendered rather than swallowed, because each says something
- * different to the person reading: a source whose evidence has been released is
- * not the same as an adapter that never had any, and a page outside the
- * document is a bug worth seeing rather than a crop worth guessing at. Task 4.2
- * turns this into the crop beside the row; what it must keep is asking the
- * island rather than holding the map.
- */
-function Evidence({
-  rows,
-  onInspectSource,
-}: {
-  rows: readonly ParsedRow[];
-  onInspectSource: (ref: SourceRef) => EvidenceLookup;
-}): JSX.Element | null {
-  const ref = rows.find((row) => row.sourceRef !== undefined)?.sourceRef;
-  if (ref === undefined) {
-    return null;
-  }
-
-  const found = onInspectSource(ref);
-
-  return (
-    <p data-testid="evidence" data-kind={found.kind}>
-      {found.kind === 'evidence'
-        ? `${found.resource.file.name} p${String(found.page)}`
-        : found.kind}
-    </p>
   );
 }
 
